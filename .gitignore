@@ -1,0 +1,13 @@
+node_modules/
+.nyc_output/
+.env
+restapi/auth.rest
+dist/
+
+run.bat
+env
+_env
+env_config/
+
+test/test_temp.js
+yk
