@@ -103,19 +103,19 @@ export const run=async()=>{
         console.log(`end real time data===============================`)
         throw error
     }
-    const id = setInterval(async()=>{
-        try {
-            utils.myLog("")
-            await check()
-        } catch (error) {
-            clearInterval(id)
-            console.log(error.message)
+    // const id = setInterval(async()=>{
+    //     try {
+    //         utils.myLog("")
+    //         await check()
+    //     } catch (error) {
+    //         clearInterval(id)
+    //         console.log(error.message)
 
-            const record = utils.removeProperty(store.getState(), "config")
-            await utils.sendIfttt(`${config.mode} - ${config.symbol} - ${error.message}`, JSON.stringify(record))
+    //         const record = utils.removeProperty(store.getState(), "config")
+    //         await utils.sendIfttt(`${config.mode} - ${config.symbol} - ${error.message}`, JSON.stringify(record))
 
-            throw error
-        }
-    }, config.intervalSecond * 1000)
+    //         throw error
+    //     }
+    // }, config.intervalSecond * 1000)
 }
 
