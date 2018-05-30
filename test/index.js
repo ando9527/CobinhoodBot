@@ -1,1 +1,2 @@
-import './ask'
+// import './ask'
+import './other/redux'
