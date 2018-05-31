@@ -14,6 +14,9 @@ export const setWOB = ({payload}) => {
   return { type: "SET_WOB", payload }
 }
 
+export const updateWOB = ({payload}) => {
+  return { type: "UPDATE_WOB", payload }
+}
 
 
 const connect = () => {
@@ -51,10 +54,14 @@ const connect = () => {
     // console.log(data)
     const {h:header, d:orderBook} = JSON.parse(data)
     const status = header[2]
-    if (status === 's') store.dispatch(updateWOB({payload:zipOrderBook(orderBook)}));
-    // if (status === "u") console.log(data);
+    if (status === 's') store.dispatch(setWOB({payload:zipOrderBook(orderBook)}));
+    if (status === "u")store.dispatch(updateWOB({payload:zipOrderBook(orderBook)}))
+     if( status==='s')console.log('ssssssssssssssssssssssssssssssssssss');
+     if(status==="u") console.log('uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
+     
+     
     
-    
+    // ​​​​​{"h":["order-book.TRX-ETH.1E-7","2","u"],"d":{"bids":[],"asks":[["0.0001113","-1","-1229.268"]]}}​​​​​
     
   })
 }
@@ -84,11 +91,9 @@ export const startSync=()=>{
 
 const zipOrderBook=(orderBook)=>{
   const newAsk = orderBook.asks.map(a=>Object.assign({},{price:parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2])}))
-  const newBid = orderBook.asks.map(a=>Object.assign({},{price:parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2])}))
+  const newBid = orderBook.bids.map(a=>Object.assign({},{price:parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2])}))
   return {bids: newBid, asks: newAsk}
 }
 
 startSync()
-
-
 
