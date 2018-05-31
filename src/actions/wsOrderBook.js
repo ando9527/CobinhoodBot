@@ -77,8 +77,8 @@ export const startSync=()=>{
 }
 
 const zipOrderBook=(orderBook)=>{
-  const newAsk = orderBook.asks.map(a=>{price:parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2])})
-  const newBid = orderBook.bids.map(a=>{price:parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2])})
+  const newAsk = orderBook.asks.map(a=>Object.assign({},{price:parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2])}))
+  const newBid = orderBook.asks.map(a=>Object.assign({},{price:parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2])}))
   return {bids: newBid, asks: newAsk}
 }
 
