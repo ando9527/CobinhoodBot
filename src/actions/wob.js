@@ -8,16 +8,15 @@ let connected = false
 let connecting = false
 
 /**
- * set wsOrderBook store 
+ * set wsOrderBook store
  */
-export const setWOB = ({payload}) => {
-  return { type: "SET_WOB", payload }
+export const setWOB = ({ payload }) => {
+  return { type: 'SET_WOB', payload }
 }
 
-export const updateWOB = ({payload}) => {
-  return { type: "UPDATE_WOB", payload }
+export const updateWOB = ({ payload }) => {
+  return { type: 'UPDATE_WOB', payload }
 }
-
 
 const connect = () => {
   if (connecting || connected) return
@@ -38,7 +37,9 @@ const connect = () => {
 
     client.send(
       JSON.stringify({
-"action":"subscribe","type":"order-book","trading_pair_id":config.symbol
+        action: 'subscribe',
+        type: 'order-book',
+        trading_pair_id: config.symbol,
       }),
     )
   })
@@ -51,27 +52,19 @@ const connect = () => {
   })
 
   client.on('message', function(data) {
-    // console.log(data)
-    const {h:header, d:orderBook} = JSON.parse(data)
+    const { h: header, d: orderBook } = JSON.parse(data)
     const status = header[2]
-    if (status === 's') store.dispatch(setWOB({payload:zipOrderBook(orderBook)}));
-    if (status === "u")store.dispatch(updateWOB({payload:zipOrderBook(orderBook)}))
-     if( status==='s')console.log('ssssssssssssssssssssssssssssssssssss');
-     if(status==="u") console.log('uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
-     
-     
-    
-    // ​​​​​{"h":["order-book.TRX-ETH.1E-7","2","u"],"d":{"bids":[],"asks":[["0.0001113","-1","-1229.268"]]}}​​​​​
-    
+    if (status === 's') store.dispatch(setWOB({ payload: zipOrderBook(orderBook) }))
+    if (status === 'u') store.dispatch(updateWOB({ payload: zipOrderBook(orderBook) }))
   })
 }
 
-export const startSync=()=>{
+export const startSync = () => {
   setInterval(function() {
     if (connected) return
     connect()
   }, 3500)
-  
+
   /**
    * require ping every 20 sec or disconnection
    */
@@ -79,21 +72,24 @@ export const startSync=()=>{
     if (!connected) return
     client.send(
       JSON.stringify({
-        "action":"ping"
+        action: 'ping',
       }),
     )
   }, 20000)
 
-  setInterval(async() => {
-    console.log(store.getState().wob);   
-  },3000)
+  setInterval(async () => {
+    console.log(store.getState().wob)
+  }, 3000)
 }
 
-const zipOrderBook=(orderBook)=>{
-  const newAsk = orderBook.asks.map(a=>Object.assign({},{price:parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2])}))
-  const newBid = orderBook.bids.map(a=>Object.assign({},{price:parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2])}))
-  return {bids: newBid, asks: newAsk}
+const zipOrderBook = orderBook => {
+  const newAsk = orderBook.asks.map(a =>
+    Object.assign({}, { price: parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2]) }),
+  )
+  const newBid = orderBook.bids.map(a =>
+    Object.assign({}, { price: parseFloat(a[0]), count: parseFloat(a[1]), size: parseFloat(a[2]) }),
+  )
+  return { bids: newBid, asks: newAsk }
 }
 
 startSync()
-

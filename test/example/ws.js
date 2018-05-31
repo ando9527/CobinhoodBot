@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import config from '../../src/config'
 dotenv.load()
 const WS = require('ws')
 let client = null
@@ -9,12 +10,6 @@ const connect = () => {
   if (connecting || connected) return
   connecting = true
   console.log('connecting')
-  // client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
-  //   headers: {
-  //     'authorization': process.env.BOT_API_SECRET,
-  //     // "nonce": new Date()*1000000 ,
-  //   },
-  // })
   client = new WS('wss://ws.cobinhood.com/v2/ws')
 
   client.on('open', function(data) {
@@ -24,7 +19,9 @@ const connect = () => {
 
     client.send(
       JSON.stringify({
-"action":"subscribe","type":"order-book","trading_pair_id":"LYM-ETH"
+        action: 'subscribe',
+        type: 'order-book',
+        trading_pair_id: config.symbol,
       }),
     )
   })
