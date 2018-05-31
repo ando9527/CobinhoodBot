@@ -6,11 +6,13 @@ import {opPriceReducer} from './opPrice'
 import {sellOrderReducer} from './sellOrder'
 import {orderIdReducer} from './orderId'
 import { configReducer } from './config';
+import {wobReducer} from './wob'
 
 const rootReducer = combineReducers({
     buyOrder: buyOrderReducer,
     balance: balanceReducer,
     orderBook: orderBookReducer,
+    wob: wobReducer,
     opPrice: opPriceReducer,
     sellOrder: sellOrderReducer,
     orderId: orderIdReducer,

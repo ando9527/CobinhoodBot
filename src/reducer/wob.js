@@ -1,8 +1,8 @@
 
 
-export function wsOrderBookReducer(state = null, action) {
+export function wobReducer(state = null, action) {
   switch (action.type) {
-      case "UPDATE_ORDER_BOOK":
+      case "SET_WOB":
       {
           return action.payload
       }    
