@@ -152,6 +152,7 @@ export const run = async () => {
       await runSellOrder()
     }
   } catch (error) {
+    
     console.log(`Global error handle: ${error}`);
     process.exit(1)
     

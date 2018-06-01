@@ -1,5 +1,7 @@
 import dotenv from 'dotenv'
 import config from '../../src/config'
+import store from '../../src/reducer'
+
 dotenv.load()
 const WS = require('ws')
 let client = null
@@ -34,7 +36,11 @@ const connect = () => {
   })
 
   client.on('message', function(data) {
-    console.log('message data', data)
+    const { h: header, d: orderBook } = JSON.parse(data)
+    const status = header[2]
+    if(status==="error") throw new Error(`public ws error:${data}`)
+    console.log(data);
+    
   })
 }
 
@@ -54,3 +60,13 @@ setInterval(function() {
     }),
   )
 }, 20000)
+
+try {
+  connect()
+} catch (error) {
+  console.log('got it============');
+  console.log(error);
+  
+  
+  
+}

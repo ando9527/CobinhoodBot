@@ -31,7 +31,7 @@ const connect = () => {
 
     client.send(
       JSON.stringify({
-        action: 'subscribe',
+        action: 'subscribes',
         type: 'order-book',
         trading_pair_id: config.symbol,
       }),
