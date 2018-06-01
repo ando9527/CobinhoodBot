@@ -4,6 +4,7 @@ import utils from './utils'
 import store from './reducer'
 import lib from './lib'
 import askLib from './askLib'
+import { startSync } from './actions/wob';
 
 export const initial = async () => {
   await askLib.verifyConfig()
@@ -129,6 +130,9 @@ const runSellOrder = async () => {
     await initial()
     await lib.updateData()
     await check()
+    await startSync()
+
+    
   } catch (error) {
     const record = utils.removeProperty(store.getState(), 'config')
     console.log('real time data==================================')
@@ -139,12 +143,19 @@ const runSellOrder = async () => {
 }
 
 export const run = async () => {
-  if(config.mode==="BID"){
-    await runBuyOrder()
+  try {
+    if(config.mode==="BID"){
+      await runBuyOrder()
+    }
+  
+    if(config.mode==="ASK"){
+      await runSellOrder()
+    }
+  } catch (error) {
+    console.log(`Global error handle: ${error}`);
+    process.exit(1)
+    
   }
 
-  if(config.mode==="ASK"){
-    await runSellOrder()
-  }
   
 }

@@ -13,11 +13,7 @@ export function wobReducer(state = null, action) {
   }
 }
 
-export const wobMaker=({state, orderBook})=>{
-  // console.log(state);
-  // console.log(orderBook);
-  
-  
+export const wobMaker=({state, orderBook})=>{ 
   const {asks, bids} = state
   const {asks: uasks, bids: ubids} = orderBook
   let newAsks = []

@@ -21,17 +21,11 @@ export const updateWOB = ({ payload }) => {
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  console.log('connecting')
-  // client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
-  //   headers: {
-  //     'authorization': process.env.BOT_API_SECRET,
-  //     // "nonce": new Date()*1000000 ,
-  //   },
-  // })
+  console.log('public ws connecting')
   client = new WS('wss://ws.cobinhood.com/v2/ws')
 
   client.on('open', function(data) {
-    console.log('WS opened')
+    console.log('public ws opened')
     connecting = false
     connected = true
 
@@ -45,7 +39,7 @@ const connect = () => {
   })
 
   client.on('close', function(data) {
-    console.log('WS close')
+    console.log('public ws close')
     if (data) console.log(JSON.parse(data))
     connecting = false
     connected = false
@@ -56,6 +50,7 @@ const connect = () => {
     const status = header[2]
     if (status === 's') store.dispatch(setWOB({ payload: zipOrderBook(orderBook) }))
     if (status === 'u') store.dispatch(updateWOB({ payload: zipOrderBook(orderBook) }))
+    if(status==="error") throw new Error(`public ws error:${data}`)
   })
 }
 
@@ -76,10 +71,6 @@ export const startSync = () => {
       }),
     )
   }, 20000)
-
-  setInterval(async () => {
-    console.log(store.getState().wob)
-  }, 3000)
 }
 
 const zipOrderBook = orderBook => {
@@ -92,4 +83,4 @@ const zipOrderBook = orderBook => {
   return { bids: newBid, asks: newAsk }
 }
 
-startSync()
+
