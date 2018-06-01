@@ -71,32 +71,38 @@ const connect = () => {
   
 // }
 
-// const test = () => {
-//   return new Promise((res,rej)=>{
-//     setInterval(()=>{
-//       console.log('yo');
-//       // rej('errrrrrrrrrrr')
-//     }, 1000)
-//   })
+const test = () => {
+  return new Promise((res,rej)=>{
+    setInterval(()=>{
+      console.log('yo');
+      // rej('errrrrrrrrrrr')
+      
+    }, 2000)
+    res()
+  })
 
-// }
+}
 
-// const run = async() => {
-//   try {
-//     await test()
-//   } catch (e) {
-//     throw (e)
+const run = async() => {
+  try {
+    await test()
+  } catch (e) {
+    throw (e)
+  }
     
+  try {
+    console.log('second');
     
-//   }
+  } catch (error) {
     
-// }
+  }
+}
 
 
-// run()
-// .catch(err=>{
-//   console.log('got itttttttttttttt');
+run()
+.catch(err=>{
+  console.log('got itttttttttttttt');
   
-//   console.log(err)
-//   process.exit(1)
-// })
+  console.log(err)
+  process.exit(1)
+})

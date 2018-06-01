@@ -54,6 +54,7 @@ const connect = () => {
       
       if(status==="error") rej(`public ws error:${data}`)
     })
+    res('SUCCESS')
   })
   
 }
@@ -64,6 +65,7 @@ export const startSync = () => {
       if (connected) return
       try {
         await connect()
+        
       } catch (error) {
         rej(error)
       }
@@ -81,6 +83,7 @@ export const startSync = () => {
         }),
       )
     }, 20000)
+    res('SUCCESS')
   })
 }
 

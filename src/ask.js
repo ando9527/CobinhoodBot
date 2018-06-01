@@ -94,69 +94,47 @@ export const check = async () => {
   await lib.modifyOrder({ price: priceModified, order: sellOrder })
 }
 
-const runBuyOrder = async () => {
-  try {
-    await initial()
-    await lib.updateData()
-    await check()
-  } catch (error) {
-    const record = utils.removeProperty(store.getState(), 'config')
-    console.log('real time data==================================')
-    console.log(JSON.stringify(record))
-    console.log(`end real time data===============================`)
-    throw error
-  }
-  const id = setInterval(async () => {
-    try {
-      utils.myLog('')
-      await check()
-    } catch (error) {
-      clearInterval(id)
-      console.log(error.message)
-
-      const record = utils.removeProperty(store.getState(), 'config')
-      await utils.sendIfttt(
-        `${config.mode} - ${config.symbol} - ${error.message}`,
-        JSON.stringify(record),
-      )
-
-      throw error
-    }
-  }, config.intervalSecond * 1000)
-}
-
 const runSellOrder = async () => {
-  try {
-    await initial()
-    await lib.updateData()
-    await check()
-    await startSync()
+  return new Promise(async(res,rej)=>{
+    try {
+      await initial()
+      await lib.updateData()
+      await check()
+      await startSync()
+  
+      
+    } catch (error) {
+      const record = utils.removeProperty(store.getState(), 'config')
+      console.log('real time data==================================')
+      console.log(JSON.stringify(record))
+      console.log(`end real time data===============================`)
+      rej(error)
+    }
+  
+    const id = setInterval(async () => {
+      try {
+        utils.myLog('')
+        await check()
+        
+        
+      } catch (error) {
+        clearInterval(id)
+        console.log(error.message)
+  
+        const record = utils.removeProperty(store.getState(), 'config')
+        await utils.sendIfttt(
+          `${config.mode} - ${config.symbol} - ${error.message}`,
+          JSON.stringify(record),
+        )
+  
+        rej(error)
+      }
+    }, config.intervalSecond * 100)
+  })
 
-    
-  } catch (error) {
-    const record = utils.removeProperty(store.getState(), 'config')
-    console.log('real time data==================================')
-    console.log(JSON.stringify(record))
-    console.log(`end real time data===============================`)
-    throw error
-  }
 }
 
 export const run = async () => {
-  try {
-    if(config.mode==="BID"){
-      await runBuyOrder()
-    }
-  
-    if(config.mode==="ASK"){
-      await runSellOrder()
-    }
-  } catch (error) {
-    
-    console.log(`Global error handle: ${error}`);
-    process.exit(1)
-    
-  }
+  await runSellOrder()
 
-  
 }
