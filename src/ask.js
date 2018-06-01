@@ -99,7 +99,6 @@ const runSellOrder = async () => {
     try {
       await initial()
       await lib.updateData()
-      // await check()
       await startSync()
   
       

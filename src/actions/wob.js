@@ -63,7 +63,6 @@ const connect = () => {
       const { h: header, d: dataPayload } = JSON.parse(data)
       const status = header[2]
       const type = header[0]
-      console.log(data);
       
       if (status === 's') store.dispatch(setWOB({ payload: zipOrderBook(dataPayload) }))
       if (status === 'u' && type.startsWith('order-book')) store.dispatch(updateWOB({ payload: zipOrderBook(dataPayload) }))

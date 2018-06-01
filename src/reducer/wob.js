@@ -1,3 +1,5 @@
+import {  sortOrder } from "../utils/utils";
+
 export function wobReducer(state = null, action) {
   switch (action.type) {
     case 'SET_WOB': {
@@ -13,37 +15,34 @@ export function wobReducer(state = null, action) {
   }
 }
 
-export const wobMaker=({state, orderBook})=>{ 
-  const {asks, bids} = state
-  const {asks: uasks, bids: ubids} = orderBook
-  let newAsks = []
-  if (uasks.length===0) newAsks = asks
-  for (let item of asks){
-    for (let j of uasks){
+export const ordersMaker=({orders, uOrders})=>{
+  let newOrders = []
+  let flag = null
+  if (uOrders.length===0)return orders
+
+  for (let item of orders){
+    for (let j of uOrders){
       if(item.price===j.price){
         const count = item.count+j.count
         const size = item.size+j.size
-        if(count!==0) newAsks.push(Object.assign({},{price:item.price, count, size}))
+        if(count!==0) newOrders.push(Object.assign({},{price:item.price, count, size}))
+        flag = "DONE"
       }else{
-        newAsks.push(item)
-      }
-    }
-  }     
-  let newBids = []
-  if (ubids.length===0) newBids = bids
-  for (let item of bids){
-    for (let j of ubids){
-      if(item.price===j.price){
-        const count = item.count+j.count
-        const size = item.size+j.size
-        if(count!==0) newBids.push(Object.assign({},{price: item.price, count, size}))
-      }else{
-        
-        newBids.push(item)
+        newOrders.push(item)
       }
     }
   }  
-  
+  if (flag===null) newOrders.push(uOrders[0])
+  return newOrders
+}
+
+export const wobMaker=({state, orderBook})=>{ 
+  const {asks, bids} = state
+  const {asks: uasks, bids: ubids} = orderBook
+  const newAsks = ordersMaker({orders:asks, uOrders: uasks})
+  newAsks.sort(sortOrder)
+  const newBids = ordersMaker({orders: bids, uOrders:ubids})  
+  newBids.sort(sortOrder).reverse()
   return Object.assign({}, {asks:newAsks, bids: newBids})
 
 }
