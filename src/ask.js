@@ -4,7 +4,7 @@ import utils from './utils'
 import store from './reducer'
 import lib from './lib'
 import askLib from './askLib'
-import { startSync } from './actions/wob';
+import { startSync, wsModifyOrder } from './actions/wob';
 
 export const initial = async () => {
   await askLib.verifyConfig()
@@ -91,7 +91,8 @@ export const check = async () => {
   // will throw error if state machine logic is wrong
   askLib.checkUnderCost({ price: priceModified })
   lib.checkProfitLimitPercentage({ profitPercentage: mepp })
-  await lib.modifyOrder({ price: priceModified, order: sellOrder })
+  // await lib.modifyOrder({ price: priceModified, order: sellOrder })
+  await wsModifyOrder({ price: priceModified, order: sellOrder })
 }
 
 const runSellOrder = async () => {
