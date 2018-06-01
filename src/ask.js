@@ -115,6 +115,8 @@ const runSellOrder = async () => {
       console.log('real time data==================================')
       console.log(JSON.stringify(record))
       console.log(`end real time data===============================`)
+      console.log(error);
+      
       process.exit(1)
     }
   

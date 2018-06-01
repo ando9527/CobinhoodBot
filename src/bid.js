@@ -98,32 +98,38 @@ export const check=async()=>{
 
 
 export const run=async()=>{
+  return new Promise(async(res,rej)=>{
     try {
-        await initial()
-        await check()
-    } catch (error) {
-        const record = utils.removeProperty(store.getState(), "config")
-        console.log('real time data==================================')
-        console.log(JSON.stringify(record))
-        console.log(`end real time data===============================`)
-        throw error
-    }
+      await initial()
+      await check()
+  } catch (error) {
+      const record = Object.assign({},store.getState(),{config:null})
+      console.log('real time data==================================')
+      console.log(JSON.stringify(record))
+      console.log(`end real time data===============================`)
+      console.log(error);
+      
+      process.exit(1)
+  }
 
-    const id = setInterval(async()=>{
-        try {
-            utils.myLog("")
-            await check()
-            
-        } catch (error) {
-            clearInterval(id)
-            console.log(error.message)
+  const id = setInterval(async()=>{
+      try {
+          utils.myLog("")
+          await check()
+          
+      } catch (error) {
+          clearInterval(id)
+          console.log(error.message)
 
-            const record = utils.removeProperty(store.getState(), "config")
-            await utils.sendIfttt(`${config.mode} - ${config.symbol} - ${error.message}`, JSON.stringify(record))
-            
-            throw error
-        }
+          const record = Object.assign({},store.getState(),{config:null})
+          await utils.sendIfttt(`${config.mode} - ${config.symbol} - ${error.message}`, JSON.stringify(record))
+          
+          rej(error)
+      }
     }, config.intervalSecond * 1000)
+    res("SUCCESS")
+  })
+
 }
 
 
