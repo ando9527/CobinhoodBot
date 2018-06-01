@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
-import config from '../../src/config'
-import store from '../../src/reducer'
+import config from '../config'
+import store from '../reducer'
 dotenv.load()
 const WS = require('ws')
 let client = null
@@ -8,62 +8,69 @@ let connected = false
 let connecting = false
 
 const connect = () => {
-  if (connecting || connected) return
-  connecting = true
-  console.log('private ws connecting')
-  client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
-    headers: {
-      'authorization': process.env.BOT_API_SECRET,
-      // "nonce": new Date()*1000000 ,
-    },
+  return new Promise((res,rej)=>{
+    if (connecting || connected) res()
+    connecting = true
+    console.log('private ws connecting')
+    client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
+      headers: {
+        'authorization': process.env.BOT_API_SECRET,
+        // "nonce": new Date()*1000000 ,
+      },
+    })
+  
+    client.on('open', function(data) {
+      console.log('private ws opened')
+      connecting = false
+      connected = true
+  
+      client.send(
+        JSON.stringify({
+          action: 'subscribe',
+          type: 'trade',
+          trading_pair_id: config.symbol,
+        }),
+      )
+    })
+  
+    client.on('close', function(data) {
+      console.log('private ws  close')
+      if (data) console.log(JSON.parse(data))
+      connecting = false
+      connected = false
+    })
+  
+    client.on('message', function(data) {
+      console.log(`private ws message: ${data}`)
+      const {h:header} = JSON.parse(data)
+      const status = header[2]
+      if(status==="error") rej(`private ws error:${data}`)
+    })
   })
-
-  client.on('open', function(data) {
-    console.log('private ws opened')
-    connecting = false
-    connected = true
-
-    client.send(
-      JSON.stringify({
-        action: 'subscribe',
-        type: 'trade',
-        trading_pair_id: config.symbol,
-      }),
-    )
-  })
-
-  client.on('close', function(data) {
-    console.log('private ws  close')
-    if (data) console.log(JSON.parse(data))
-    connecting = false
-    connected = false
-  })
-
-  client.on('message', function(data) {
-    console.log(`private ws message: ${data}`)
-    const {h:header} = JSON.parse(data)
-    const status = header[2]
-    if(status==="error") throw new Error(`private ws error:${data}`)
-  })
+  
 }
 
-setInterval(function() {
-  if (connected) return
-  connect()
-}, 3500)
+export const startPrivateWS = async() => {
+    return new Promise(async(res,rej)=>{
+      setInterval(function() {
+        if (connected) return
+        try {
+          await connect()
+        } catch (error) {
+          rej(error)
+        }
+        
+      }, 3500)
 
-/**
- * require ping every 20 sec or disconnection
- */
-export const keepConnection = async() => {
-  setInterval(function() {
-    if (!connected) return
-    client.send(
-      JSON.stringify({
-        "action":"ping"
-      }),
-    )
-  }, 20000)
+      setInterval(function() {
+        if (!connected) return
+        client.send(
+          JSON.stringify({
+            "action":"ping"
+          }),
+        )
+      }, 20000)
+    })
 }
 
 

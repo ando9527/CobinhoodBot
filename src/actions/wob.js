@@ -19,58 +19,69 @@ export const updateWOB = ({ payload }) => {
 }
 
 const connect = () => {
-  if (connecting || connected) return
-  connecting = true
-  console.log('public ws connecting')
-  client = new WS('wss://ws.cobinhood.com/v2/ws')
-
-  client.on('open', function(data) {
-    console.log('public ws opened')
-    connecting = false
-    connected = true
-
-    client.send(
-      JSON.stringify({
-        action: 'subscribes',
-        type: 'order-book',
-        trading_pair_id: config.symbol,
-      }),
-    )
+  return new Promise((res,rej)=>{
+    if (connecting || connected) res()
+    connecting = true
+    console.log('public ws connecting')
+    client = new WS('wss://ws.cobinhood.com/v2/ws')
+  
+    client.on('open', function(data) {
+      console.log('public ws opened')
+      connecting = false
+      connected = true
+  
+      client.send(
+        JSON.stringify({
+          action: 'subscribe',
+          type: 'order-book',
+          trading_pair_id: config.symbol,
+        }),
+      )
+    })
+  
+    client.on('close', function(data) {
+      console.log('public ws close')
+      if (data) console.log(JSON.parse(data))
+      connecting = false
+      connected = false
+    })
+  
+    client.on('message', function(data) {
+      const { h: header, d: orderBook } = JSON.parse(data)
+      const status = header[2]
+      if (status === 's') store.dispatch(setWOB({ payload: zipOrderBook(orderBook) }))
+      if (status === 'u') store.dispatch(updateWOB({ payload: zipOrderBook(orderBook) }))
+      
+      if(status==="error") rej(`public ws error:${data}`)
+    })
   })
-
-  client.on('close', function(data) {
-    console.log('public ws close')
-    if (data) console.log(JSON.parse(data))
-    connecting = false
-    connected = false
-  })
-
-  client.on('message', function(data) {
-    const { h: header, d: orderBook } = JSON.parse(data)
-    const status = header[2]
-    if (status === 's') store.dispatch(setWOB({ payload: zipOrderBook(orderBook) }))
-    if (status === 'u') store.dispatch(updateWOB({ payload: zipOrderBook(orderBook) }))
-    if(status==="error") throw new Error(`public ws error:${data}`)
-  })
+  
 }
 
 export const startSync = () => {
-  setInterval(function() {
-    if (connected) return
-    connect()
-  }, 3500)
-
-  /**
-   * require ping every 20 sec or disconnection
-   */
-  setInterval(function() {
-    if (!connected) return
-    client.send(
-      JSON.stringify({
-        action: 'ping',
-      }),
-    )
-  }, 20000)
+  return new Promise((res,rej)=>{
+    setInterval(async()=> {
+      if (connected) return
+      try {
+        await connect()
+      } catch (error) {
+        rej(error)
+      }
+      
+    }, 3500)
+  
+    /**
+     * require ping every 20 sec or disconnection
+     */
+    setInterval(()=> {
+      if (!connected) return
+      client.send(
+        JSON.stringify({
+          action: 'ping',
+        }),
+      )
+    }, 20000)
+  })
 }
 
 const zipOrderBook = orderBook => {

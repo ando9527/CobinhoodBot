@@ -44,29 +44,59 @@ const connect = () => {
   })
 }
 
-setInterval(function() {
-  if (connected) return
-  connect()
-}, 3500)
+// setInterval(function() {
+//   if (connected) return
+//   connect()
+// }, 3500)
 
-/**
- * require ping every 20 sec or disconnection
- */
-setInterval(function() {
-  if (!connected) return
-  client.send(
-    JSON.stringify({
-      "action":"ping"
-    }),
-  )
-}, 20000)
+// /**
+//  * require ping every 20 sec or disconnection
+//  */
+// setInterval(function() {
+//   if (!connected) return
+//   client.send(
+//     JSON.stringify({
+//       "action":"ping"
+//     }),
+//   )
+// }, 20000)
 
-try {
-  connect()
-} catch (error) {
-  console.log('got it============');
-  console.log(error);
+// try {
+//   connect()
+// } catch (error) {
+//   console.log('got it============');
+//   console.log(error);
   
   
   
-}
+// }
+
+// const test = () => {
+//   return new Promise((res,rej)=>{
+//     setInterval(()=>{
+//       console.log('yo');
+//       // rej('errrrrrrrrrrr')
+//     }, 1000)
+//   })
+
+// }
+
+// const run = async() => {
+//   try {
+//     await test()
+//   } catch (e) {
+//     throw (e)
+    
+    
+//   }
+    
+// }
+
+
+// run()
+// .catch(err=>{
+//   console.log('got itttttttttttttt');
+  
+//   console.log(err)
+//   process.exit(1)
+// })
