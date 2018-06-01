@@ -110,14 +110,12 @@ const runSellOrder = async () => {
       await initial()
       await lib.updateData()
       await startSync()
-  
-      
     } catch (error) {
-      const record = utils.removeProperty(store.getState(), 'config')
+      const record = Object.assign({},store.getState(),{config:null})
       console.log('real time data==================================')
       console.log(JSON.stringify(record))
       console.log(`end real time data===============================`)
-      rej(error)
+      process.exit(1)
     }
   
     const id = setInterval(async () => {
@@ -129,6 +127,7 @@ const runSellOrder = async () => {
         rej(error)
       }
     }, 1000)
+    res("SUCCESS")
   })
 
 }

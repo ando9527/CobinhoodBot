@@ -6,9 +6,10 @@ import { sendIfttt } from './utils/utils';
 import config from './config'
 
 bot.run()
-.catch(async(err)=>{
-  console.log(`Global Error ${err}`)
-  const record = utils.removeProperty(store.getState(), 'config')
+.catch(async(error)=>{
+  console.log(`Global Error ${error}`)
+  console.log(store.getState());
+  const record = Object.assign({},store.getState(),{config:null})
   await sendIfttt(
     `${config.mode} - ${config.symbol} - ${error.message}`,
     JSON.stringify(record),
