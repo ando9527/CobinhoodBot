@@ -99,7 +99,7 @@ const runSellOrder = async () => {
     try {
       await initial()
       await lib.updateData()
-      await check()
+      // await check()
       await startSync()
   
       
@@ -115,12 +115,15 @@ const runSellOrder = async () => {
       try {
         utils.myLog('')
         await check()
+        // console.log(JSON.stringify(store.getState()));
+        
+        
+        
         
         
       } catch (error) {
         clearInterval(id)
         console.log(error.message)
-  
         const record = utils.removeProperty(store.getState(), 'config')
         await utils.sendIfttt(
           `${config.mode} - ${config.symbol} - ${error.message}`,

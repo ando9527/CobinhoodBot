@@ -1,13 +1,40 @@
 import test from 'ava'
 import { wobMaker } from '../src/reducer/wob';
+import store from '../src/reducer';
+import { updateData } from '../src/lib/lib';
+import { zipOrder } from '../src/actions/wob';
 test.serial('wobMaker', async t => {
 
-  const state ={bids: [{ price: 0.0001299, count: 5, size: 3000 }], asks: [ { price: 0.0001299, count: 5, size: 3000 } ] }
-  const orderBook ={bids: [], asks: [ { price: 0.0001299, count: -1, size: -1430 } ] }
-  
-  const data = wobMaker({state, orderBook})
-  const ans = { asks: [ { price: 0.0001299, count: 4, size: 1570 } ],
-                bids: [ { price: 0.0001299, count: 5, size: 3000 } ] }
-  t.deepEqual(data, ans )
-  
+  const state = { bids: [{ price: 0.0001299, count: 5, size: 3000 }], asks: [{ price: 0.0001299, count: 5, size: 3000 }] }
+  const orderBook = { bids: [], asks: [{ price: 0.0001299, count: -1, size: -1430 }] }
+
+  const data = wobMaker({ state, orderBook })
+  const ans = {
+    asks: [{ price: 0.0001299, count: 4, size: 1570 }],
+    bids: [{ price: 0.0001299, count: 5, size: 3000 }]
+  }
+  t.deepEqual(data, ans)
+
+})
+
+
+test.serial('zipOrder', async t => {
+  const data = ["9c105d00-ecdc-4b81-9722-456b820c24bf","1527806905810","","ABT-ETH","partially_filled","modified","ask","0.0016099","0.0016174305555556","86.8","72"]
+  const res = zipOrder(data)
+  const ans = {
+    id: '9c105d00-ecdc-4b81-9722-456b820c24bf',
+    trading_pair_id: 'ABT-ETH',
+    side: 'ask',
+    // type: 'limit',
+    price: 0.0016099,
+    size: 86.8,
+    filled: 72,
+    state: 'partially_filled',
+    timestamp: 1527806905810,
+    eq_price: 0.0016174305555556,
+    event: 'modified'
+    // completed_at: null
+  }
+
+  t.deepEqual(res, ans)
 })

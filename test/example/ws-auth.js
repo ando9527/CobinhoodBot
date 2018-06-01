@@ -26,7 +26,15 @@ const connect = () => {
     client.send(
       JSON.stringify({
         action: 'subscribe',
-        type: 'trade',
+        type: 'order',
+        trading_pair_id: config.symbol,
+      }),
+    )
+
+    client.send(
+      JSON.stringify({
+        action: 'subscribe',
+        type: 'order-book',
         trading_pair_id: config.symbol,
       }),
     )
@@ -64,23 +72,23 @@ setInterval(function() {
 /**
  * require ping every 20 sec or disconnection
  */
-setInterval(function() {
-  if (!connected) return
-  const {sellOrder, orderBook} = store.getState()
-  client.send(
+// setInterval(function() {
+//   if (!connected) return
+//   const {sellOrder, orderBook} = store.getState()
+//   client.send(
     
-    JSON.stringify({
-      "action": "modify_order",
-      "type": "0",    // Type enum above
-      "order_id": `${config.sellOrderId}`,
-      "price": `${0.0015899}`,
-      "size": `${86.8}`,
-      // "stop_price": "",        // mandatory for stop/stop-limit order
-      // "trailing_distance": "", // mandatory for trailing stop order
-      "id": `modify-order-${config.sellOrderId}`
-    }),
-  )
-}, 5000)
+//     JSON.stringify({
+//       "action": "modify_order",
+//       "type": "0",    // Type enum above
+//       "order_id": `${config.sellOrderId}`,
+//       "price": `${0.0015899}`,
+//       "size": `${86.8}`,
+//       // "stop_price": "",        // mandatory for stop/stop-limit order
+//       // "trailing_distance": "", // mandatory for trailing stop order
+//       "id": `modify-order-${config.sellOrderId}`
+//     }),
+//   )
+// }, 5000)
 
 
 // ​​​​​message data {"h":["","2","error","4005","invalid_payload"],"d":[]}​​​​​

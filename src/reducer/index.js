@@ -11,7 +11,7 @@ import {wobReducer} from './wob'
 const rootReducer = combineReducers({
     buyOrder: buyOrderReducer,
     balance: balanceReducer,
-    orderBook: orderBookReducer,
+    orderBook: wobReducer,
     wob: wobReducer,
     opPrice: opPriceReducer,
     sellOrder: sellOrderReducer,

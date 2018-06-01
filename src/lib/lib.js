@@ -8,6 +8,7 @@ import { onSellOrderUpdate } from '../reducer/sellOrder';
 import { onOrderBookUpdate } from '../reducer/orderBook';
 import { onOpPriceUpdate } from '../reducer/opPrice';
 import packageJson from '../../package.json'
+import { updateWOB, setWOB } from '../actions/wob';
 export const api = Cobinhood({
     apiSecret: config.apiSecret,
 })
@@ -242,8 +243,9 @@ export const updateData=async()=>{
     
     const orderBook = await api.orderBooks({trading_pair_id: config.symbol})   // eslint-disable-line
     const newOrderBook = packageOrderBook({orderBook})
-    store.dispatch(onOrderBookUpdate({payload: newOrderBook}))
-
+    store.dispatch(setWOB({payload: newOrderBook}))
+    
+    
     
 }
 
