@@ -4,7 +4,8 @@ import utils from './utils'
 import store from './reducer'
 import lib from './lib'
 import askLib from './askLib'
-import { startSync, wsModifyOrder } from './actions/wob';
+import { startSync, wsModifyOrder, connected, orderBookNewest, setOrderBookNewest } from './actions/wob';
+
 
 export const initial = async () => {
   await askLib.verifyConfig()
@@ -30,7 +31,6 @@ export const askStateMachine = () => {
 
 export const check = async () => {
   // For Logic
-
   const code = askStateMachine()
 
   const { sellOrder, orderBook } = store.getState()
@@ -95,6 +95,15 @@ export const check = async () => {
   await wsModifyOrder({ price: priceModified, order: sellOrder })
 }
 
+const runCheck=async()=>{
+  if(!connected) return
+  
+  if(orderBookNewest === false) return
+  
+  await check()
+  setOrderBookNewest(false)
+}
+
 const runSellOrder = async () => {
   return new Promise(async(res,rej)=>{
     try {
@@ -112,27 +121,14 @@ const runSellOrder = async () => {
     }
   
     const id = setInterval(async () => {
+      if (!connected) return
       try {
-        utils.myLog('')
-        await check()
-        // console.log(JSON.stringify(store.getState()));
-        
-        
-        
-        
-        
+        await runCheck()   
       } catch (error) {
-        clearInterval(id)
-        console.log(error.message)
-        const record = utils.removeProperty(store.getState(), 'config')
-        await utils.sendIfttt(
-          `${config.mode} - ${config.symbol} - ${error.message}`,
-          JSON.stringify(record),
-        )
-  
+        clearInterval(id)  
         rej(error)
       }
-    }, config.intervalSecond * 100)
+    }, 1000)
   })
 
 }

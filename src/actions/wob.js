@@ -5,8 +5,12 @@ import { onSellOrderUpdate } from '../reducer/sellOrder';
 dotenv.load()
 const WS = require('ws')
 let client = null
-let connected = false
+export let connected = false
 let connecting = false
+export let orderBookNewest = false
+export const setOrderBookNewest = (status) => {
+    orderBookNewest = status
+}
 
 /**
  * set wsOrderBook store
@@ -63,9 +67,15 @@ const connect = () => {
       const { h: header, d: dataPayload } = JSON.parse(data)
       const status = header[2]
       const type = header[0]
-      
-      if (status === 's') store.dispatch(setWOB({ payload: zipOrderBook(dataPayload) }))
-      if (status === 'u' && type.startsWith('order-book')) store.dispatch(updateWOB({ payload: zipOrderBook(dataPayload) }))
+
+      if (status === 's' && type.startsWith('order-book')){
+        store.dispatch(setWOB({ payload: zipOrderBook(dataPayload) }))
+        orderBookNewest = true
+      } 
+      if (status === 'u' && type.startsWith('order-book')) {
+        store.dispatch(updateWOB({ payload: zipOrderBook(dataPayload) }))
+        orderBookNewest = true
+      }
       if (status === 'u' && type.endsWith('order')) {
         const order =  zipOrder(dataPayload)
         
