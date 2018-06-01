@@ -11,6 +11,7 @@ import test from 'ava'
 import lib from 'lib'
 import askLib from 'askLib'
 import bidLib from 'bidLib'
+import { packageOrder } from '../../src/lib/lib';
 
 var api = Cobinhood({
     apiSecret: config.apiSecret
@@ -76,10 +77,9 @@ test.serial('getProfitPercentage', async t => {
     t.is(profit, 18.33)
 })
 
-
 test.serial('packageOrder', async t => {
     const order =     { id: '23305b1d-584c-4389-bad2-3aca7a19e780',
-                        trading_pair: 'IOST-ETH',
+                        trading_pair_id: 'IOST-ETH',
                         side: 'bid',
                         type: 'limit',
                         price: '0.0000101',
@@ -90,9 +90,9 @@ test.serial('packageOrder', async t => {
                         eq_price: '0',
                         completed_at: null }
 
-    const ans = lib.packageOrder({order})
+    const ans = packageOrder({order})
     t.deepEqual(ans,    { id: '23305b1d-584c-4389-bad2-3aca7a19e780',
-                    trading_pair: 'IOST-ETH',
+                    trading_pair_id: 'IOST-ETH',
                     side: 'bid',
                     type: 'limit',
                     price: 0.0000101,
