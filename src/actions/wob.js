@@ -1,15 +1,16 @@
 import dotenv from 'dotenv'
 import config from '../config'
 import store from '../reducer'
-import { onSellOrderUpdate } from '../reducer/sellOrder';
+import { onSellOrderUpdate } from '../reducer/sellOrder'
+import { haltProcess } from '../utils/utils'
 dotenv.load()
 const WS = require('ws')
 let client = null
 export let connected = false
 let connecting = false
 export let orderBookNewest = false
-export const setOrderBookNewest = (status) => {
-    orderBookNewest = status
+export const setOrderBookNewest = status => {
+  orderBookNewest = status
 }
 
 /**
@@ -24,102 +25,91 @@ export const updateWOB = ({ payload }) => {
 }
 
 const connect = () => {
-  return new Promise((res,rej)=>{
-    if (connecting || connected) res()
-    connecting = true
-    console.log('WS connecting')
-    client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
-      headers: {
-        'authorization': process.env.BOT_API_SECRET,
-        // "nonce": new Date()*1000000 ,
-      },
-    })
-  
-    client.on('open', function(data) {
-      console.log('WS opened')
-      connecting = false
-      connected = true
-  
-      client.send(
-        JSON.stringify({
-          action: 'subscribe',
-          type: 'order-book',
-          trading_pair_id: config.symbol,
-        }),
-      )
-      client.send(
-        JSON.stringify({
-          action: 'subscribe',
-          type: 'order',
-          trading_pair_id: config.symbol,
-        }),
-      )
-    })
-  
-    client.on('close', function(data) {
-      console.log('WS close')
-      if (data) console.log(JSON.parse(data))
-      connecting = false
-      connected = false
-    })
-  
-    client.on('message', function(data) {
-      const { h: header, d: dataPayload } = JSON.parse(data)
-      const status = header[2]
-      const type = header[0]
+  if (connecting || connected) return
+  connecting = true
+  console.log('WS connecting')
+  client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
+    headers: {
+      authorization: process.env.BOT_API_SECRET,
+      // "nonce": new Date()*1000000 ,
+    },
+  })
 
-      if (status === 's' && type.startsWith('order-book')){
-        store.dispatch(setWOB({ payload: zipOrderBook(dataPayload) }))
-        orderBookNewest = true
-      } 
-      if (status === 'u' && type.startsWith('order-book')) {
-        store.dispatch(updateWOB({ payload: zipOrderBook(dataPayload) }))
-        orderBookNewest = true
-      }
-      if (status === 'u' && type.endsWith('order')) {
-        const order =  zipOrder(dataPayload)
-        
-        const {event, id} = order
-        if (id===config.sellOrderId){
-          if (event!=="modified" || event!=="opened") rej(`this order might be done ${data}`)
-          store.dispatch(onSellOrderUpdate({payload:order}))
+  client.on('open', function(data) {
+    console.log('WS opened')
+    connecting = false
+    connected = true
+
+    client.send(
+      JSON.stringify({
+        action: 'subscribe',
+        type: 'order-book',
+        trading_pair_id: config.symbol,
+      }),
+    )
+    client.send(
+      JSON.stringify({
+        action: 'subscribe',
+        type: 'order',
+        trading_pair_id: config.symbol,
+      }),
+    )
+  })
+
+  client.on('close', function(data) {
+    console.log('WS close')
+    if (data) console.log(JSON.parse(data))
+    connecting = false
+    connected = false
+  })
+
+  client.on('message', async data => {
+    const { h: header, d: dataPayload } = JSON.parse(data)
+    const status = header[2]
+    const type = header[0]
+
+    if (status === 's' && type.startsWith('order-book')) {
+      store.dispatch(setWOB({ payload: zipOrderBook(dataPayload) }))
+      orderBookNewest = true
+    }
+    if (status === 'u' && type.startsWith('order-book')) {
+      store.dispatch(updateWOB({ payload: zipOrderBook(dataPayload) }))
+      orderBookNewest = true
+    }
+    if (status === 'u' && type.endsWith('order')) {
+      const order = zipOrder(dataPayload)
+
+      const { event, id } = order
+      if (id === config.sellOrderId) {
+        if (event === 'modified' || event === 'opened') {
+          store.dispatch(onSellOrderUpdate({ payload: order }))
+        } else {
+          await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
         }
       }
-        
-      if(status==="error") rej(`WS error:${data}`)
-    })
-    res('SUCCESS')
+    }
+
+    if (status === 'error') await haltProcess(`WS error:${data}`)
   })
-  
 }
-// ​​​​​ws message: {"h":["order-book.ABT-ETH.1E-7","2","u"],"d":{"bids":[["0.0013309","1","1620.38"]],"asks":[]}}​​​​​
 
 export const startSync = () => {
-  return new Promise((res,rej)=>{
-    setInterval(async()=> {
-      if (connected) return
-      try {
-        await connect()
-        
-      } catch (error) {
-        rej(error)
-      }
-      
-    }, 3500)
-  
-    /**
-     * require ping every 20 sec or disconnection
-     */
-    setInterval(()=> {
-      if (!connected) return
-      client.send(
-        JSON.stringify({
-          action: 'ping',
-        }),
-      )
-    }, 20000)
-    res('SUCCESS')
-  })
+  setInterval(async () => {
+    if (connected) return
+    connect()
+  }, 3500)
+
+  /**
+   * require ping every 20 sec or disconnection
+   */
+  setInterval(() => {
+    if (!connected) return
+    client.send(
+      JSON.stringify({
+        action: 'ping',
+      }),
+    )
+  }, 20000)
 }
 
 const zipOrderBook = orderBook => {
@@ -132,7 +122,7 @@ const zipOrderBook = orderBook => {
   return { bids: newBid, asks: newAsk }
 }
 
-export const zipOrder = (order) => {
+export const zipOrder = order => {
   const id = order[0]
   const timestamp = parseFloat(order[1])
   const trading_pair_id = order[3]
@@ -143,23 +133,25 @@ export const zipOrder = (order) => {
   const eq_price = parseFloat(order[8])
   const size = parseFloat(order[9])
   const filled = parseFloat(order[10])
-  
-  return Object.assign({},{id, timestamp, trading_pair_id, state, event, side, price, eq_price, size, filled})
+
+  return Object.assign(
+    {},
+    { id, timestamp, trading_pair_id, state, event, side, price, eq_price, size, filled },
+  )
 }
 
-
-export const wsModifyOrder = async({price, order}) => {
-  if (!connected) throw new Error("WS disconnet, unable to modify order")
+export const wsModifyOrder = async ({ price, order }) => {
+  if (!connected) throw new Error('WS disconnet, unable to modify order')
   client.send(
     JSON.stringify({
-      "action": "modify_order",
-      "type": "0",    // Type enum above
-      "order_id": `${order.id}`,
-      "price": `${price}`,
-      "size": `${order.size}`,
+      action: 'modify_order',
+      type: '0', // Type enum above
+      order_id: `${order.id}`,
+      price: `${price}`,
+      size: `${order.size}`,
       // "stop_price": "",        // mandatory for stop/stop-limit order
       // "trailing_distance": "", // mandatory for trailing stop order
-      "id": `modify-order-${order.sellOrderId}`
+      id: `modify-order-${order.sellOrderId}`,
     }),
   )
 }
