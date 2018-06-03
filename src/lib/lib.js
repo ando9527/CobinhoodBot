@@ -220,7 +220,7 @@ export const commonVerifyConfig = async() => {
     verifyConfigFactory({env: "BOT_PROFIT_LIMIT_PERCENTAGE", attr: "profitLimitPercentage"})
     verifyConfigFactory({env: "BOT_QUANTITY_COMPARE_PERCENTAGE", attr: "quantityComparePercentage"})
     if (parseFloat(config.profitLimit)>1000) throw new Error('Profit limit Percentage over 1000, something must wrong here')
-
+    if (parseFloat(config.profitLimit)<0) throw new Error('Profit limit Percentage is negative, something must wrong here')
 
 }
 
