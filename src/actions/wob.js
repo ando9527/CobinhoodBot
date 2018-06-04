@@ -81,8 +81,11 @@ const connect = () => {
 
       const { event, id } = order
       if (id === config.sellOrderId) {
-        if (event === 'modified' || event === 'opened') {
+        const eventTypes = ['modified','opened', "balance_locked"]
+        if (eventTypes.includes(event)) {
           store.dispatch(onSellOrderUpdate({ payload: order }))
+          if(event==="balance_locked") console.log(event);
+          
         } else {
           await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
         }

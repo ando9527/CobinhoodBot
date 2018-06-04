@@ -124,3 +124,6 @@ orderbook
 
 cancel order
 {"h":["order","2","u","0"],"d":["74a4c4f8-c637-4bb7-a2dc-bf24bfsafdsa","1527984639089","1527985606251","ETH-USDT","cancelled","cancelled","ask","591.64","0","0.035","0"]}
+
+error when modified error
+{"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
