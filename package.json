@@ -1,6 +1,6 @@
 {
   "name": "cobinhood-bot",
-  "version": "1.9.1",
+  "version": "2.0.0",
   "main": "dist",
   "license": "MIT",
   "scripts": {
