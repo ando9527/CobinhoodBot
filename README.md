@@ -127,3 +127,5 @@ cancel order
 
 error when modified error
 {"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
+
+{"h":["order","2","u","0"],"d":["17e7de41-6adb-4695-901f-308d2becc64b","1528271149364","","MFG-ETH","partially_filled","executed","ask","0.0000334","0.0000334","9000","4173.15793413"]}
