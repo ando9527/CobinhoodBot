@@ -1,53 +1,15 @@
-# Cobinhood Bot
-## Installation
-$ git clone https://bitbucket.org/uselessmining/cobinhood_bot
+# Cobinhood Bot V2
+This is version 2 cobinhood bot, the primary changed is communication go through websocket.
 
-$ yarn global add pm2
+# UML
 
-$ yarn install
-
-$ yarn build
-
-### default location is  ./env_config/bid/bid-bdg.json
-$ mv sample_config env_config
-
-There is a config sample in root folder 
-
-$ cd ./env_config/bid && mv bid-sample.json bid-bdg.json && cd ../../  
-
-$ node bot.js bid-bdg && pm2 logs bid-bdg
-
-*$ pm2 logs bid-bdg
-
-*$ pm2 status
-
-*$ pm2 delete bid-bdg
-
-*$ pm2 kill
-
-### Other
-*$ viso
-
-edit ~/.bashrc and source ~/.bashrc
-
-## Recommend conemu install
-
-https://sourceforge.net/projects/conemu/
-
-## Structure
-
-### BID MODE UML
 [Bid]( https://goo.gl/64YsAu )
 
-### ASK MODE UML
 [Ask]( https://goo.gl/1j7z2X )
 
-### TODO
 
-node -r dotenv/config ./dist/cmd dotenv_config_path=./env_config/bid/ins.env
-
-### Configuration Translate
-### Bid Mode
+# Configuration Translate
+Bid mode
 
 ```json
 
@@ -83,7 +45,7 @@ node -r dotenv/config ./dist/cmd dotenv_config_path=./env_config/bid/ins.env
 }
 
 ```
-### Ask Mode
+Ask Mode
 ```json
 {
   "apps": [
@@ -117,15 +79,21 @@ node -r dotenv/config ./dist/cmd dotenv_config_path=./env_config/bid/ins.env
 }
 ```
 
-### Websocket message
+# Websocket message
+### Orderbook
+```javascript
+// Orderbook
+​​​​​{"h":["order-book.ABT-ETH.1E-7","2","u"],"d":{"bids":[["0.0013309","1","1620.38"]],"asks":[]}}​​​​​
 
-orderbook
-​​​​​ws message: {"h":["order-book.ABT-ETH.1E-7","2","u"],"d":{"bids":[["0.0013309","1","1620.38"]],"asks":[]}}​​​​​
-
-cancel order
+// Cancel Order
 {"h":["order","2","u","0"],"d":["74a4c4f8-c637-4bb7-a2dc-bf24bfsafdsa","1527984639089","1527985606251","ETH-USDT","cancelled","cancelled","ask","591.64","0","0.035","0"]}
 
-error when modified error
-{"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
-
+// Order partially filled
 {"h":["order","2","u","0"],"d":["17e7de41-6adb-4695-901f-308d2becc64b","1528271149364","","MFG-ETH","partially_filled","executed","ask","0.0000334","0.0000334","9000","4173.15793413"]}
+```
+
+### Error message 
+```javascript
+// Unknown error
+{"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
+```
