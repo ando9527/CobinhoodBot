@@ -65,23 +65,26 @@ const connect = () => {
 
   client.on('message', async data => {
     const { h: header, d: dataPayload } = JSON.parse(data)
-    const status = header[2]
-    const type = header[0]
+    // [channel_id, version, type, request_id (optional)]
+    const channelId = header[0]
+    const type = header[2]
 
-    if (status === 's' && type.startsWith('order-book')) {
+    if (type === 's' && channelId.startsWith('order-book')) {
       store.dispatch(setWOB({ payload: zipOrderBook(dataPayload) }))
       orderBookNewest = true
+      return 
     }
-    if (status === 'u' && type.startsWith('order-book')) {
+    if (type === 'u' && channelId.startsWith('order-book')) {
       store.dispatch(updateWOB({ payload: zipOrderBook(dataPayload) }))
       orderBookNewest = true
+      return
     }
-    if (status === 'u' && type.endsWith('order')) {
+    if (type === 'u' && channelId.endsWith('order')) {
       const order = zipOrder(dataPayload)
 
       const { event, id } = order
       if (id === config.sellOrderId) {
-        const eventTypes = ['modified','opened', "balance_locked", "partially_filled"]
+        const eventTypes = ['modified','opened', "partially_filled"]
         if (eventTypes.includes(event)) {
           store.dispatch(onSellOrderUpdate({ payload: order }))
           if(event==="balance_locked") console.log(event);
@@ -90,9 +93,16 @@ const connect = () => {
           await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
         }
       }
+      return
     }
 
-    if (status === 'error') await haltProcess(`WS error:${data}`)
+    if (type === 'error'){
+      const errorMessage = header[4] 
+      // {"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
+      if (errorMessage==="balance_locked") return console.log('balance_locked');
+      await haltProcess(`WS error:${data}`)
+    }
+    
   })
 }
 
