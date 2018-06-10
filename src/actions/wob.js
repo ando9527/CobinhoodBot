@@ -104,7 +104,11 @@ const connect = () => {
     }
     
   })
-  client.addEventListener('error', (err) => haltProcess(err.message))
+  client.addEventListener('error', (err) =>{
+    connecting = false
+    connected = false
+    logger.warn(`[Websocket] error ${err.message}`)
+  })
 }
 
 export const startSync = () => {

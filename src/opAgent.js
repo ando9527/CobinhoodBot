@@ -29,7 +29,7 @@ const connect = () => {
   })
 
   client.on('close', function(data) {
-    logger.info('[WebSocket] CoinGecko WS close')
+    logger.warn('[WebSocket] CoinGecko WS close')
     if (data) logger.info(JSON.parse(data))
     connecting = false
     connected = false
@@ -39,15 +39,20 @@ const connect = () => {
     try {
       logger.debug(`[Websocket] opAgent ws message receiving: ${message}`)
       const {h: header, d: data} = JSON.parse(message)
-      if (header[0]==="price"){
+      if (header[0]==="price" && data!==null){
         receivingData({data})
       } 
     } catch (error) {
       logger.error(`JSON parse failed ${error}`)
+      logger.error(`Original message: ${message}`)
       return 
     }
   })
-  client.addEventListener('error', (err) => haltProcess(err.message))
+  client.addEventListener('error', (err) =>{
+    connecting = false
+    connected = false
+    logger.warn(`[Websocket] error ${err.message}`)
+  })
 }
 
 const receivingData = ({data}) => {
