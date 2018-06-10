@@ -28,7 +28,7 @@ const config={
     totalPriceLimit: process.env.BOT_TOTAL_PRICE_LIMIT? parseFloat(process.env.BOT_TOTAL_PRICE_LIMIT):process.env.BOT_TOTAL_PRICE_LIMIT,
     opPercentage: process.env.BOT_OP_PERCENTAGE?parseFloat(process.env.BOT_OP_PERCENTAGE):process.env.BOT_OP_PERCENTAGE,
     BOT_API_URL: process.env.BOT_API_URL,
-    BOT_WS_URL: process.env.BOT_WS_URL,
+    BOT_OP_WS_URL: process.env.BOT_OP_WS_URL,
     
     /**
      * ASK MODE
