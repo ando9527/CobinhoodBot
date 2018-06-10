@@ -9,7 +9,7 @@ export function opPriceReducer(state: OpPrice = {price: 0, lastUpdate: "NONE"}, 
     case UPDATE_OP_PRICE: {
       logger.debug(`[Redux] opPriceReducer-UPDATE_OP_PRICE-payload: ${JSON.stringify(action.payload)}`)
       const {price} = action.payload
-      const lastUpdate = moment().tz("Asia/Taipei").format('YYYY-MM-DD HH:mm:ss.SSSS');
+      const lastUpdate = moment().tz("Asia/Taipei").format('YYYY-MM-DD HH:mm:ss');
       return Object.assign({}, {price, lastUpdate})
     }
     default:
