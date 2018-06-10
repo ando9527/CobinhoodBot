@@ -139,7 +139,7 @@ export const run = async () => {
       const record = Object.assign({}, store.getState(), { config: null })
 
       logger.error(error)
-      logger.error(`Orignal Data:${JSON.stringify(record)}`)
+      logger.error(`Original Data:${JSON.stringify(record)}`)
 
       process.exit(1)
     }
