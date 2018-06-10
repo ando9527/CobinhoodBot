@@ -1,3 +1,3 @@
 // import './ask'
 import './lib'
-// import './bid'
+import './bid'

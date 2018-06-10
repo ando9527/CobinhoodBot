@@ -9,6 +9,7 @@ import { onOrderBookUpdate } from '../reducer/orderBook';
 import { onOpPriceUpdate } from '../reducer/opPrice';
 import packageJson from '../../package.json'
 import { updateWOB, setWOB } from '../actions/wob';
+import logger from '../utils/winston';
 export const api = Cobinhood({
     apiSecret: config.apiSecret,
 })
@@ -63,7 +64,7 @@ export const modifyOrder=async({price, order})=>{
         const {success} = await api.modifyOrder({order_id: currentOrder.id, trading_pair_id: currentOrder.trading_pair_id, price: price.toString(), size: currentOrder.size.toString()})   /*eslint-disable camelcase*/      // eslint-disable-line
         if(success!== true) throw new Error(`Failed to modify order, price: ${JSON.stringify(price)}, current order: ${JSON.stringify(currentOrder)}`)
         const editMessage = `You have modified your order to the price ${price}`
-        utils.yellow(editMessage)
+        logger.info(editMessage)
     } catch (error) {
         throw new Error(`Failed to modify order, price: ${JSON.stringify(price)}, current order: ${JSON.stringify(currentOrder)} ${error.message}`)
     }
@@ -89,12 +90,12 @@ export const getCurrentOrder=async()=>{
         const {order} = data.result
         if (order.state==="filled") throw new Error(`This order is not available right now.`)
         
-        utils.cyan(`Order ID: ${order.id}`)
-        utils.cyan(`Symbol: ${order.trading_pair_id}`)       // eslint-disable-line camelcase
-        utils.cyan(`Side: ${order.side}`)
-        utils.cyan(`Price: ${order.price}`)
-        utils.cyan(`Size: ${order.size}`)   
-        utils.cyan(`Config Profit: ${config.profitLimitPercentage}%`)
+        logger.info(`Order ID: ${order.id}`)
+        logger.info(`Symbol: ${order.trading_pair_id}`)       // eslint-disable-line camelcase
+        logger.info(`Side: ${order.side}`)
+        logger.info(`Price: ${order.price}`)
+        logger.info(`Size: ${order.size}`)   
+        logger.info(`Config Profit: ${config.profitLimitPercentage}%`)
         return packageOrder({order})
     } catch (error) {
         throw new Error(`Failed to get current order ${error}`)
@@ -163,8 +164,8 @@ export const verifyConfigFactory = ({env, attr, requires = []}) => {
 
 
 export const commonVerifyConfig = async() => {
-    utils.magenta(`Version ${packageJson.version}`)
-    utils.magenta('Verifying your configuration..')
+    logger.info(`Version ${packageJson.version}`)
+    logger.info('Verifying your configuration..')
     /**
      * Check API Secret
      * BOT_API_SECRET

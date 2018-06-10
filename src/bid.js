@@ -3,6 +3,7 @@ import utils from './utils'
 import store from './reducer'
 import lib from './lib'
 import bidLib from './bidLib'
+import logger from './utils/winston';
 
 
 
@@ -45,7 +46,7 @@ export const check=async()=>{
     const lowestAsk = lib.getLowestAsk().price
     // For Info
     const highestPrice = lib.getHighestBid().price
-    utils.green(`Yours: ${buyOrder.price}(${eppInfo}) Highest Bid: ${highestPrice}(${lib.getProfitPercentage({price: lowestAsk, productCost: highestPrice})}%) Lowest Ask: ${lowestAsk} ${config.BOT_API_URL}: ${opPrice}(${lib.getProfitPercentage({price: opPrice, productCost: buyOrder.price})}%).`)
+    logger.info(`Yours: ${buyOrder.price}(${eppInfo}) Highest Bid: ${highestPrice}(${lib.getProfitPercentage({price: lowestAsk, productCost: highestPrice})}%) Lowest Ask: ${lowestAsk} ${config.BOT_API_URL}: ${opPrice}(${lib.getProfitPercentage({price: opPrice, productCost: buyOrder.price})}%).`)
     
     if (code=== "ZERO_LIMIT_PROFIT_SELL_ORDER") throw new Error("Price of buy orders on the list break your profit limit.")    
     if (code==="ZERO_BELOW_OP_PRICE" ) throw new Error("Price of orders on list with your order size is higher than external exchange  price")
@@ -57,7 +58,7 @@ export const check=async()=>{
         // will throw error if state machine logic is wrong 
         bidLib.checkOverLimit({price: buyOrder.price, priceModified, buyOrder, opPrice, totalPriceLimit: config.totalPriceLimit})
         lib.checkProfitLimitPercentage({profitPercentage: epp})
-        utils.myLog("Your offer is good, you don't need to change.")  
+        logger.info("Your offer is good, you don't need to change.")  
         return "NOTHING"
     } 
     
@@ -73,17 +74,17 @@ export const check=async()=>{
     } 
     
     if (priceModified=== buyOrder.price){
-        console.log("PRICE the same, do nothing here, temporary bug... will fix soon")
+        logger.warn("PRICE the same, do nothing here, temporary bug... will fix soon")
         return "NOTHING_BUG"
     }
     // Modified Expected Profit Percentage 
     const mepp =lib.getProfitPercentage({ price: lib.getLowestAsk().price, productCost:priceModified})
-    utils.yellow(`${priceModified}(${mepp}%) ${changeMessage}` )
+    logger.info(`${priceModified}(${mepp}%) ${changeMessage}` )
     
 
 
     if (config.watchOnly===true){
-        utils.cyan((`You are in watch mode now, nothing to do here `))
+        logger.info((`You are in watch mode now, nothing to do here `))
         return "WATCH_ONLY"
     }
     /**
@@ -104,22 +105,20 @@ export const run=async()=>{
       await check()
   } catch (error) {
       const record = Object.assign({},store.getState(),{config:null})
-      console.log('real time data==================================')
-      console.log(JSON.stringify(record))
-      console.log(`end real time data===============================`)
-      console.log(error);
+      
+      logger.error(error);
+      logger.error(`Orignal Data:${JSON.stringify(record)}`)
       
       process.exit(1)
   }
 
   const id = setInterval(async()=>{
       try {
-          utils.myLog("")
           await check()
           
       } catch (error) {
           clearInterval(id)
-          console.log(error.message)
+          logger.error(error.message)
 
           const record = Object.assign({},store.getState(),{config:null})
           await utils.sendIfttt(`${config.mode} - ${config.symbol} - ${error.message}`, JSON.stringify(record))

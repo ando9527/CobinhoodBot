@@ -4,6 +4,7 @@ import colors from 'colors/safe'
 import utils from '../utils'
 import store from '../reducer'
 import lib from '../lib'
+import logger from '../utils/winston';
 
 export const api = Cobinhood({
   apiSecret: config.apiSecret,
@@ -22,12 +23,11 @@ export const verifyConfig=async()=>{
     /**
      * Verify Done
      */
-    utils.myLog(colors.magenta(`Configuration is good, the bot is ready to go!`))
-    utils.myLog(colors.magenta(`Mode: ${config.mode}`));
-    utils.myLog(colors.magenta(`Asset: ${config.assetType}`));
-    utils.myLog(colors.magenta(`Product: ${config.productType}`));
-    utils.myLog(colors.magenta(`Profit Limit: ${config.profitLimitPercentage}%`));
-
+    logger.info(`Configuration is good, the bot is ready to go!`)
+    logger.info(`Mode: ${config.mode}`)
+    logger.info(`Asset: ${config.assetType}`)
+    logger.info(`Product: ${config.productType}`)
+    logger.info(`Profit Limit: ${config.profitLimitPercentage}%`)
     return "SUCCESS"
     
 }

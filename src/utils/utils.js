@@ -82,26 +82,6 @@ export const info = (data = {}) => {
   return message
 }
 
-export const myLog = message => {
-  console.log(`${colors.gray(getTime())}: ${message.toString()}`) // eslint-disable-line
-}
-
-export const green = message => {
-  console.log(`${colors.gray(getTime())}: ${colors.green(message.toString())}`)
-}
-
-export const yellow = message => {
-  console.log(`${colors.gray(getTime())}: ${colors.yellow(message.toString())}`)
-}
-
-export const magenta = message => {
-  console.log(`${colors.gray(getTime())}: ${colors.magenta(message.toString())}`)
-}
-
-export const cyan = message => {
-  console.log(`${colors.gray(getTime())}: ${colors.cyan(message.toString())}`)
-}
-
 export const removeProperty = (obj, property) => {
   return Object.keys(obj).reduce((acc, key) => {
     if (key !== property) {

@@ -16,13 +16,14 @@
     "bignumber.js": "^6.0.0",
     "bluebird": "^3.5.1",
     "cobinhood-api-node": "ssh://git@bitbucket.org:uselessmining/cobinhood-api-node.git",
-    "colors": "^1.1.2",
     "commander": "^2.14.1",
     "dotenv": "^5.0.1",
     "lodash": "^4.17.10",
     "lowdb": "^1.0.0",
     "moment": "^2.20.1",
+    "moment-timezone": "^0.5.17",
     "redux": "^3.7.2",
+    "winston": "^2.4.2",
     "ws": "^5.2.0"
   },
   "devDependencies": {
@@ -31,6 +32,7 @@
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.1",
     "babel-plugin-module-resolver": "^3.0.0",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.24.1",

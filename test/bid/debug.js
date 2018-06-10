@@ -6,6 +6,7 @@ import Cobinhood from 'cobinhood-api-node'
 import store from 'reducer'
 import test from 'ava'
 import lib from 'lib'
+import logger from '../../src/utils/winston';
 var api = Cobinhood({
     apiSecret: config.apiSecret
 });
@@ -65,10 +66,9 @@ export const check=async()=>{
         // will throw error if state machine logic is wrong 
         bidLib.checkOverLimit({price: buyOrder.price, priceModified, buyOrder, opPrice, totalPriceLimit: config.totalPriceLimit})
         lib.checkProfitLimitPercentage({profitPercentage: epp})
-        utils.myLog("Your offer is good, you don't need to change.")  
+        logger.info("Your offer is good, you don't need to change.")  
         return "NOTHING"
     } 
-    
     let priceModified = 0
     let changeMessage = ""
     if (code==="BE_TOP"){
