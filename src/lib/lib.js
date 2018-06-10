@@ -228,8 +228,6 @@ export const updateData=async()=>{
     if (config.mode==="BID"){
         const buyOrder = await getCurrentOrder()
         store.dispatch(onBuyOrderUpdate({payload:buyOrder}))
-        const opPrice = await getCCPrice({from: config.productType, to: config.assetType})
-        store.dispatch(onOpPriceUpdate({payload: {price:opPrice}}))
     }else if(config.mode === "ASK"){
         const sellOrder = await getCurrentOrder()
         store.dispatch(onSellOrderUpdate({payload:sellOrder}))

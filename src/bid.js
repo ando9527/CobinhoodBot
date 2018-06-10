@@ -4,6 +4,11 @@ import store from './reducer'
 import lib from './lib'
 import bidLib from './bidLib'
 import logger from './utils/winston'
+import './opAgent'
+import { haltProcess } from './utils/utils';
+import { opAgentRun } from './opAgent';
+import { getCCPrice } from './lib/lib';
+import { onOpPriceUpdate } from './actions/opPrice';
 
 export const initial = async () => {
   await bidLib.verifyConfig()
@@ -130,36 +135,27 @@ export const check = async () => {
   await lib.modifyOrder({ price: priceModified, order: buyOrder })
 }
 
-export const run = async () => {
-  return new Promise(async (res, rej) => {
+export const run = async()=>{
+  try {
+    await initial()
+    opAgentRun()
+    const opPrice = await getCCPrice({from: config.productType, to: config.assetType})
+    store.dispatch(onOpPriceUpdate({payload: {price:opPrice}}))
+    await check()
+  } catch (error) {
+    const record = Object.assign({}, store.getState(), { config: null })
+    logger.error(error)
+    logger.error(`Original Data:${JSON.stringify(record)}`)
+
+    process.exit(1)
+  }
+
+  setInterval(async () => {
     try {
-      await initial()
       await check()
     } catch (error) {
-      const record = Object.assign({}, store.getState(), { config: null })
-
-      logger.error(error)
-      logger.error(`Original Data:${JSON.stringify(record)}`)
-
-      process.exit(1)
+      haltProcess(error)
     }
-
-    const id = setInterval(async () => {
-      try {
-        await check()
-      } catch (error) {
-        clearInterval(id)
-        logger.error(error.message)
-
-        const record = Object.assign({}, store.getState(), { config: null })
-        await utils.sendIfttt(
-          `${config.mode} - ${config.symbol} - ${error.message}`,
-          JSON.stringify(record),
-        )
-
-        rej(error)
-      }
-    }, config.intervalSecond * 1000)
-    res('SUCCESS')
-  })
+  }, config.intervalSecond * 1000)
 }
+
