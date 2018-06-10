@@ -17,7 +17,7 @@ export const showSpread = async() => {
         const {trading_pair_id, lowest_ask, highest_bid} = symbol
         const volume24h = symbol["24h_volume"]
         const spread = utils.div(utils.minus(lowest_ask,highest_bid),highest_bid)
-        // if (symbol==='IOST-ETH') console.log({symbol: symbol, spread: spread, lowest_ask: lowest_ask, highest_bid:highest_bid})
+        // if (symbol==='IOST-ETH') logger.info({symbol: symbol, spread: spread, lowest_ask: lowest_ask, highest_bid:highest_bid})
         return {symbol: trading_pair_id, spread, lowest_ask, highest_bid, volume24h}
     })
     const newData = data.sort(utils.sortVolume24h).reverse()

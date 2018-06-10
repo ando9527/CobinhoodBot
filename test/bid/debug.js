@@ -15,9 +15,8 @@ var api = Cobinhood({
 const debug_store={"buyOrder":{"id":"e9bae674-824e-4851-beef-82d0828ceb5f","trading_pair":"BDG-ETH","side":"bid","type":"limit","price":0.0000625,"size":4300,"filled":0,"state":"open","timestamp":1521682252288,"eq_price":0,"completed_at":null},"balance":null,"orderBook":{"asks":[{"price":0.0000889,"count":1,"size":4179.2967},{"price":0.000089,"count":1,"size":3067.9966},{"price":0.00009,"count":1,"size":4004},{"price":0.0000933,"count":2,"size":11046},{"price":0.0000954,"count":2,"size":12500},{"price":0.0000955,"count":1,"size":4428.41880341},{"price":0.0000956,"count":1,"size":1187.64480785},{"price":0.0000957,"count":1,"size":40267},{"price":0.000097,"count":1,"size":1450},{"price":0.0000974,"count":1,"size":3290.32258064},{"price":0.000105,"count":1,"size":2970},{"price":0.000108,"count":1,"size":7000},{"price":0.0001239,"count":1,"size":1545},{"price":0.000127,"count":1,"size":7000},{"price":0.00015,"count":3,"size":89687.7144422},{"price":0.000165,"count":1,"size":1000},{"price":0.00017,"count":2,"size":16510},{"price":0.000179,"count":1,"size":3000},{"price":0.000189,"count":1,"size":1726},{"price":0.00019,"count":2,"size":23885.00854456},{"price":0.0001999,"count":1,"size":1251},{"price":0.0002,"count":2,"size":4250},{"price":0.00025,"count":2,"size":41000},{"price":0.00026,"count":1,"size":5000},{"price":0.0002609,"count":1,"size":5525.44382894},{"price":0.0003,"count":1,"size":5000},{"price":0.000349,"count":1,"size":1000},{"price":0.000395,"count":1,"size":10000},{"price":0.000463,"count":1,"size":2722.67554061},{"price":0.0005,"count":2,"size":21000},{"price":0.00052,"count":1,"size":2750},{"price":0.00056,"count":1,"size":1000},{"price":0.0006,"count":1,"size":1000},{"price":0.00077,"count":1,"size":1300},{"price":0.00079,"count":1,"size":1246.228},{"price":0.0009999,"count":1,"size":1303.59051365},{"price":0.001,"count":2,"size":8399.83},{"price":0.0012345,"count":1,"size":1324.9},{"price":0.00134,"count":1,"size":1500},{"price":0.004545,"count":1,"size":1100},{"price":8.00025,"count":1,"size":1333}],"bids":[{"price":0.0000705,"count":2,"size":11200},{"price":0.0000701,"count":1,"size":1043.25},{"price":0.00007,"count":1,"size":1071.42857145},{"price":0.0000698,"count":1,"size":3123.759035},{"price":0.0000695,"count":1,"size":1747.57843292},{"price":0.000069,"count":1,"size":4976.65391304},{"price":0.0000685,"count":1,"size":1100},{"price":0.0000684,"count":1,"size":14295},{"price":0.0000641,"count":1,"size":6835.62222574},{"price":0.000064,"count":2,"size":5025},{"price":0.0000626,"count":1,"size":4300},{"price":0.0000625,"count":1,"size":4300},{"price":0.0000619,"count":1,"size":5000},{"price":0.000061,"count":2,"size":12700},{"price":0.0000605,"count":1,"size":5000},{"price":0.00006,"count":1,"size":2000},{"price":0.0000595,"count":1,"size":5000},{"price":0.000058,"count":2,"size":10471.724},{"price":0.0000551,"count":1,"size":10000},{"price":0.000055,"count":2,"size":9516.232},{"price":0.000052,"count":2,"size":27500},{"price":0.0000515,"count":1,"size":7323.96640776},{"price":0.00005,"count":2,"size":4000},{"price":0.0000481,"count":1,"size":30000},{"price":0.0000462,"count":2,"size":5335.86787699},{"price":0.000046,"count":2,"size":7500},{"price":0.0000451,"count":1,"size":30000},{"price":0.000045,"count":1,"size":10107.37524182},{"price":0.0000435,"count":1,"size":1046},{"price":0.0000404,"count":1,"size":3000},{"price":0.00004,"count":1,"size":24999.99},{"price":0.0000371,"count":1,"size":1000},{"price":0.0000311,"count":1,"size":11500},{"price":0.000031,"count":1,"size":3000},{"price":0.00003,"count":2,"size":3000},{"price":0.0000247,"count":1,"size":2200},{"price":0.0000243,"count":1,"size":5000},{"price":0.00002,"count":1,"size":2000},{"price":0.000012,"count":1,"size":1000},{"price":0.000011,"count":1,"size":10000},{"price":0.00001,"count":1,"size":50000},{"price":0.0000099,"count":1,"size":1000},{"price":0.0000097,"count":1,"size":100000},{"price":0.0000095,"count":1,"size":10000},{"price":0.0000092,"count":1,"size":20000},{"price":0.000009,"count":1,"size":15000},{"price":0.0000088,"count":1,"size":19204.54545456},{"price":0.0000059,"count":1,"size":10000},{"price":0.0000056,"count":1,"size":4000},{"price":0.0000034,"count":1,"size":6258.82352955}]},"opPrice":0.00005693,"sellOrder":null,"orderId":null}
 const {opPrice, buyOrder, orderBook} = debug_store
 const {asks, bids} = orderBook
-
 export const bidStateMachine=()=>{
-    console.log('bid machine start')
+    logger.info('bid machine start')
     const {orderBook, buyOrder} = debug_store
     const {asks, bids} = orderBook
     
@@ -81,7 +80,7 @@ export const check=async()=>{
     } 
     
     if (priceModified=== buyOrder.price){
-        console.log("PRICE the same, do nothing here, temporary bug... will fix soon")
+        logger.info("PRICE the same, do nothing here, temporary bug... will fix soon")
         return "NOTHING_BUG"
     }
     // Modified Expected Profit Percentage 
@@ -104,7 +103,7 @@ export const check=async()=>{
 
 test.serial('bid machine', async t => {
     const code = bidStateMachine()
-    console.log(code)
+    logger.info(code)
     t.pass()
 })
 test.serial('check', async t => {
@@ -116,7 +115,7 @@ test.serial('check', async t => {
 test.skip('getBelowOpBuyOrderFy', async t => {
 
     const ans = bidLib.getBelowOpBuyOrderFy({bids, opPrice})
-    console.log(ans)
+    logger.info(ans)
 
 })
 

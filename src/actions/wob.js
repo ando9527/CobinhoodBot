@@ -27,7 +27,7 @@ export const updateWOB = ({ payload }) => {
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  logger.info('WS connecting')
+  logger.info('[Websocket] Cobinhood WS connecting')
   client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
     headers: {
       authorization: process.env.BOT_API_SECRET,
@@ -36,7 +36,7 @@ const connect = () => {
   })
 
   client.on('open', function(data) {
-    logger.info('WS opened')
+    logger.info('[Websocket] Cobinhood WS opened')
     connecting = false
     connected = true
 
@@ -57,7 +57,7 @@ const connect = () => {
   })
 
   client.on('close', function(data) {
-    logger.info('WS close')
+    logger.info('[Websocket] Cobinhood WS close')
     if (data) logger.info(JSON.parse(data))
     connecting = false
     connected = false
@@ -87,7 +87,7 @@ const connect = () => {
         const eventTypes = ['modified','opened', "partially_filled"]
         if (eventTypes.includes(event)) {
           store.dispatch(onSellOrderUpdate({ payload: order }))
-          if(event==="balance_locked") console.log(event);
+          if(event==="balance_locked") logger.info(event);
           
         } else {
           await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
@@ -99,7 +99,7 @@ const connect = () => {
     if (type === 'error'){
       const errorMessage = header[4] 
       // {"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
-      if (errorMessage==="balance_locked") return console.log('balance_locked');
+      if (errorMessage==="balance_locked") return logger.info('balance_locked');
       await haltProcess(`WS error:${data}`)
     }
     

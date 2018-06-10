@@ -1,16 +1,16 @@
 import dotenv from 'dotenv'
 import config from '../../src/config'
 import store from '../../src/reducer'
+import logger from '../../src/utils/winston';
 dotenv.load()
 const WS = require('ws')
 let client = null
 let connected = false
 let connecting = false
-
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  console.log('connecting')
+  logger.info('connecting')
   client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
     headers: {
       'authorization': process.env.BOT_API_SECRET,
@@ -19,7 +19,7 @@ const connect = () => {
   })
 
   client.on('open', function(data) {
-    console.log('WS opened')
+    logger.info('WS opened')
     connecting = false
     connected = true
 
@@ -41,14 +41,14 @@ const connect = () => {
   })
 
   client.on('close', function(data) {
-    console.log('WS close')
-    if (data) console.log(JSON.parse(data))
+    logger.info('WS close')
+    if (data) logger.info(JSON.parse(data))
     connecting = false
     connected = false
   })
 
   client.on('message', function(data) {
-    console.log(`ws message: ${data}`)
+    logger.info(`ws message: ${data}`)
   })
 }
 

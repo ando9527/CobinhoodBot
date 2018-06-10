@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import config from '../../src/config'
 import store from '../../src/reducer'
-
+import logger from '../../src/utils/winston';
 dotenv.load()
 const WS = require('ws')
 let client = null
@@ -11,11 +11,11 @@ let connecting = false
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  console.log('connecting')
+  logger.info('connecting')
   client = new WS('wss://ws.cobinhood.com/v2/ws')
 
   client.on('open', function(data) {
-    console.log('WS opened')
+    logger.info('WS opened')
     connecting = false
     connected = true
 
@@ -29,8 +29,8 @@ const connect = () => {
   })
 
   client.on('close', function(data) {
-    console.log('WS close')
-    if (data) console.log(JSON.parse(data))
+    logger.info('WS close')
+    if (data) logger.info(JSON.parse(data))
     connecting = false
     connected = false
   })
@@ -39,7 +39,7 @@ const connect = () => {
     const { h: header, d: orderBook } = JSON.parse(data)
     const status = header[2]
     if(status==="error") throw new Error(`public ws error:${data}`)
-    console.log(data);
+    logger.info(data);
     
   })
 }
@@ -64,8 +64,8 @@ const connect = () => {
 // try {
 //   connect()
 // } catch (error) {
-//   console.log('got it============');
-//   console.log(error);
+//   logger.info('got it============');
+//   logger.info(error);
   
   
   
@@ -74,7 +74,7 @@ const connect = () => {
 const test = () => {
   return new Promise((res,rej)=>{
     setInterval(()=>{
-      console.log('yo');
+      logger.info('yo');
       // rej('errrrrrrrrrrr')
       
     }, 2000)
@@ -91,7 +91,7 @@ const run = async() => {
   }
     
   try {
-    console.log('second');
+    logger.info('second');
     
   } catch (error) {
     
@@ -101,8 +101,8 @@ const run = async() => {
 
 run()
 .catch(err=>{
-  console.log('got itttttttttttttt');
+  logger.info('got itttttttttttttt');
   
-  console.log(err)
+  logger.info(err)
   process.exit(1)
 })

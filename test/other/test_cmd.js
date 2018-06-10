@@ -10,6 +10,7 @@ import Cobinhood from 'cobinhood-api-node'
 import store from 'reducer'
 import test from 'ava'
 import cmd from 'cmd'
+import logger from '../../src/utils/winston';
 /**
  * Test it with 1 order only
  */
@@ -26,6 +27,6 @@ import cmd from 'cmd'
 
 test.serial('getOrder', async t => {
     const order = await cmd.getOrder()
-    console.log(order)
+    logger.info(order)
     t.pass()
 })
