@@ -13,8 +13,8 @@ let connecting = false
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  logger.info(`[Websocket] connecting to ${config.BOT_WS_URL}`)
-  client = new Websocket(config.BOT_WS_URL)
+  logger.info(`[Websocket] connecting to ${config.BOT_OP_WS_URL}`)
+  client = new Websocket(config.BOT_OP_WS_URL)
   client.on('open', function(data) {
     logger.info('[Websocket] CoinGecko WS opened')
     connecting = false

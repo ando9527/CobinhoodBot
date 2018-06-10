@@ -4,6 +4,7 @@ import moment from 'moment'
 import colors from 'colors/safe'
 import { BigNumber } from 'bignumber.js'
 import store from '../reducer';
+import logger from './winston';
 
 export const sortNumber = (a, b) => {
   return minus(a, b)
@@ -103,15 +104,12 @@ export const haltProcess=async(message)=>{
     )
 
   } catch (e) {
-    console.log(e);
-    
+    logger.error(e);
   } finally{
     const record = Object.assign({},store.getState(),{config:null})
-    console.log('Halt Process');
-    console.log(`Error Message ${message}`);
-    console.log('Real time data==================================')
-    console.log(JSON.stringify(record))
-    console.log(`End real time data===============================`)
+    logger.error('Halt Process');
+    logger.error(`Error Message ${message}`);
+    logger.error(JSON.stringify(record))
     process.exit(1)
 
   }

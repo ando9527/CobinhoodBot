@@ -4,6 +4,7 @@ import Cobinhood from 'cobinhood-api-node'
 import axios from 'axios'
 import utils from '../utils'
 import lib from '../lib'
+import logger from '../utils/winston';
 const api = Cobinhood({
     apiSecret: config.apiSecret,
 })
@@ -20,9 +21,8 @@ export const showSpread = async() => {
         return {symbol: trading_pair_id, spread, lowest_ask, highest_bid, volume24h}
     })
     const newData = data.sort(utils.sortVolume24h).reverse()
-    console.log(newData)
+    logger.info(newData)
 }
-
 
 export const getOrder = async()=>{
     const order = await lib.getCurrentOrder()

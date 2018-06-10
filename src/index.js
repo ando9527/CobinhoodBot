@@ -7,8 +7,8 @@ import config from './config'
 
 bot.run()
 .catch(async(error)=>{
-  console.log(`Global Error ${error}`)
-  console.log(store.getState());
+  logger.error(`Global Error ${error}`)
+  logger.error(store.getState());
   const record = Object.assign({},store.getState(),{config:null})
   await sendIfttt(
     `${config.mode} - ${config.symbol} - ${error.message}`,

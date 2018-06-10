@@ -3,6 +3,7 @@ import config from '../config'
 import store from '../reducer'
 import { onSellOrderUpdate } from '../reducer/sellOrder'
 import { haltProcess } from '../utils/utils'
+import logger from '../utils/winston';
 dotenv.load()
 const WS = require('ws')
 let client = null
@@ -23,11 +24,10 @@ export const setWOB = ({ payload }) => {
 export const updateWOB = ({ payload }) => {
   return { type: 'UPDATE_WOB', payload }
 }
-
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  console.log('WS connecting')
+  logger.info('WS connecting')
   client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
     headers: {
       authorization: process.env.BOT_API_SECRET,
@@ -36,7 +36,7 @@ const connect = () => {
   })
 
   client.on('open', function(data) {
-    console.log('WS opened')
+    logger.info('WS opened')
     connecting = false
     connected = true
 
@@ -57,8 +57,8 @@ const connect = () => {
   })
 
   client.on('close', function(data) {
-    console.log('WS close')
-    if (data) console.log(JSON.parse(data))
+    logger.info('WS close')
+    if (data) logger.info(JSON.parse(data))
     connecting = false
     connected = false
   })
