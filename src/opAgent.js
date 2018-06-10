@@ -29,8 +29,8 @@ const connect = () => {
   })
 
   client.on('close', function(data) {
-    logger.warn('[WebSocket] CoinGecko WS close')
-    if (data) logger.info(JSON.parse(data))
+    logger.warn('[Websocket] CoinGecko WS close')
+    if (data) logger.warn(`[Websocket] on close message ${JSON.parse(data)}`)
     connecting = false
     connected = false
   })
@@ -51,7 +51,7 @@ const connect = () => {
   client.addEventListener('error', (err) =>{
     connecting = false
     connected = false
-    logger.warn(`[Websocket] error ${err.message}`)
+    logger.warn(`[Websocket] error event listener ${err}`)
   })
 }
 
