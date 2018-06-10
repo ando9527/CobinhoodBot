@@ -47,6 +47,7 @@ const connect = () => {
       return 
     }
   })
+  client.addEventListener('error', (err) => haltProcess(err.message))
 }
 
 const receivingData = ({data}) => {

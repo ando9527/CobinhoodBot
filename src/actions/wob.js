@@ -104,6 +104,7 @@ const connect = () => {
     }
     
   })
+  client.addEventListener('error', (err) => haltProcess(err.message))
 }
 
 export const startSync = () => {
