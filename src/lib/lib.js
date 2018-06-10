@@ -89,13 +89,7 @@ export const getCurrentOrder=async()=>{
         if (data.success === false) throw new Error(`Can not retrieve your order from server, Error ${data}`)
         const {order} = data.result
         if (order.state==="filled") throw new Error(`This order is not available right now.`)
-        
-        logger.info(`Order ID: ${order.id}`)
-        logger.info(`Symbol: ${order.trading_pair_id}`)       // eslint-disable-line camelcase
-        logger.info(`Side: ${order.side}`)
-        logger.info(`Price: ${order.price}`)
-        logger.info(`Size: ${order.size}`)   
-        logger.info(`Config Profit: ${config.profitLimitPercentage}%`)
+        logger.info(`Current Order Information, id: ${order.id}, symbol: ${order.trading_pair_id}, side: ${order.side}, price: ${order.price}, size: ${order.size}, config profit: ${config.profitLimitPercentage}%`)
         return packageOrder({order})
     } catch (error) {
         throw new Error(`Failed to get current order ${error}`)

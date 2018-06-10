@@ -23,11 +23,7 @@ export const verifyConfig=async()=>{
     /**
      * Verify Done
      */
-    logger.info(`Configuration is good, the bot is ready to go!`)
-    logger.info(`Mode: ${config.mode}`)
-    logger.info(`Asset: ${config.assetType}`)
-    logger.info(`Product: ${config.productType}`)
-    logger.info(`Profit Limit: ${config.profitLimitPercentage}%`)
+    logger.info(`Setting mode: ${config.mode}, asset: ${config.assetType}, product: ${config.productType}, profit limit: ${config.profitLimitPercentage}%`)
     return "SUCCESS"
     
 }
