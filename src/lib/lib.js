@@ -1,3 +1,4 @@
+// @flow
 import utils from '../utils'
 import config from '../config'
 import store from '../reducer'
@@ -6,14 +7,13 @@ import axios from 'axios'
 import { onBuyOrderUpdate } from '../reducer/buyOrder';
 import { onSellOrderUpdate } from '../reducer/sellOrder';
 import { onOrderBookUpdate } from '../reducer/orderBook';
-import { onOpPriceUpdate } from '../reducer/opPrice';
 import packageJson from '../../package.json'
 import { updateWOB, setWOB } from '../actions/wob';
 import logger from '../utils/winston';
+import { onOpPriceUpdate } from '../actions/opPrice';
 export const api = Cobinhood({
     apiSecret: config.apiSecret,
 })
-
 /**
  * Crypto Compare Last trade
  * @param {Object} payload
@@ -21,7 +21,7 @@ export const api = Cobinhood({
  * @param {string} payload.to
  * @returns {number} 
  */
-export const getCCPrice =async({from, to})=>{    
+export const getCCPrice =async({from, to}: {from: string, to: string})=>{    
     
     try {
         
@@ -44,7 +44,7 @@ export const getCCPrice =async({from, to})=>{
  * @param {string} payload.to
  * @returns {number} 
  */
-export const getCGPrice =async({from, to})=>{    
+export const getCGPrice =async({from, to}:  {from: string, to: string})=>{    
     const url = `https://crypto.nctu.me/api/cg/${from.toLowerCase()}/${to.toLowerCase()}`    
     const data = await axios.get(url)
     return parseFloat(data.data.data)
@@ -58,7 +58,7 @@ export const getCGPrice =async({from, to})=>{
  * @param {Object} payload
  */
 
-export const modifyOrder=async({price, order})=>{
+export const modifyOrder=async({price, order}: {price: number, order: Object})=>{
     const currentOrder = order
     try {
         const {success} = await api.modifyOrder({order_id: currentOrder.id, trading_pair_id: currentOrder.trading_pair_id, price: price.toString(), size: currentOrder.size.toString()})   /*eslint-disable camelcase*/      // eslint-disable-line
@@ -100,12 +100,12 @@ export const getCurrentOrder=async()=>{
 
 }
 
-export const packageOrder=({order})=>{
+export const packageOrder=({order}: {order: Object})=>{
     const {id, trading_pair_id, side, type, price, size, filled, state, timestamp, eq_price, completed_at} = order   // eslint-disable-line camelcase
     return  {id, trading_pair_id, side, type, price: parseFloat(price), size: parseFloat(size), filled: parseFloat(filled), state, timestamp, eq_price:parseFloat(eq_price), completed_at } // eslint-disable-line
 }
 
-export const checkProfitLimitPercentage = ({profitPercentage}) => {
+export const checkProfitLimitPercentage = ({profitPercentage}: {profitPercentage: number}) => {
     // due to top price minus/plus 0.0000001 
     if (utils.plus(profitPercentage,1)< parseFloat(config.profitLimitPercentage)){
         const message = JSON.stringify(store.getState())
@@ -118,7 +118,7 @@ export const getLowestAsk=()=>{
     return getLowestAskFy({asks})
 }
 
-export const getLowestAskFy=({asks})=>{
+export const getLowestAskFy=({asks}: {asks: Object})=>{
     const ask =  asks.sort(utils.sortOrder)[0]
     return ask
 }
@@ -128,12 +128,12 @@ export const getHighestBid=()=>{
     return getHighestBidFy({bids})
 }
 
-export const getHighestBidFy=({bids})=>{
+export const getHighestBidFy=({bids}: {bids: Object})=>{
     const bid =  bids.sort(utils.sortOrder).reverse()[0]
     return bid
 }
 
-export const getProfitPercentage = ({price, productCost}) => {
+export const getProfitPercentage = ({price, productCost}: {price: number, productCost: number}) => {
     const spread = utils.minus(price, productCost)
     const fraction = utils.div(spread, productCost)
     const profit = parseFloat(utils.multi(fraction,100).toFixed(2))
@@ -146,7 +146,7 @@ export const getProfitPercentage = ({price, productCost}) => {
  * @param {string} payload.attr
  * @param {Array} payload.requires
  */
-export const verifyConfigFactory = ({env, attr, requires = []}) => {
+export const verifyConfigFactory = ({env, attr, requires = []}: {env: string, attr: string, requires?: Array<string>}) => {
     if(!env) throw new Error("You need to pass a env string.")
     if (!attr) throw new Error('You need to pass a config attribute.')    
     if(!process.env.hasOwnProperty(env)) throw new Error(`Please setup ${env}`)
@@ -229,7 +229,7 @@ export const updateData=async()=>{
         const buyOrder = await getCurrentOrder()
         store.dispatch(onBuyOrderUpdate({payload:buyOrder}))
         const opPrice = await getCCPrice({from: config.productType, to: config.assetType})
-        store.dispatch(onOpPriceUpdate({payload: opPrice}))
+        store.dispatch(onOpPriceUpdate({payload: {price:opPrice}}))
     }else if(config.mode === "ASK"){
         const sellOrder = await getCurrentOrder()
         store.dispatch(onSellOrderUpdate({payload:sellOrder}))
@@ -245,7 +245,7 @@ export const updateData=async()=>{
 }
 
 
-export const packageOrderBook= ({orderBook})=>{
+export const packageOrderBook= ({orderBook}: {orderBook: Object})=>{
     const asks = orderBook.asks.map(a=>{
         return {price: parseFloat(a.price), count: parseFloat(a.count), size: parseFloat(a.size)}
     })
