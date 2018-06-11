@@ -6,7 +6,7 @@ import test from 'ava'
 import bot from 'askLib'
 import Cobinhood from 'cobinhood-api-node'
 import config from 'config'
-import store from 'reducer'
+import store from 'store'
 import utils from 'utils'
 import lib from 'lib'
 

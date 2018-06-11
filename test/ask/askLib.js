@@ -7,7 +7,7 @@ import config from 'config'
 import askLib from 'askLib'
 import bot from 'askLib'
 import Cobinhood from 'cobinhood-api-node'
-import store from 'reducer'
+import store from 'store'
 import test from 'ava'
 import lib from 'lib'
 

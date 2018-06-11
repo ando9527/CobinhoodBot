@@ -6,7 +6,7 @@
 import logger from './utils/winston'
 import Websocket from 'ws'
 import { haltProcess } from './utils/utils';
-import store from './reducer';
+import store from './store';
 import { onOpPriceUpdate } from './actions/opPrice';
 import config from './config';
 

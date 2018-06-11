@@ -1,7 +1,7 @@
 import {register} from 'babel-core'
 import polyfill from 'babel-polyfill'
 import bot from 'methods'
-import store from './reducer';
+import store from './store';
 import { sendIfttt } from './utils/utils';
 import config from './config'
 

@@ -3,7 +3,7 @@ import config from '../config'
 import moment from 'moment'
 import colors from 'colors/safe'
 import { BigNumber } from 'bignumber.js'
-import store from '../reducer';
+import store from '../store';
 import logger from './winston';
 
 export const sortNumber = (a, b) => {

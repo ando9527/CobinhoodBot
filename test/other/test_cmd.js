@@ -7,7 +7,7 @@ import config from 'config'
 
 import bot from 'methods'
 import Cobinhood from 'cobinhood-api-node'
-import store from 'reducer'
+import store from 'store'
 import test from 'ava'
 import cmd from 'cmd'
 import logger from '../../src/utils/winston';

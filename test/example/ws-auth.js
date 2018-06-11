@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 import config from '../../src/config'
-import store from '../../src/reducer'
+import store from '../../src/store'
 import logger from '../../src/utils/winston';
 dotenv.load()
 const WS = require('ws')

@@ -1,10 +1,10 @@
 import dotenv from 'dotenv'
 import config from '../config'
-import store from '../reducer'
-import { onSellOrderUpdate } from '../reducer/sellOrder'
+import store from '../store'
+import { onSellOrderUpdate } from '../store/sellOrder'
 import { haltProcess } from '../utils/utils'
 import logger from '../utils/winston';
-import { onBuyOrderUpdate } from '../reducer/buyOrder';
+import { onBuyOrderUpdate } from '../store/buyOrder';
 dotenv.load()
 const WS = require('ws')
 let client = null
@@ -50,7 +50,7 @@ const connect = () => {
         trading_pair_id: config.symbol,
       }),
     )
-    
+
     client.send(
       JSON.stringify({
         action: 'subscribe',

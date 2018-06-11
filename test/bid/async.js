@@ -7,7 +7,7 @@ import bot from 'bidLib'
 import lib from 'lib'
 import Cobinhood from 'cobinhood-api-node'
 import config from 'config'
-import store from 'reducer'
+import store from 'store'
 import utils from 'utils'
 
 const api = Cobinhood({

@@ -1,5 +1,5 @@
 import test from 'ava'
-import store from '../../src/reducer'
+import store from '../../src/store'
 import { updateData } from '../../src/lib/lib'
 import { zipOrder } from '../../src/actions/wob'
 import { wobMaker } from '../../src/reducer/wob';

@@ -1,11 +1,11 @@
 // @flow
 import utils from '../utils'
 import config from '../config'
-import store from '../reducer'
+import store from '../store'
 import Cobinhood from 'cobinhood-api-node'
 import axios from 'axios'
-import { onBuyOrderUpdate } from '../reducer/buyOrder';
-import { onSellOrderUpdate } from '../reducer/sellOrder';
+import { onBuyOrderUpdate } from '../store/buyOrder';
+import { onSellOrderUpdate } from '../store/sellOrder';
 import packageJson from '../../package.json'
 import { updateWOB, setWOB } from '../actions/wob';
 import logger from '../utils/winston';

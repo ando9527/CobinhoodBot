@@ -3,7 +3,7 @@ import config from 'config'
 
 import bidLib from 'bidLib'
 import Cobinhood from 'cobinhood-api-node'
-import store from 'reducer'
+import store from 'store'
 import test from 'ava'
 import lib from 'lib'
 import logger from '../../src/utils/winston';

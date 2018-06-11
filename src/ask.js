@@ -1,7 +1,7 @@
 import config from 'config'
 import colors from 'colors/safe'
 import utils from './utils'
-import store from './reducer'
+import store from './store'
 import lib from './lib'
 import askLib from './askLib'
 import {

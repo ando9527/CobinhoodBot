@@ -1,6 +1,6 @@
 import config from './config'
 import utils from './utils'
-import store from './reducer'
+import store from './store'
 import lib from './lib'
 import bidLib from './bidLib'
 import logger from './utils/winston'

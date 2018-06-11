@@ -1,4 +1,4 @@
-import store from 'reducer'
+import store from 'store'
 import test from 'ava'
 import lib from 'lib'
 import logger from '../../src/utils/winston';
