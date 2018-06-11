@@ -200,9 +200,6 @@ export const commonVerifyConfig = async() => {
      */
     // BOT_WATCH_ONLY
     verifyConfigFactory({env: "BOT_WATCH_ONLY", attr: "watchOnly",  requires: ["true", "false"]})
-    // BOT_INTERVAL_SECOND
-    verifyConfigFactory({env: "BOT_INTERVAL_SECOND", attr: "intervalSecond"})
-    if (config.intervalSecond<30) throw new Error('Please setup BOT_INTERVAL_SECOND, larger than 30 sec')
     // BOT_MODE
     verifyConfigFactory({env: "BOT_MODE", attr: "mode", requires:["bid", "ask", "BID", "ASK"]})
     if (!config.mode) throw new Error('Please setup BOT_MODE')
@@ -215,8 +212,8 @@ export const commonVerifyConfig = async() => {
     if(!ans===1) throw new Error('Please setup supportive BOT_PRODUCT_TYPE')
     verifyConfigFactory({env: "BOT_PROFIT_LIMIT_PERCENTAGE", attr: "profitLimitPercentage"})
     verifyConfigFactory({env: "BOT_QUANTITY_COMPARE_PERCENTAGE", attr: "quantityComparePercentage"})
-    if (parseFloat(config.profitLimit)>1000) throw new Error('Profit limit Percentage over 1000, something must wrong here')
-    if (parseFloat(config.profitLimit)<0) throw new Error('Profit limit Percentage is negative, something must wrong here')
+    if (parseFloat(config.profitLimitPercentage)>1000000) throw new Error('Profit limit Percentage over 100000, something must wrong here')
+    if (parseFloat(config.profitLimitPercentage)<0) throw new Error('Profit limit Percentage is negative, something must wrong here')
 
 }
 

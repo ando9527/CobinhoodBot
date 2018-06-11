@@ -1,3 +1,4 @@
+// @flow
 /**
  * Custom axios setting.
  * Provide longer connection time for requesting data from api-server
