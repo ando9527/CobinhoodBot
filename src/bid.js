@@ -177,28 +177,3 @@ export const run = async () => {
 
 
 
-
-// export const run = async()=>{
-//   try {
-//     await initial()
-//     opAgentRun()
-//     const opPrice = await getCCPrice({from: config.productType, to: config.assetType})
-//     store.dispatch(onOpPriceUpdate({payload: {price:opPrice}}))
-//     await check()
-//   } catch (error) {
-//     const record = Object.assign({}, store.getState(), { config: null })
-//     logger.error(error)
-//     logger.error(`Original Data:${JSON.stringify(record)}`)
-
-//     process.exit(1)
-//   }
-
-//   setInterval(async () => {
-//     try {
-//       await check()
-//     } catch (error) {
-//       haltProcess(error)
-//     }
-//   }, config.intervalSecond * 1000)
-// }
-

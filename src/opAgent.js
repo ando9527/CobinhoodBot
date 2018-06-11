@@ -13,10 +13,10 @@ let connecting = false
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  logger.info(`[Websocket] connecting to ${config.BOT_OP_WS_URL}`)
+  logger.info(`[Websocket][Crypto OP] connecting to ${config.BOT_OP_WS_URL}`)
   client = new Websocket(config.BOT_OP_WS_URL)
   client.on('open', function(data) {
-    logger.info('[Websocket] CoinGecko WS opened')
+    logger.info('[Websocket][Crypto OP] WS opened')
     connecting = false
     connected = true
 
@@ -29,15 +29,15 @@ const connect = () => {
   })
 
   client.on('close', function(data) {
-    logger.warn('[Websocket] CoinGecko WS close')
-    if (data) logger.warn(`[Websocket] on close message ${JSON.parse(data)}`)
+    logger.warn('[Websocket][Crypto OP] WS close')
+    if (data) logger.warn(`[Websocket][Crypto OP] on close message ${JSON.parse(data)}`)
     connecting = false
     connected = false
   })
 
   client.on('message', function(message) {
     try {
-      logger.debug(`[Websocket] opAgent ws message receiving: ${message}`)
+      logger.debug(`[Websocket][Crypto OP] opAgent ws message receiving: ${message}`)
       const {h: header, d: data} = JSON.parse(message)
       if (header[0]==="price" && data!==null){
         receivingData({data})
@@ -51,7 +51,7 @@ const connect = () => {
   client.addEventListener('error', (err) =>{
     connecting = false
     connected = false
-    logger.warn(`[Websocket] error event listener ${err}`)
+    logger.warn(`[Websocket][Crypto OP] error event listener ${err}`)
   })
 }
 

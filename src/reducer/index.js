@@ -11,7 +11,6 @@ const rootReducer = combineReducers({
     buyOrder: buyOrderReducer,
     balance: balanceReducer,
     orderBook: wobReducer,
-    wob: wobReducer,
     opPrice: opPriceReducer,
     sellOrder: sellOrderReducer,
     orderId: orderIdReducer,

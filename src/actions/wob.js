@@ -28,7 +28,7 @@ export const updateWOB = ({ payload }) => {
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  logger.info('[Websocket] Cobinhood WS connecting')
+  logger.info('[Websocket][Cobinhood] WS connecting')
   client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
     headers: {
       authorization: process.env.BOT_API_SECRET,
@@ -37,7 +37,7 @@ const connect = () => {
   })
 
   client.on('open', function(data) {
-    logger.info('[Websocket] Cobinhood WS opened')
+    logger.info('[Websocket][Cobinhood] WS opened')
     connecting = false
     connected = true
 
@@ -58,7 +58,7 @@ const connect = () => {
   })
 
   client.on('close', function(data) {
-    logger.info('[Websocket] Cobinhood WS close')
+    logger.info('[Websocket][Cobinhood] WS close')
     if (data) logger.info(JSON.parse(data))
     connecting = false
     connected = false
@@ -124,7 +124,7 @@ const connect = () => {
   client.addEventListener('error', (err) =>{
     connecting = false
     connected = false
-    logger.warn(`[Websocket] error ${err.message}`)
+    logger.warn(`[Websocket][Cobinhood] error ${err.message}`)
   })
 }
 
