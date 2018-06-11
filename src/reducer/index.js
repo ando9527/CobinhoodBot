@@ -1,7 +1,6 @@
 import { createStore, combineReducers } from 'redux'
 import {balanceReducer} from './balance'
 import {buyOrderReducer} from './buyOrder'
-import {orderBookReducer} from './orderBook'
 import {opPriceReducer} from './opPrice'
 import {sellOrderReducer} from './sellOrder'
 import {orderIdReducer} from './orderId'

@@ -6,7 +6,6 @@ import Cobinhood from 'cobinhood-api-node'
 import axios from 'axios'
 import { onBuyOrderUpdate } from '../reducer/buyOrder';
 import { onSellOrderUpdate } from '../reducer/sellOrder';
-import { onOrderBookUpdate } from '../reducer/orderBook';
 import packageJson from '../../package.json'
 import { updateWOB, setWOB } from '../actions/wob';
 import logger from '../utils/winston';
@@ -222,12 +221,14 @@ export const commonVerifyConfig = async() => {
 
 
 /**
- * Update order and balance Data
+ * Update order/order book/balance/opPrice data
  */
 export const updateData=async()=>{
     if (config.mode==="BID"){
         const buyOrder = await getCurrentOrder()
         store.dispatch(onBuyOrderUpdate({payload:buyOrder}))
+        const opPrice = await getCCPrice({from: config.productType, to: config.assetType})
+        store.dispatch(onOpPriceUpdate({payload: {price:opPrice}}))
     }else if(config.mode === "ASK"){
         const sellOrder = await getCurrentOrder()
         store.dispatch(onSellOrderUpdate({payload:sellOrder}))

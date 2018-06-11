@@ -4,6 +4,7 @@ import store from '../reducer'
 import { onSellOrderUpdate } from '../reducer/sellOrder'
 import { haltProcess } from '../utils/utils'
 import logger from '../utils/winston';
+import { onBuyOrderUpdate } from '../reducer/buyOrder';
 dotenv.load()
 const WS = require('ws')
 let client = null
@@ -79,11 +80,14 @@ const connect = () => {
       orderBookNewest = true
       return
     }
+    /**
+     * sync cobinhood order book data
+     */
     if (type === 'u' && channelId.endsWith('order')) {
       const order = zipOrder(dataPayload)
 
       const { event, id } = order
-      if (id === config.sellOrderId) {
+      if (id === config.sellOrderId && config.mode.toLowerCase()==="ask") {
         const eventTypes = ['modified','opened', "partially_filled"]
         if (eventTypes.includes(event)) {
           store.dispatch(onSellOrderUpdate({ payload: order }))
@@ -92,6 +96,19 @@ const connect = () => {
         } else {
           await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
         }
+        return
+      }
+
+      if (id === config.buyOrderId && config.mode.toLowerCase()==="bid") {
+        const eventTypes = ['modified','opened', "partially_filled"]
+        if (eventTypes.includes(event)) {
+          store.dispatch(onBuyOrderUpdate({ payload: order }))
+          if(event==="balance_locked") logger.info(event);
+          
+        } else {
+          await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
+        }
+        return
       }
       return
     }

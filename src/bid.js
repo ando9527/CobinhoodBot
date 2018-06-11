@@ -9,6 +9,7 @@ import { haltProcess } from './utils/utils';
 import { opAgentRun } from './opAgent';
 import { getCCPrice } from './lib/lib';
 import { onOpPriceUpdate } from './actions/opPrice';
+import { wsModifyOrder, startSync, connected, orderBookNewest, setOrderBookNewest } from './actions/wob';
 
 export const initial = async () => {
   await bidLib.verifyConfig()
@@ -39,7 +40,6 @@ export const bidStateMachine = () => {
 
 export const check = async () => {
   // For Logic
-  await lib.updateData()
   const code = bidStateMachine()
   const { opPrice, buyOrder, orderBook } = store.getState()
   const { asks, bids } = orderBook
@@ -132,30 +132,73 @@ export const check = async () => {
   })
   lib.checkProfitLimitPercentage({ profitPercentage: mepp })
   await bidLib.checkEnoughBalance({ price: priceModified })
-  await lib.modifyOrder({ price: priceModified, order: buyOrder })
+  await wsModifyOrder({ price: priceModified, order: buyOrder })
 }
 
-export const run = async()=>{
-  try {
-    await initial()
-    opAgentRun()
-    const opPrice = await getCCPrice({from: config.productType, to: config.assetType})
-    store.dispatch(onOpPriceUpdate({payload: {price:opPrice}}))
-    await check()
-  } catch (error) {
-    const record = Object.assign({}, store.getState(), { config: null })
-    logger.error(error)
-    logger.error(`Original Data:${JSON.stringify(record)}`)
+const runCheck = async () => {
+  if (!connected) return
+  if (orderBookNewest === false) return
+  await check()
+  setOrderBookNewest(false)
+}
 
-    process.exit(1)
-  }
-
-  setInterval(async () => {
+const runBuyOrder = async () => {
     try {
-      await check()
+      // verify configuration
+      await initial()
+      // retrieve order/order book/opPrice once
+      await lib.updateData()
+      // sync order book data
+      startSync()
+      // sync Op Price
+      opAgentRun()
+
     } catch (error) {
-      haltProcess(error)
+      const record = Object.assign({}, store.getState(), { config: null })
+      logger.error(error)
+      logger.error(`Original Data: ${JSON.stringify(record)}`)
+      process.exit(1)
     }
-  }, config.intervalSecond * 1000)
+
+    setInterval(async () => {
+      if (!connected) return
+      try {
+        await runCheck()
+      } catch (error) {
+        await haltProcess(error)
+      }
+    }, 1000)
+  
 }
+
+export const run = async () => {
+  await runBuyOrder()
+}
+
+
+
+
+// export const run = async()=>{
+//   try {
+//     await initial()
+//     opAgentRun()
+//     const opPrice = await getCCPrice({from: config.productType, to: config.assetType})
+//     store.dispatch(onOpPriceUpdate({payload: {price:opPrice}}))
+//     await check()
+//   } catch (error) {
+//     const record = Object.assign({}, store.getState(), { config: null })
+//     logger.error(error)
+//     logger.error(`Original Data:${JSON.stringify(record)}`)
+
+//     process.exit(1)
+//   }
+
+//   setInterval(async () => {
+//     try {
+//       await check()
+//     } catch (error) {
+//       haltProcess(error)
+//     }
+//   }, config.intervalSecond * 1000)
+// }
 

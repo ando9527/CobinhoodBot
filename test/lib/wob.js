@@ -1,8 +1,9 @@
 import test from 'ava'
-import { wobMaker } from '../src/reducer/wob'
-import store from '../src/reducer'
-import { updateData } from '../src/lib/lib'
-import { zipOrder } from '../src/actions/wob'
+import store from '../../src/reducer'
+import { updateData } from '../../src/lib/lib'
+import { zipOrder } from '../../src/actions/wob'
+import { wobMaker } from '../../src/reducer/wob';
+
 test.serial('wobMaker1', async t => {
   const state = {
     bids: [{ price: 0.0001299, count: 5, size: 3000 }],

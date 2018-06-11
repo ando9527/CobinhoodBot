@@ -1,13 +1,14 @@
 import {  sortOrder } from "../utils/utils";
+import logger from "../utils/winston";
 
 export function wobReducer(state = null, action) {
   switch (action.type) {
     case 'SET_WOB': {
-      
-      
+      logger.debug(`[Redux][wobReducer] setWOB`)
       return action.payload
     }
     case 'UPDATE_WOB': {
+      logger.debug(`[Redux][wobReducer] updateWOB-payload ${JSON.stringify(action.payload)}`)
       return wobMaker({state, orderBook: action.payload})
     }
     default:
