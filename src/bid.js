@@ -9,7 +9,7 @@ import { haltProcess } from './utils/utils';
 import { opAgentRun } from './opWsClient';
 import { getCCPrice } from './lib/lib';
 import { onOpPriceUpdate } from './actions/opPrice';
-
+import colors from 'colors/safe'
 import { startSync, wsModifyOrder,connected,orderBookNewest, setOrderBookNewest} from './cobWsClient';
 
 
@@ -62,15 +62,16 @@ export const check = async () => {
   const lowestAsk = lib.getLowestAsk().price
   // For Info
   const highestPrice = lib.getHighestBid().price
-  logger.info(
-    `Yours: ${buyOrder.price}(${eppInfo}) Highest Bid: ${highestPrice}(${lib.getProfitPercentage({
-      price: lowestAsk,
-      productCost: highestPrice,
-    })}%) Lowest Ask: ${lowestAsk} CoinGecko/last update: ${opPrice.price}(${lib.getProfitPercentage({
-      price: opPrice.price,
-      productCost: buyOrder.price,
-    })}%)/${opPrice.lastUpdate}.`,
-  )
+
+  const yoursInfo = colors.red(`Yours: ${buyOrder.price}(${eppInfo}),`)
+  const highestBidInfo = colors.yellow(`Highest Bid: ${highestPrice}(${lib.getProfitPercentage({price: lowestAsk,productCost: highestPrice})}%),`)
+  const lowestAskInfo = colors.green(`Lowest Ask: ${lowestAsk},`)
+  const opPriceInfo = colors.grey(`CoinGecko/LastUpdate: ${opPrice.price}(${lib.getProfitPercentage({
+    price: opPrice.price,
+    productCost: buyOrder.price,
+  })}%)/${opPrice.lastUpdate}.`)
+  
+  logger.info(yoursInfo, highestBidInfo,lowestAskInfo, opPriceInfo  )
 
   if (code === 'ZERO_LIMIT_PROFIT_SELL_ORDER')
     throw new Error('Price of buy orders on the list break your profit limit.')
