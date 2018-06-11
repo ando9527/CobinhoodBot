@@ -1,3 +1,4 @@
+// @flow
 import dotenv from 'dotenv'
 import winston from 'winston'
 import moment from 'moment-timezone'

@@ -1,3 +1,4 @@
+// @flow
 import axios from 'axios'
 import config from '../config'
 import moment from 'moment'
@@ -5,20 +6,19 @@ import colors from 'colors/safe'
 import { BigNumber } from 'bignumber.js'
 import store from '../store';
 import logger from './winston';
+import type { Order } from '../types/orderBook'
 
-export const sortNumber = (a, b) => {
+export const sortNumber = (a: number, b: number) => {
   return minus(a, b)
 }
 
-export const sortOrder = (a, b) => {
+export const sortOrder = (a: Order, b: Order) => {
   return minus(a.price, b.price)
 }
 
-export const sortVolume24h = (a, b) => {
-  return minus(a.volume24h, b.volume24h)
-}
 
-export const sendIfttt = (value1 = null, value2 = null, value3 = null) => {
+
+export const sendIfttt = (value1: string , value2: string|null= null, value3: string|null=null) => {
   return axios
     .post(`https://maker.ifttt.com/trigger/${config.iftttEvent}/with/key/${config.iftttKey}`, {
       value1,
@@ -36,7 +36,7 @@ export const getTime = () => {
   // return moment().format('ddd MMM D YYYY hh:mm:ss')
 }
 
-export const plus = (a, b) => {
+export const plus = (a: number, b: number) => {
   const x = new BigNumber(parseFloat(a).toFixed(10))
   const y = new BigNumber(parseFloat(b).toFixed(10))
   return x
@@ -45,7 +45,7 @@ export const plus = (a, b) => {
     .toNumber()
 }
 
-export const minus = (a, b) => {
+export const minus = (a: number, b: number) => {
   const x = new BigNumber(parseFloat(a).toFixed(10))
   const y = new BigNumber(parseFloat(b).toFixed(10))
   return x
@@ -54,7 +54,7 @@ export const minus = (a, b) => {
     .toNumber()
 }
 
-export const multi = (a, b) => {
+export const multi = (a: number, b:number) => {
   const x = new BigNumber(parseFloat(a).toFixed(10))
   const y = new BigNumber(parseFloat(b).toFixed(10))
   return x
@@ -63,7 +63,7 @@ export const multi = (a, b) => {
     .toNumber()
 }
 
-export const div = (a, b) => {
+export const div = (a:number, b: number) => {
   const x = new BigNumber(parseFloat(a).toFixed(10))
   const y = new BigNumber(parseFloat(b).toFixed(10))
   return x
@@ -72,18 +72,18 @@ export const div = (a, b) => {
     .toNumber()
 }
 
-export const info = (data = {}) => {
-  if (Object.keys(data).length === 0) {
-    return 'Nothing to display.'
-  }
-  let message = ''
-  Object.keys(data).forEach(item => {
-    message += `${item}: ${data[item]}, `
-  })
-  return message
-}
+// export const info = (data = {}) => {
+//   if (Object.keys(data).length === 0) {
+//     return 'Nothing to display.'
+//   }
+//   let message = ''
+//   Object.keys(data).forEach(item => {
+//     message += `${item}: ${data[item]}, `
+//   })
+//   return message
+// }
 
-export const removeProperty = (obj, property) => {
+export const removeProperty = (obj: Object, property: string) => {
   return Object.keys(obj).reduce((acc, key) => {
     if (key !== property) {
       return { ...acc, [key]: obj[key] }
@@ -92,7 +92,7 @@ export const removeProperty = (obj, property) => {
   }, {})
 }
 
-export const haltProcess=async(message)=>{
+export const haltProcess=async(message: string)=>{
 
   try {
     

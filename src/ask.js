@@ -1,17 +1,12 @@
-import config from 'config'
+// @flow
+import config from './config'
 import colors from 'colors/safe'
 import utils from './utils'
 import store from './store'
 import lib from './lib'
 import askLib from './askLib'
-import {
-  wsModifyOrder,
-  connected,
-  orderBookNewest,
-  setOrderBookNewest,
-} from './actions/orderBook'
 import logger from './utils/winston';
-import { startSync } from './cobWsClient';
+import { startSync,wsModifyOrder,  connected,orderBookNewest, setOrderBookNewest, } from './cobWsClient';
 
 
 export const initial = async () => {
