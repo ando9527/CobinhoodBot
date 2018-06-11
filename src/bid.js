@@ -63,7 +63,7 @@ export const check = async () => {
   // For Info
   const highestPrice = lib.getHighestBid().price
 
-  const yoursInfo = colors.red(`Yours: ${buyOrder.price}(${eppInfo}),`)
+  const yoursInfo = colors.blue(`Yours: ${buyOrder.price}(${eppInfo}),`)
   const highestBidInfo = colors.yellow(`Highest Bid: ${highestPrice}(${lib.getProfitPercentage({price: lowestAsk,productCost: highestPrice})}%),`)
   const lowestAskInfo = colors.green(`Lowest Ask: ${lowestAsk},`)
   const opPriceInfo = colors.grey(`CoinGecko/LastUpdate: ${opPrice.price}(${lib.getProfitPercentage({
