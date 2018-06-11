@@ -1,3 +1,7 @@
+// @flow
+
+export const UPDATE_BUY_ORDER = "UPDATE_BUY_ORDER"
+
 export type BuyOrder={
     "id": string,
     "trading_pair_id": string,
@@ -10,8 +14,13 @@ export type BuyOrder={
     "timestamp": string,
     "eq_price": number,
     "completed_at"?: string,
+}| null
 
+export type OnBuyOrderUpdateAction={
+  type: string,
+  payload: BuyOrder
 }
+
 // {
 //     "id": "72be5846-bbe7-4f30-a475-4ed9d0356c87",
 //     "trading_pair_id": "SMT-ETH",

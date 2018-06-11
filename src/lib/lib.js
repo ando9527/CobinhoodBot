@@ -4,7 +4,7 @@ import config from '../config'
 import store from '../store'
 import Cobinhood from 'cobinhood-api-node'
 import axios from 'axios'
-import { onBuyOrderUpdate } from '../store/buyOrder';
+import { onBuyOrderUpdate } from '../actions/buyOrder';
 import { onSellOrderUpdate } from '../store/sellOrder';
 import packageJson from '../../package.json'
 import { updateWOB, setWOB } from '../actions/wob';

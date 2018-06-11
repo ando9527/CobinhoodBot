@@ -1,8 +1,11 @@
-export function buyOrderReducer(state = null, action) {
+// @flow
+import type { BuyOrder, OnBuyOrderUpdateAction } from "../types/buyOrder";
+import { UPDATE_BUY_ORDER,  } from "../types/buyOrder";
+
+
+export function buyOrderReducer(state: BuyOrder= null, action: OnBuyOrderUpdateAction ):BuyOrder {
   switch (action.type) {
-    case 'UPDATE_BUY_ORDER': {
-      console.log(JSON.stringify(action.payload));
-      
+    case UPDATE_BUY_ORDER: {
       return action.payload
     }
     default:
@@ -10,6 +13,4 @@ export function buyOrderReducer(state = null, action) {
   }
 }
 
-export const onBuyOrderUpdate = ({ payload }) => {
-  return { type: 'UPDATE_BUY_ORDER', payload }
-}
+
