@@ -1,17 +1,16 @@
 import test from 'ava'
 import store from '../../src/store'
 import { updateData } from '../../src/lib/lib'
-import { zipOrder } from '../../src/actions/orderBook'
-import { wobMaker } from '../../src/store/orderBook';
-
-test.serial('wobMaker1', async t => {
+import { orderBookMaker } from '../../src/store/orderBook';
+import { zipOrder } from '../../src/cobWsClient';
+test.serial('orderBookMaker1', async t => {
   const state = {
     bids: [{ price: 0.0001299, count: 5, size: 3000 }],
     asks: [{ price: 0.0001299, count: 5, size: 3000 }],
   }
   const orderBook = { bids: [], asks: [{ price: 0.0001299, count: -1, size: -1430 }] }
 
-  const data = wobMaker({ state, orderBook })
+  const data = orderBookMaker({ state, orderBook })
   const ans = {
     asks: [{ price: 0.0001299, count: 4, size: 1570 }],
     bids: [{ price: 0.0001299, count: 5, size: 3000 }],
@@ -19,14 +18,14 @@ test.serial('wobMaker1', async t => {
   t.deepEqual(data, ans)
 })
 
-test.serial('wobMaker2', async t => {
+test.serial('orderBookMaker2', async t => {
   const state = {
     bids: [{ price: 0.0001299, count: 5, size: 3000 }],
     asks: [{ price: 0.0001299, count: 5, size: 3000 }],
   }
   const orderBook = { bids: [], asks: [{ price: 0.0001298, count: 1, size: 2000 }] }
 
-  const res = wobMaker({ state, orderBook })
+  const res = orderBookMaker({ state, orderBook })
   const ans = {
     asks: [ {price: 0.0001298, count: 1, size: 2000},{ price: 0.0001299, count: 5, size: 3000 }],
     bids: [{ price: 0.0001299, count: 5, size: 3000 }],

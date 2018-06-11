@@ -99,7 +99,7 @@ test.serial('packageOrder', async t => {
                     size: 1000,
                     filled: 0,
                     state: 'open',
-                    timestamp: 1519071138754,
+                    timestamp: '1519071138754',
                     eq_price: 0,
                     completed_at: null })
     
