@@ -1,8 +1,8 @@
 // @flow
 
-export const UPDATE_BUY_ORDER = "UPDATE_BUY_ORDER"
+export const UPDATE_SELL_ORDER = "UPDATE_SELL_ORDER"
 
-export type BuyOrder={
+export type SellOrder={
     "id": string,
     "trading_pair_id": string,
     "side": string,
@@ -16,9 +16,9 @@ export type BuyOrder={
     "completed_at"?: string,
 }| null
 
-export type OnBuyOrderUpdateAction={
+export type OnSellOrderUpdateAction={
   type: string,
-  payload: BuyOrder
+  payload: SellOrder
 }
 
 // {

@@ -8,7 +8,7 @@ import { haltProcess } from './utils/utils';
 import { opAgentRun } from './opWsClient';
 import { getCCPrice } from './lib/lib';
 import { onOpPriceUpdate } from './actions/opPrice';
-import { wsModifyOrder, startSync, connected, orderBookNewest, setOrderBookNewest } from './actions/wob';
+import { wsModifyOrder, startSync, connected, orderBookNewest, setOrderBookNewest } from './actions/orderBook';
 
 export const initial = async () => {
   await bidLib.verifyConfig()

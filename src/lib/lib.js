@@ -1,15 +1,16 @@
-// @flow
 import utils from '../utils'
 import config from '../config'
 import store from '../store'
 import Cobinhood from 'cobinhood-api-node'
 import axios from 'axios'
 import { onBuyOrderUpdate } from '../actions/buyOrder';
-import { onSellOrderUpdate } from '../store/sellOrder';
+import { onSellOrderUpdate } from '../actions/sellOrder';
 import packageJson from '../../package.json'
-import { updateWOB, setWOB } from '../actions/wob';
+import { updateOrderBook, setOrderBook } from '../actions/orderBook';
 import logger from '../utils/winston';
 import { onOpPriceUpdate } from '../actions/opPrice';
+import type { BuyOrder } from '../types/buyOrder';
+import type { SellOrder } from '../types/sellOrder';
 export const api = Cobinhood({
     apiSecret: config.apiSecret,
 })
@@ -20,7 +21,7 @@ export const api = Cobinhood({
  * @param {string} payload.to
  * @returns {number} 
  */
-export const getCCPrice =async({from, to}: {from: string, to: string})=>{    
+export const getCCPrice =async({from, to}: {from: string, to: string}): Promise<number>=>{    
     
     try {
         
@@ -43,7 +44,7 @@ export const getCCPrice =async({from, to}: {from: string, to: string})=>{
  * @param {string} payload.to
  * @returns {number} 
  */
-export const getCGPrice =async({from, to}:  {from: string, to: string})=>{    
+export const getCGPrice =async({from, to}:  {from: string, to: string}):Promise<number>=>{    
     const url = `https://crypto.nctu.me/api/cg/${from.toLowerCase()}/${to.toLowerCase()}`    
     const data = await axios.get(url)
     return parseFloat(data.data.data)
@@ -99,7 +100,7 @@ export const getCurrentOrder=async()=>{
 
 }
 
-export const packageOrder=({order}: {order: Object})=>{
+export const packageOrder=({order}: {order: Object}): BuyOrder| SellOrder=>{
     const {id, trading_pair_id, side, type, price, size, filled, state, timestamp, eq_price, completed_at} = order   // eslint-disable-line camelcase
     return  {id, trading_pair_id, side, type, price: parseFloat(price), size: parseFloat(size), filled: parseFloat(filled), state, timestamp: timestamp.toString(), eq_price:parseFloat(eq_price), completed_at } // eslint-disable-line
 }
@@ -237,7 +238,7 @@ export const updateData=async()=>{
     
     const orderBook = await api.orderBooks({trading_pair_id: config.symbol})   // eslint-disable-line
     const newOrderBook = packageOrderBook({orderBook})
-    store.dispatch(setWOB({payload: newOrderBook}))
+    store.dispatch(setOrderBook({payload: newOrderBook}))
     
     
     

@@ -1,12 +1,13 @@
+// @flow
 import { createStore, combineReducers } from 'redux'
 import {buyOrderReducer} from './buyOrder'
 import {opPriceReducer} from './opPrice'
 import {sellOrderReducer} from './sellOrder'
-import {wobReducer} from './wob'
+import {orderBookReducer} from './orderBook'
 
 const rootReducer = combineReducers({
     buyOrder: buyOrderReducer,
-    orderBook: wobReducer,
+    orderBook: orderBookReducer,
     opPrice: opPriceReducer,
     sellOrder: sellOrderReducer,
   });

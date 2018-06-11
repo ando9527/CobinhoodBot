@@ -18,12 +18,12 @@ export const setOrderBookNewest = status => {
 /**
  * set wsOrderBook store
  */
-export const setWOB = ({ payload }) => {
-  return { type: 'SET_WOB', payload }
+export const setOrderBook = ({ payload }) => {
+  return { type: 'SET_ORDER_BOOK', payload }
 }
 
-export const updateWOB = ({ payload }) => {
-  return { type: 'UPDATE_WOB', payload }
+export const updateOrderBook = ({ payload }) => {
+  return { type: 'UPDATE_ORDER_BOOK', payload }
 }
 
 const connect = () => {
@@ -74,12 +74,12 @@ const connect = () => {
     const type = header[2]
 
     if (type === 's' && channelId.startsWith('order-book')) {
-      store.dispatch(setWOB({ payload: zipOrderBook(dataPayload) }))
+      store.dispatch(setOrderBook({ payload: zipOrderBook(dataPayload) }))
       orderBookNewest = true
       return 
     }
     if (type === 'u' && channelId.startsWith('order-book')) {
-      store.dispatch(updateWOB({ payload: zipOrderBook(dataPayload) }))
+      store.dispatch(updateOrderBook({ payload: zipOrderBook(dataPayload) }))
       orderBookNewest = true
       return
     }

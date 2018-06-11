@@ -1,8 +1,8 @@
 import test from 'ava'
 import store from '../../src/store'
 import { updateData } from '../../src/lib/lib'
-import { zipOrder } from '../../src/actions/wob'
-import { wobMaker } from '../../src/reducer/wob';
+import { zipOrder } from '../../src/actions/orderBook'
+import { wobMaker } from '../../src/store/orderBook';
 
 test.serial('wobMaker1', async t => {
   const state = {

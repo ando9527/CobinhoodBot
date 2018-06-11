@@ -10,7 +10,7 @@ import {
   connected,
   orderBookNewest,
   setOrderBookNewest,
-} from './actions/wob'
+} from './actions/orderBook'
 import logger from './utils/winston';
 
 export const initial = async () => {
