@@ -101,7 +101,7 @@ export const getCurrentOrder=async()=>{
 
 export const packageOrder=({order}: {order: Object})=>{
     const {id, trading_pair_id, side, type, price, size, filled, state, timestamp, eq_price, completed_at} = order   // eslint-disable-line camelcase
-    return  {id, trading_pair_id, side, type, price: parseFloat(price), size: parseFloat(size), filled: parseFloat(filled), state, timestamp, eq_price:parseFloat(eq_price), completed_at } // eslint-disable-line
+    return  {id, trading_pair_id, side, type, price: parseFloat(price), size: parseFloat(size), filled: parseFloat(filled), state, timestamp: timestamp.toString(), eq_price:parseFloat(eq_price), completed_at } // eslint-disable-line
 }
 
 export const checkProfitLimitPercentage = ({profitPercentage}: {profitPercentage: number}) => {
