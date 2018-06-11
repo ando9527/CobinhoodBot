@@ -28,8 +28,9 @@ export const updateWOB = ({ payload }) => {
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  logger.info('[Websocket][Cobinhood] WS connecting')
-  client = new WS('wss://ws.cobinhood.com/v2/ws', [], {
+  const wsURL = 'wss://ws.cobinhood.com/v2/ws'
+  logger.info(`[Websocket][Cobinhood] WS connecting to ${wsURL}`)
+  client = new WS(wsURL, [], {
     headers: {
       authorization: process.env.BOT_API_SECRET,
       // "nonce": new Date()*1000000 ,
