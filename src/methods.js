@@ -1,3 +1,4 @@
+// @flow
 import config from './config'
 import * as bidMethods from './bid'
 import * as askMethods from './ask'
