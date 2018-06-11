@@ -1,3 +1,4 @@
+// @flow
 import utils from '../utils'
 import config from '../config'
 import store from '../store'
