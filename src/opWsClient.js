@@ -41,7 +41,7 @@ const connect = () => {
 
   client.on('message', function(message) {
     try {
-      logger.debug(`[Websocket][Crypto OP] opAgent ws message receiving: ${message}`)
+      logger.debug(`[Websocket][Crypto OP] WS message receiving: ${message}`)
       const {h: header, d: data} = JSON.parse(message)
       if (header[0]==="price" && data!==null){
         receivingData({data})

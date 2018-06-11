@@ -5,13 +5,14 @@ import store from './store'
 import lib from './lib'
 import askLib from './askLib'
 import {
-  startSync,
   wsModifyOrder,
   connected,
   orderBookNewest,
   setOrderBookNewest,
 } from './actions/orderBook'
 import logger from './utils/winston';
+import { startSync } from './cobWsClient';
+
 
 export const initial = async () => {
   await askLib.verifyConfig()
