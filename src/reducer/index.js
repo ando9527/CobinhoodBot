@@ -4,7 +4,6 @@ import {buyOrderReducer} from './buyOrder'
 import {opPriceReducer} from './opPrice'
 import {sellOrderReducer} from './sellOrder'
 import {orderIdReducer} from './orderId'
-import { configReducer } from './config';
 import {wobReducer} from './wob'
 
 const rootReducer = combineReducers({
@@ -14,7 +13,6 @@ const rootReducer = combineReducers({
     opPrice: opPriceReducer,
     sellOrder: sellOrderReducer,
     orderId: orderIdReducer,
-    config: configReducer,
   });
 const store = createStore(rootReducer)
 

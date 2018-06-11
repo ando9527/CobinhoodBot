@@ -25,6 +25,7 @@ export const setWOB = ({ payload }) => {
 export const updateWOB = ({ payload }) => {
   return { type: 'UPDATE_WOB', payload }
 }
+
 const connect = () => {
   if (connecting || connected) return
   connecting = true
@@ -49,6 +50,7 @@ const connect = () => {
         trading_pair_id: config.symbol,
       }),
     )
+    
     client.send(
       JSON.stringify({
         action: 'subscribe',

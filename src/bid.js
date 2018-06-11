@@ -4,9 +4,8 @@ import store from './reducer'
 import lib from './lib'
 import bidLib from './bidLib'
 import logger from './utils/winston'
-import './opAgent'
 import { haltProcess } from './utils/utils';
-import { opAgentRun } from './opAgent';
+import { opAgentRun } from './opWsClient';
 import { getCCPrice } from './lib/lib';
 import { onOpPriceUpdate } from './actions/opPrice';
 import { wsModifyOrder, startSync, connected, orderBookNewest, setOrderBookNewest } from './actions/wob';

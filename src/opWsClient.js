@@ -1,10 +1,14 @@
 // @flow
+/**
+ * It's a websocket client.
+ * Provide the average price of crypto currency from CoinGecko website.
+ */
 import logger from './utils/winston'
-import config from './config'
 import Websocket from 'ws'
 import { haltProcess } from './utils/utils';
 import store from './reducer';
 import { onOpPriceUpdate } from './actions/opPrice';
+import config from './config';
 
 let client = null
 let connected = false

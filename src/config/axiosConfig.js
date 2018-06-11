@@ -1,3 +1,8 @@
+/**
+ * Custom axios setting.
+ * Provide longer connection time for requesting data from api-server
+ */
+
 const axios = require('axios')
 if (process.env.NODE_ENV==="production"){
     axios.defaults.retry = 3;
