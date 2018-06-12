@@ -133,7 +133,7 @@ export const check = async () => {
     totalPriceLimit: config.totalPriceLimit,
   })
   lib.checkProfitLimitPercentage({ profitPercentage: mepp })
-  await bidLib.checkEnoughBalance({ price: priceModified })
+  // await bidLib.checkEnoughBalance({ price: priceModified })
   await wsModifyOrder({ price: priceModified, order: buyOrder })
 }
 
