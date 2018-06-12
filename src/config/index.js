@@ -39,6 +39,9 @@ const iftttEvent= process.env.BOT_IFTTT_EVENT
 if (!process.env.BOT_IFTTT_KEY) throw new Error(message)
 const iftttKey = process.env.BOT_IFTTT_KEY
 
+if(mode==="BID" && !process.env.BOT_CHECK_INTERVAL) throw new Error(message)
+const BOT_CHECK_INTERVAL = process.env.BOT_CHECK_INTERVAL?parseFloat(process.env.BOT_CHECK_INTERVAL):30
+
 if(mode==="BID" && !process.env.BOT_BUY_ORDER_ID) throw new Error(message)
 const buyOrderId = process.env.BOT_BUY_ORDER_ID?process.env.BOT_BUY_ORDER_ID:"NONE"
 
@@ -92,6 +95,7 @@ const config={
   opPercentage,
   BOT_API_URL,
   BOT_OP_WS_URL,
+  BOT_CHECK_INTERVAL,
   
   /**
    * ASK MODE

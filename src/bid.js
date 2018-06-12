@@ -169,7 +169,7 @@ const runBuyOrder = async () => {
       } catch (error) {
         await haltProcess(error)
       }
-    }, 1000)
+    }, config.BOT_CHECK_INTERVAL*1000)
   
 }
 

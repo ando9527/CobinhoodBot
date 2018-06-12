@@ -25,15 +25,20 @@ const connect = () => {
   if (connecting || connected) return
   connecting = true
   if (!process.env.BOT_COB_WS_URL) throw new Error("Please setup process.env.BOT_COB_WS_URL")
-  const wsURL = process.env.BOT_COB_WS_URL
+  const wsURL = process.env.BOT_COB_WS_URL||"wss://ws.cobinhood.com/v2/ws"
   logger.info(`[Websocket][Cobinhood] WS connecting to ${wsURL}`)
-  // client = new WS(wsURL, [], {
-  //   headers: {
-  //     authorization: process.env.BOT_API_SECRET,
-  //     // "nonce": new Date()*1000000 ,
-  //   },
-  // })
-  client = new WS(wsURL, [],)
+  
+  if (wsURL==="wss://ws.cobinhood.com/v2/ws"){
+  client = new WS(wsURL, [], {
+    headers: {
+      authorization: process.env.BOT_API_SECRET,
+      // "nonce": new Date()*1000000 ,
+    },
+  })
+  }else{
+    client = new WS(wsURL, [],)
+  }
+
   client.on('open', function(data) {
     logger.info('[Websocket][Cobinhood] WS opened')
     connecting = false
