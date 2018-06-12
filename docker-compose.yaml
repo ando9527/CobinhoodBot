@@ -3,3 +3,8 @@ services:
   cobbv2:
     image: cobbv2
     build: .
+    networks:
+      - websocket
+networks:
+  websocket:
+    external: true
