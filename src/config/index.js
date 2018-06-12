@@ -51,8 +51,8 @@ const totalPriceLimit = process.env.BOT_TOTAL_PRICE_LIMIT?parseFloat(process.env
 if(mode==="BID" && !process.env.BOT_OP_PERCENTAGE)throw new Error(message)
 const opPercentage = process.env.BOT_OP_PERCENTAGE?parseFloat(process.env.BOT_OP_PERCENTAGE):9999999999999999999999999999
 
-if(mode==="BID" && !process.env.BOT_API_URL) throw new Error(message)
-const BOT_API_URL = process.env.BOT_API_URL?process.env.BOT_API_URL:"NONE"
+if(mode==="BID" && !process.env.BOT_OP_API_URL) throw new Error(message)
+const BOT_OP_API_URL = process.env.BOT_OP_API_URL?process.env.BOT_OP_API_URL:"NONE"
 
 if(mode==="BID" && !process.env.BOT_OP_WS_URL) throw new Error(message)
 const BOT_OP_WS_URL= process.env.BOT_OP_WS_URL?process.env.BOT_OP_WS_URL:"NONE"
@@ -93,7 +93,7 @@ const config={
   buyOrderId,
   totalPriceLimit,
   opPercentage,
-  BOT_API_URL,
+  BOT_OP_API_URL,
   BOT_OP_WS_URL,
   BOT_CHECK_INTERVAL,
   

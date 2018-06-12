@@ -26,7 +26,7 @@ export const verifyConfig = async () => {
   /**
    * check api source
    */
-  lib.verifyConfigFactory({ env: 'BOT_API_URL', attr: 'BOT_API_URL' })
+  lib.verifyConfigFactory({ env: 'BOT_OP_API_URL', attr: 'BOT_OP_API_URL' })
 
   lib.verifyConfigFactory({ env: 'BOT_TOTAL_PRICE_LIMIT', attr: 'totalPriceLimit' })
   // BOT_OP_PERCENTAGE

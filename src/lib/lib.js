@@ -25,12 +25,12 @@ export const api = Cobinhood({
  */
 export const getCCPrice = async ({ from, to }: { from: string, to: string }): Promise<number> => {
   try {
-    const url = `${config.BOT_API_URL}/${from.toLowerCase()}/${to.toLowerCase()}`
+    const url = `${config.BOT_OP_API_URL}/${from.toLowerCase()}/${to.toLowerCase()}`
     const data = await axios.get(url)
     if (!data.data.data) throw new Error(`${from.toLowerCase()} is not available in ${url}`)
     return parseFloat(data.data.data)
   } catch (error) {
-    throw new Error(`Get price from ${config.BOT_API_URL} Failed, ${error}`)
+    throw new Error(`Get price from ${config.BOT_OP_API_URL} Failed, ${error}`)
   }
 }
 
