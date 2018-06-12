@@ -124,7 +124,7 @@ const connect = () => {
   client.addEventListener('error', (err) =>{
     connecting = false
     connected = false
-    logger.warn(`[Websocket][Cobinhood] error ${err.message}`)
+    logger.warn(`[Websocket][Cobinhood] Error event listener ${err.message}`)
   })
 }
 
