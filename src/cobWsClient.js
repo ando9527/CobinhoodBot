@@ -94,7 +94,7 @@ const connect = () => {
       const { event, id, state } = order
       if (id === config.sellOrderId && config.mode.toLowerCase()==="ask") {
         const eventTypes = ['modified','opened']
-        if (eventTypes.includes(event) || (event==="partially_filled" && state==="partially_filled")) {
+        if (eventTypes.includes(event) || (event==="executed" && state==="partially_filled")) {
           
           store.dispatch(onSellOrderUpdate({ payload: packageOrder({order}) }))
           if(event==="balance_locked") logger.info(event);
@@ -107,7 +107,7 @@ const connect = () => {
 
       if (id === config.buyOrderId && config.mode.toLowerCase()==="bid") {
         const eventTypes = ['modified','opened']
-        if (eventTypes.includes(event) || (event==="partially_filled" && state==="partially_filled")) {
+        if (eventTypes.includes(event) || (event==="executed" && state==="partially_filled")) {
           store.dispatch(onBuyOrderUpdate({ payload: packageOrder({order}) }))
           if(event==="balance_locked") logger.info(event);
           
