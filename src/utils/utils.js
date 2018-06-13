@@ -4,8 +4,8 @@ import config from '../config'
 import moment from 'moment'
 import colors from 'colors/safe'
 import { BigNumber } from 'bignumber.js'
-import store from '../store';
-import logger from './winston';
+import store from '../store'
+import logger from './winston'
 import type { Order } from '../types/orderBook'
 
 export const sortNumber = (a: number, b: number) => {
@@ -16,9 +16,11 @@ export const sortOrder = (a: Order, b: Order) => {
   return minus(a.price, b.price)
 }
 
-
-
-export const sendIfttt = (value1: string , value2: string|null= null, value3: string|null=null) => {
+export const sendIfttt = (
+  value1: string,
+  value2: string | null = null,
+  value3: string | null = null,
+) => {
   return axios
     .post(`https://maker.ifttt.com/trigger/${config.iftttEvent}/with/key/${config.iftttKey}`, {
       value1,
@@ -26,7 +28,7 @@ export const sendIfttt = (value1: string , value2: string|null= null, value3: st
       value3,
     })
     .then(data => {
-      if (data.data !== `Congratulations! You've fired the cbb event`)
+      if (data.data !== 'Congratulations! You\'ve fired the cbb event')
         throw Error('IFTTT EVENT sent failed')
     })
 }
@@ -54,7 +56,7 @@ export const minus = (a: number, b: number) => {
     .toNumber()
 }
 
-export const multi = (a: number, b:number) => {
+export const multi = (a: number, b: number) => {
   const x = new BigNumber(parseFloat(a).toFixed(10))
   const y = new BigNumber(parseFloat(b).toFixed(10))
   return x
@@ -63,7 +65,7 @@ export const multi = (a: number, b:number) => {
     .toNumber()
 }
 
-export const div = (a:number, b: number) => {
+export const div = (a: number, b: number) => {
   const x = new BigNumber(parseFloat(a).toFixed(10))
   const y = new BigNumber(parseFloat(b).toFixed(10))
   return x
@@ -92,27 +94,18 @@ export const removeProperty = (obj: Object, property: string) => {
   }, {})
 }
 
-export const haltProcess=async(message: string)=>{
-
+export const haltProcess = async (message: string) => {
   try {
-    
-    const record = Object.assign({},store.getState(),{config:null})
+    const record = Object.assign({}, store.getState(), { config: null })
 
-    await sendIfttt(
-      `${config.mode} - ${config.symbol} - ${message}`,
-      JSON.stringify(record),
-    )
-
+    await sendIfttt(`${config.mode} - ${config.symbol} - ${message}`, JSON.stringify(record))
   } catch (e) {
-    logger.error(e);
-  } finally{
-    const record = Object.assign({},store.getState(),{config:null})
-    logger.error('Halt Process');
-    logger.error(`Error Message ${message}`);
+    logger.error(e)
+  } finally {
+    const record = Object.assign({}, store.getState(), { config: null })
+    logger.error('Halt Process')
+    logger.error(`Error Message ${message}`)
     logger.error(JSON.stringify(record))
     process.exit(1)
-
   }
-
-
 }

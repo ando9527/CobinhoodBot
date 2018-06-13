@@ -4,12 +4,12 @@ import config from './config'
 import store from './store'
 import { onSellOrderUpdate } from './actions/sellOrder'
 import { haltProcess } from './utils/utils'
-import logger from './utils/winston';
-import { onBuyOrderUpdate } from './actions/buyOrder';
-import { setOrderBook, updateOrderBook } from './actions/orderBook';
-import { packageOrder } from './lib/lib';
-import type { SellOrder } from './types/sellOrder';
-import type { BuyOrder } from './types/buyOrder';
+import logger from './utils/winston'
+import { onBuyOrderUpdate } from './actions/buyOrder'
+import { setOrderBook, updateOrderBook } from './actions/orderBook'
+import { packageOrder } from './lib/lib'
+import type { SellOrder } from './types/sellOrder'
+import type { BuyOrder } from './types/buyOrder'
 dotenv.load()
 const WS = require('ws')
 let client = null
@@ -20,30 +20,29 @@ export const setOrderBookNewest = (status: boolean) => {
   orderBookNewest = status
 }
 
-
 const connect = () => {
   if (connecting || connected) return
   connecting = true
-  if (!process.env.BOT_COB_WS_URL) throw new Error("Please setup process.env.BOT_COB_WS_URL")
-  const wsURL = process.env.BOT_COB_WS_URL||"wss://ws.cobinhood.com/v2/ws"
+  if (!process.env.BOT_COB_WS_URL) throw new Error('Please setup process.env.BOT_COB_WS_URL')
+  const wsURL = process.env.BOT_COB_WS_URL || 'wss://ws.cobinhood.com/v2/ws'
   logger.info(`[Websocket][Cobinhood] WS connecting to ${wsURL}`)
-  
-  if (wsURL==="wss://ws.cobinhood.com/v2/ws"){
-  client = new WS(wsURL, [], {
-    headers: {
-      authorization: process.env.BOT_API_SECRET,
-      // "nonce": new Date()*1000000 ,
-    },
-  })
-  }else{
-    client = new WS(wsURL, [],)
+
+  if (wsURL === 'wss://ws.cobinhood.com/v2/ws') {
+    client = new WS(wsURL, [], {
+      headers: {
+        authorization: process.env.BOT_API_SECRET,
+        // "nonce": new Date()*1000000 ,
+      },
+    })
+  } else {
+    client = new WS(wsURL, [])
   }
 
   client.on('open', function(data) {
     logger.info('[Websocket][Cobinhood] WS opened')
     connecting = false
     connected = true
-    if (client===null) throw new Error('Client is null')
+    if (client === null) throw new Error('Client is null')
 
     client.send(
       JSON.stringify({
@@ -78,7 +77,7 @@ const connect = () => {
     if (type === 's' && channelId.startsWith('order-book')) {
       store.dispatch(setOrderBook({ payload: zipOrderBook(dataPayload) }))
       orderBookNewest = true
-      return 
+      return
     }
     if (type === 'u' && channelId.startsWith('order-book')) {
       store.dispatch(updateOrderBook({ payload: zipOrderBook(dataPayload) }))
@@ -92,25 +91,22 @@ const connect = () => {
       const order = zipOrder(dataPayload)
 
       const { event, id, state } = order
-      if (id === config.sellOrderId && config.mode.toLowerCase()==="ask") {
-        const eventTypes = ['modified','opened']
-        if (eventTypes.includes(event) || (event==="executed" && state==="partially_filled")) {
-          
-          store.dispatch(onSellOrderUpdate({ payload: packageOrder({order}) }))
-          if(event==="balance_locked") logger.info(event);
-          
+      if (id === config.sellOrderId && config.mode.toLowerCase() === 'ask') {
+        const eventTypes = ['modified', 'opened']
+        if (eventTypes.includes(event) || (event === 'executed' && state === 'partially_filled')) {
+          store.dispatch(onSellOrderUpdate({ payload: packageOrder({ order }) }))
+          if (event === 'balance_locked') logger.info(event)
         } else {
           await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
         }
         return
       }
 
-      if (id === config.buyOrderId && config.mode.toLowerCase()==="bid") {
-        const eventTypes = ['modified','opened']
-        if (eventTypes.includes(event) || (event==="executed" && state==="partially_filled")) {
-          store.dispatch(onBuyOrderUpdate({ payload: packageOrder({order}) }))
-          if(event==="balance_locked") logger.info(event);
-          
+      if (id === config.buyOrderId && config.mode.toLowerCase() === 'bid') {
+        const eventTypes = ['modified', 'opened']
+        if (eventTypes.includes(event) || (event === 'executed' && state === 'partially_filled')) {
+          store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
+          if (event === 'balance_locked') logger.info(event)
         } else {
           await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
         }
@@ -119,15 +115,14 @@ const connect = () => {
       return
     }
 
-    if (type === 'error'){
-      const errorMessage = header[4] 
+    if (type === 'error') {
+      const errorMessage = header[4]
       // {"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
-      if (errorMessage==="balance_locked") return logger.info('balance_locked');
+      if (errorMessage === 'balance_locked') return logger.info('balance_locked')
       await haltProcess(`WS error:${data}`)
     }
-    
   })
-  client.addEventListener('error', (err) =>{
+  client.addEventListener('error', err => {
     connecting = false
     connected = false
     logger.warn(`[Websocket][Cobinhood] Error event listener ${err.message}`)
@@ -145,7 +140,7 @@ export const startSync = () => {
    */
   setInterval(() => {
     if (!connected) return
-    if (client===null) throw new Error('Client is null')
+    if (client === null) throw new Error('Client is null')
     client.send(
       JSON.stringify({
         action: 'ping',
@@ -164,7 +159,7 @@ const zipOrderBook = orderBook => {
   return { bids: newBid, asks: newAsk }
 }
 
-export const zipOrder = (order: Array<string|number>) => {
+export const zipOrder = (order: Array<string | number>) => {
   const id = order[0]
   const timestamp = parseFloat(order[1])
   const trading_pair_id = order[3]
@@ -182,11 +177,17 @@ export const zipOrder = (order: Array<string|number>) => {
   )
 }
 
-export const wsModifyOrder = async ({ price, order }:{price: number, order: SellOrder| BuyOrder}) => {
+export const wsModifyOrder = async ({
+  price,
+  order,
+}: {
+  price: number,
+  order: SellOrder | BuyOrder,
+}) => {
   if (!connected) throw new Error('WS disconnet, unable to modify order')
-  if (client===null) throw new Error('Client is null')
-  if (order===null) throw new Error('Order is null')
-  const {id, size} = order
+  if (client === null) throw new Error('Client is null')
+  if (order === null) throw new Error('Order is null')
+  const { id, size } = order
   client.send(
     JSON.stringify({
       action: 'modify_order',

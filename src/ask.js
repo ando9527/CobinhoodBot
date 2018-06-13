@@ -5,9 +5,14 @@ import utils from './utils'
 import store from './store'
 import lib from './lib'
 import askLib from './askLib'
-import logger from './utils/winston';
-import { startSync,wsModifyOrder,  connected,orderBookNewest, setOrderBookNewest, } from './cobWsClient';
-
+import logger from './utils/winston'
+import {
+  startSync,
+  wsModifyOrder,
+  connected,
+  orderBookNewest,
+  setOrderBookNewest,
+} from './cobWsClient'
 
 export const initial = async () => {
   await askLib.verifyConfig()
@@ -62,19 +67,19 @@ export const check = async () => {
     // will throw error if state machine logic is wrong
     askLib.checkUnderCost({ price: sellOrder.price })
     lib.checkProfitLimitPercentage({ profitPercentage: epp })
-    logger.info("Your price is good, you don't need to change")
-    
+    logger.info('Your price is good, you don\'t need to change')
+
     return 'NOTHING'
   }
   let priceModified = 0
   let changeMessage = ''
   if (code === 'BE_LAST') {
     priceModified = askLib.getLastPrice({ asks: casks })
-    changeMessage = `Reducing price.`
+    changeMessage = 'Reducing price.'
   }
   if (code === 'GAIN_PRICE') {
     priceModified = askLib.getGainedPrice({ asks: casks })
-    changeMessage = `Raising price.`
+    changeMessage = 'Raising price.'
   }
 
   if (priceModified === sellOrder.price) {
@@ -86,7 +91,7 @@ export const check = async () => {
   logger.info(`${priceModified}(${mepp}%) ${changeMessage}`)
 
   if (config.watchOnly) {
-    logger.info(`You are in watch mode now, nothing to do here `)
+    logger.info('You are in watch mode now, nothing to do here ')
     return 'WATCH_ONLY'
   }
 

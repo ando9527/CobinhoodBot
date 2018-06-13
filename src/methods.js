@@ -5,12 +5,11 @@ import * as askMethods from './ask'
 
 let methods
 
-if (config.mode==='BID'){
-  
+if (config.mode === 'BID') {
   methods = bidMethods
 }
 
-if (config.mode==='ASK'){
+if (config.mode === 'ASK') {
   methods = askMethods
 }
 

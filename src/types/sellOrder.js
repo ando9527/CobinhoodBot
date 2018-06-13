@@ -1,24 +1,24 @@
 // @flow
 
-export const UPDATE_SELL_ORDER = "UPDATE_SELL_ORDER"
+export const UPDATE_SELL_ORDER = 'UPDATE_SELL_ORDER'
 
-export type SellOrder={
-    "id": string,
-    "trading_pair_id": string,
-    "side": string,
-    "type": string,
-    "price": number,
-    "size": number,
-    "filled": number,
-    "state": string,
-    "timestamp": string,
-    "eq_price": number,
-    "completed_at"?: string,
-}| null
-
-export type OnSellOrderUpdateAction={
+export type SellOrder = {
+  id: string,
+  trading_pair_id: string,
+  side: string,
   type: string,
-  payload: SellOrder
+  price: number,
+  size: number,
+  filled: number,
+  state: string,
+  timestamp: string,
+  eq_price: number,
+  completed_at?: string,
+} | null
+
+export type OnSellOrderUpdateAction = {
+  type: string,
+  payload: SellOrder,
 }
 
 // {

@@ -1,8 +1,25 @@
 {
+  "parser": "babel-eslint",
+  "plugins": [
+    "flowtype"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 8,
+    "sourceType": "module"
+  },
+  "rules": {
+    "eslint.autoFixOnSave": true,
+    "eslint.packageManager": "yarn",
+    "eslint.run": "onType",
     "extends": ["zavatta", "prettier"],
-    "rules":{
-    "linebreak-style": 0,
-    "camelcase": [2, {"properties": "never"}]
+    "indent": ["error", 2],
+    "linebreak-style": [2, "unix"],
+    "quotes": [2, "single"],
+    "semi": [2, "never"],
+    "brace-style": [2, "1tbs"],
+    "array-bracket-spacing": [2, "never"],
+    "keyword-spacing": [2],
+    "eol-last": [2],
+    "no-trailing-spaces": [2]
   }
 }
-  

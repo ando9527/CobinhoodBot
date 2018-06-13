@@ -105,8 +105,18 @@ export const isHighestBidOrder = ({
  * Check total price is larger than total price limit or not
  * @param {Object} payload
  */
-export const checkOverLimit = ({ price, buyOrder, opPrice, totalPriceLimit }: { price: number, buyOrder: BuyOrder, opPrice: number, totalPriceLimit: number }) => {
-  if (buyOrder===null) throw new Error("Buy Order is null")
+export const checkOverLimit = ({
+  price,
+  buyOrder,
+  opPrice,
+  totalPriceLimit,
+}: {
+  price: number,
+  buyOrder: BuyOrder,
+  opPrice: number,
+  totalPriceLimit: number,
+}) => {
+  if (buyOrder === null) throw new Error('Buy Order is null')
   //(config.increment*2) fixed increment number issue
   if (parseFloat(price) > parseFloat(opPrice * (config.opPercentage / 100 + 1)))
     throw new Error('over op price but not detected, plz contact the bot author')
@@ -120,13 +130,13 @@ export const checkOverLimit = ({ price, buyOrder, opPrice, totalPriceLimit }: { 
  * @param {Object} payload
  */
 
-export const checkEnoughBalance = async ({ price }: {price:number}) => {
+export const checkEnoughBalance = async ({ price }: { price: number }) => {
   const { buyOrder } = store.getState()
   const left = await getAssetBalance({ assetType: config.assetType, includeOrder: false })
   const totalLeft = utils.plus(utils.multi(buyOrder.price, buyOrder.size), left)
   const totalOrder = utils.multi(price, buyOrder.size)
 
-  if (totalOrder > totalLeft) throw new Error("You don't have enough $$ to modify this order")
+  if (totalOrder > totalLeft) throw new Error('You don\'t have enough $$ to modify this order')
 }
 
 /**
@@ -135,7 +145,7 @@ export const checkEnoughBalance = async ({ price }: {price:number}) => {
  * @param {Array} p.bids
  * @param {number} p.opPrice
  */
-export const getBelowOpBuyOrder = ({ bids, opPrice }: {bids:Array<Order>, opPrice: number}) => {
+export const getBelowOpBuyOrder = ({ bids, opPrice }: { bids: Array<Order>, opPrice: number }) => {
   const newPrice =
     parseFloat(opPrice - (config.increment + 0.0000001)) * (config.opPercentage / 100 + 1)
   const newBids = bids.filter(b => parseFloat(b.price) < newPrice)
@@ -146,8 +156,16 @@ export const getBelowOpBuyOrder = ({ bids, opPrice }: {bids:Array<Order>, opPric
  * getBelowLimitBuyOrderFy
  * @param {Object} payload
  */
-export const getBelowLimitBuyOrder = ({ bids, buyOrder, limit }:{ bids: Array<Order>, buyOrder: BuyOrder, limit:number }) => {
-  if (buyOrder===null) throw new Error("Buy Order is null")
+export const getBelowLimitBuyOrder = ({
+  bids,
+  buyOrder,
+  limit,
+}: {
+  bids: Array<Order>,
+  buyOrder: BuyOrder,
+  limit: number,
+}) => {
+  if (buyOrder === null) throw new Error('Buy Order is null')
   const { size } = buyOrder
   const newBids = bids.filter(b => utils.multi(utils.plus(b.price, config.increment), size) < limit)
   return newBids.sort(utils.sortOrder).reverse()
@@ -162,14 +180,28 @@ export const getBelowLimitBuyOrder = ({ bids, buyOrder, limit }:{ bids: Array<Or
  * isReducePriceFactory
  * @param {Object} payload
  */
-export const isReducePrice = ({ bids, buyOrder, increment }:{ bids: Array<Order>, buyOrder: BuyOrder, increment:number }) => {
-  if (buyOrder===null) throw new Error("Buy Order is null")
+export const isReducePrice = ({
+  bids,
+  buyOrder,
+  increment,
+}: {
+  bids: Array<Order>,
+  buyOrder: BuyOrder,
+  increment: number,
+}) => {
+  if (buyOrder === null) throw new Error('Buy Order is null')
   const secBid = bids.sort(utils.sortOrder).reverse()[1]
   if (parseFloat(utils.plus(secBid.price, increment)) === parseFloat(buyOrder.price)) return false
   return true
 }
 
-export const getReducePriceFactory = ({ bids, increment }:{ bids: Array<Order>, increment:number }) => {
+export const getReducePriceFactory = ({
+  bids,
+  increment,
+}: {
+  bids: Array<Order>,
+  increment: number,
+}) => {
   const secBid = bids.sort(utils.sortOrder).reverse()[1]
   return parseFloat(utils.plus(secBid.price, increment))
 }
@@ -178,7 +210,7 @@ export const getReducePriceFactory = ({ bids, increment }:{ bids: Array<Order>, 
  *
  * @param {Object} payload
  */
-export const getReducePrice = ({ bids }:{ bids: Array<Order>}) => {
+export const getReducePrice = ({ bids }: { bids: Array<Order> }) => {
   return getReducePriceFactory({ bids, increment: config.increment })
 }
 
@@ -186,7 +218,7 @@ export const getReducePrice = ({ bids }:{ bids: Array<Order>}) => {
  * getTopPrice
  * @param {Object} payload
  */
-export const getTopPrice = ({ bids }:{ bids: Array<Order>}) => {
+export const getTopPrice = ({ bids }: { bids: Array<Order> }) => {
   return getTopPriceFactory({ bids, increment: config.increment })
 }
 
@@ -194,12 +226,24 @@ export const getTopPrice = ({ bids }:{ bids: Array<Order>}) => {
  * getTopPriceFactory
  * @param {Object} payload
  */
-export const getTopPriceFactory = ({ bids, increment }:{ bids: Array<Order>, increment: number}) => {
+export const getTopPriceFactory = ({
+  bids,
+  increment,
+}: {
+  bids: Array<Order>,
+  increment: number,
+}) => {
   const newBids = bids.sort(utils.sortOrder).reverse()[0]
   return parseFloat(utils.plus(newBids.price, increment))
 }
 
-export const getExpectedCost = ({ sellPrice, profitPercentage }:{ sellPrice: number, profitPercentage: number }) => {
+export const getExpectedCost = ({
+  sellPrice,
+  profitPercentage,
+}: {
+  sellPrice: number,
+  profitPercentage: number,
+}) => {
   // (x-y)/y*100 = z
   // y = 100x/(z+100) !=-100
   // return 100*sellPrice/(profitPercentage+100)
@@ -207,7 +251,15 @@ export const getExpectedCost = ({ sellPrice, profitPercentage }:{ sellPrice: num
   return cost
 }
 
-export const getLimitProfitBuyOrderFy = ({ asks, bids, profitPercentage }:{ asks: Array<Order>, bids:Array<Order>, profitPercentage:number }) => {
+export const getLimitProfitBuyOrderFy = ({
+  asks,
+  bids,
+  profitPercentage,
+}: {
+  asks: Array<Order>,
+  bids: Array<Order>,
+  profitPercentage: number,
+}) => {
   const lowestAskPrice = lib.getLowestAskFy({ asks }).price
   const newBids = bids.filter(b => {
     return b.price < getExpectedCost({ sellPrice: lowestAskPrice, profitPercentage })
@@ -215,20 +267,40 @@ export const getLimitProfitBuyOrderFy = ({ asks, bids, profitPercentage }:{ asks
   return newBids
 }
 
-export const getLimitProfitBuyOrder = ({ asks, bids }:{ asks: Array<Order>, bids:Array<Order>}) => {
+export const getLimitProfitBuyOrder = ({
+  asks,
+  bids,
+}: {
+  asks: Array<Order>,
+  bids: Array<Order>,
+}) => {
   const profitPercentage = config.profitLimitPercentage
   return getLimitProfitBuyOrderFy({ asks, bids, profitPercentage })
 }
 
-export const inBidPriceBucket = ({ bids, buyOrder }:{ bids: Array<Order>, buyOrder: BuyOrder}) => {
-  if (buyOrder===null) throw new Error ("Buy Order is null")
+export const inBidPriceBucket = ({
+  bids,
+  buyOrder,
+}: {
+  bids: Array<Order>,
+  buyOrder: BuyOrder,
+}) => {
+  if (buyOrder === null) throw new Error('Buy Order is null')
   const bidPrice = bids.map(a => parseFloat(a.price))
   if (bidPrice.includes(parseFloat(buyOrder.price))) return true
   return false
 }
 
-export const getValidQuantityCompareFy = ({ bids, buyOrder, quantityComparePercentage }:{ bids: Array<Order>, buyOrder: BuyOrder, quantityComparePercentage:number }) => {
-  if (buyOrder===null) throw new Error ("Buy Order is null")
+export const getValidQuantityCompareFy = ({
+  bids,
+  buyOrder,
+  quantityComparePercentage,
+}: {
+  bids: Array<Order>,
+  buyOrder: BuyOrder,
+  quantityComparePercentage: number,
+}) => {
+  if (buyOrder === null) throw new Error('Buy Order is null')
   const original = JSON.parse(JSON.stringify(bids))
   const temp = JSON.parse(JSON.stringify(bids))
   const bidsA = temp.sort(utils.sortOrder)
@@ -250,7 +322,13 @@ export const getValidQuantityCompareFy = ({ bids, buyOrder, quantityComparePerce
   return newBids
 }
 
-export const getValidQuantityCompare = ({ bids, buyOrder }: { bids: Array<Order>, buyOrder: BuyOrder }) => {
+export const getValidQuantityCompare = ({
+  bids,
+  buyOrder,
+}: {
+  bids: Array<Order>,
+  buyOrder: BuyOrder,
+}) => {
   const quantityComparePercentage = config.quantityComparePercentage
   return getValidQuantityCompareFy({ bids, buyOrder, quantityComparePercentage })
 }

@@ -5,13 +5,18 @@ import store from './store'
 import lib from './lib'
 import bidLib from './bidLib'
 import logger from './utils/winston'
-import { haltProcess } from './utils/utils';
-import { opAgentRun } from './opWsClient';
-import { getCCPrice } from './lib/lib';
-import { onOpPriceUpdate } from './actions/opPrice';
+import { haltProcess } from './utils/utils'
+import { opAgentRun } from './opWsClient'
+import { getCCPrice } from './lib/lib'
+import { onOpPriceUpdate } from './actions/opPrice'
 import colors from 'colors/safe'
-import { startSync, wsModifyOrder,connected,orderBookNewest, setOrderBookNewest} from './cobWsClient';
-
+import {
+  startSync,
+  wsModifyOrder,
+  connected,
+  orderBookNewest,
+  setOrderBookNewest,
+} from './cobWsClient'
 
 export const initial = async () => {
   await bidLib.verifyConfig()
@@ -64,14 +69,21 @@ export const check = async () => {
   const highestPrice = lib.getHighestBid().price
 
   const yoursInfo = colors.blue(`Yours: ${buyOrder.price}(${eppInfo}),`)
-  const highestBidInfo = colors.yellow(`Highest Bid: ${highestPrice}(${lib.getProfitPercentage({price: lowestAsk,productCost: highestPrice})}%),`)
+  const highestBidInfo = colors.yellow(
+    `Highest Bid: ${highestPrice}(${lib.getProfitPercentage({
+      price: lowestAsk,
+      productCost: highestPrice,
+    })}%),`,
+  )
   const lowestAskInfo = colors.green(`Lowest Ask: ${lowestAsk},`)
-  const opPriceInfo = colors.grey(`CoinGecko/LastUpdate: ${opPrice.price}(${lib.getProfitPercentage({
-    price: opPrice.price,
-    productCost: buyOrder.price,
-  })}%)/${opPrice.lastUpdate}.`)
-  
-  logger.info(yoursInfo, highestBidInfo,lowestAskInfo, opPriceInfo  )
+  const opPriceInfo = colors.grey(
+    `CoinGecko/LastUpdate: ${opPrice.price}(${lib.getProfitPercentage({
+      price: opPrice.price,
+      productCost: buyOrder.price,
+    })}%)/${opPrice.lastUpdate}.`,
+  )
+
+  logger.info(yoursInfo, highestBidInfo, lowestAskInfo, opPriceInfo)
 
   if (code === 'ZERO_LIMIT_PROFIT_SELL_ORDER')
     throw new Error('Price of buy orders on the list break your profit limit.')
@@ -93,7 +105,7 @@ export const check = async () => {
       totalPriceLimit: config.totalPriceLimit,
     })
     lib.checkProfitLimitPercentage({ profitPercentage: epp })
-    logger.info("Your offer is good, you don't need to change.")
+    logger.info('Your offer is good, you don\'t need to change.')
     return 'NOTHING'
   }
 
@@ -120,7 +132,7 @@ export const check = async () => {
   logger.info(`${priceModified}(${mepp}%) ${changeMessage}`)
 
   if (config.watchOnly === true) {
-    logger.info(`You are in watch mode now, nothing to do here `)
+    logger.info('You are in watch mode now, nothing to do here ')
     return 'WATCH_ONLY'
   }
   /**
@@ -145,37 +157,32 @@ const runCheck = async () => {
 }
 
 const runBuyOrder = async () => {
+  try {
+    // verify configuration
+    await initial()
+    // retrieve order/order book/opPrice once
+    await lib.updateData()
+    // sync order book data
+    startSync()
+    // sync Op Price
+    opAgentRun()
+  } catch (error) {
+    const record = Object.assign({}, store.getState(), { config: null })
+    logger.error(error)
+    logger.error(`Original Data: ${JSON.stringify(record)}`)
+    process.exit(1)
+  }
+
+  setInterval(async () => {
+    if (!connected) return
     try {
-      // verify configuration
-      await initial()
-      // retrieve order/order book/opPrice once
-      await lib.updateData()
-      // sync order book data
-      startSync()
-      // sync Op Price
-      opAgentRun()
-
+      await runCheck()
     } catch (error) {
-      const record = Object.assign({}, store.getState(), { config: null })
-      logger.error(error)
-      logger.error(`Original Data: ${JSON.stringify(record)}`)
-      process.exit(1)
+      await haltProcess(error)
     }
-
-    setInterval(async () => {
-      if (!connected) return
-      try {
-        await runCheck()
-      } catch (error) {
-        await haltProcess(error)
-      }
-    }, config.BOT_CHECK_INTERVAL*1000)
-  
+  }, config.BOT_CHECK_INTERVAL * 1000)
 }
 
 export const run = async () => {
   await runBuyOrder()
 }
-
-
-

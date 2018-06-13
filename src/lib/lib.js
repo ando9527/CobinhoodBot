@@ -60,7 +60,7 @@ export const modifyOrder = async ({
   price: number,
   order: BuyOrder | SellOrder,
 }) => {
-  if(!order) throw new Error('Current Order is null')
+  if (!order) throw new Error('Current Order is null')
   const currentOrder = order
   try {
     const { success } = await api.modifyOrder({
@@ -103,7 +103,7 @@ export const getCurrentOrder = async () => {
     if (data.success === false)
       throw new Error(`Can not retrieve your order from server, Error ${data}`)
     const { order } = data.result
-    if (order.state === 'filled') throw new Error(`This order is not available right now.`)
+    if (order.state === 'filled') throw new Error('This order is not available right now.')
     logger.info(
       `Current Order Information, id: ${order.id}, symbol: ${order.trading_pair_id}, side: ${
         order.side
