@@ -1,7 +1,7 @@
 version: '2'
 services:
   cobbv2:
-    image: cobbv2
+    image: docker.kumay.net/cobbv2:latest
     build: .
     networks:
       - websocket
