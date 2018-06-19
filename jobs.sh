@@ -1,7 +1,7 @@
 #!/bin/sh
 REPOSITORY=$(sed -nE 's/^\s*"name": "(.*?)",$/\1/p' package.json)
 REGISTRY=docker.kumay.net
-IMAGE="$REGISTRY/$REPOSITORY:lates"
+IMAGE="$REGISTRY/$REPOSITORY:latest"
 BUILDCMD="docker build -t $IMAGE ."
 PUSHCMD="docker push $IMAGE"
 PULLCMD="docker pull $IMAGE"
