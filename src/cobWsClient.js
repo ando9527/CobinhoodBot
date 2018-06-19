@@ -95,7 +95,10 @@ const connect = () => {
         const eventTypes = ['modified', 'opened']
         if (eventTypes.includes(event) || (event === 'executed' && state === 'partially_filled')) {
           store.dispatch(onSellOrderUpdate({ payload: packageOrder({ order }) }))
-          if (event === 'balance_locked') logger.info(event)
+        } else if (event === 'balance_locked') {
+          logger.warn(event)
+        } else if (event === 'modify_rejected') {
+          logger.warn(event)
         } else {
           await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
         }
@@ -106,7 +109,10 @@ const connect = () => {
         const eventTypes = ['modified', 'opened']
         if (eventTypes.includes(event) || (event === 'executed' && state === 'partially_filled')) {
           store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
-          if (event === 'balance_locked') logger.info(event)
+        } else if (event === 'balance_locked') {
+          logger.warn(event)
+        } else if (event === 'modify_rejected') {
+          logger.warn(event)
         } else {
           await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
         }
@@ -117,8 +123,7 @@ const connect = () => {
 
     if (type === 'error') {
       const errorMessage = header[4]
-      // {"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
-      if (errorMessage === 'balance_locked') return logger.info('balance_locked')
+      if (errorMessage === 'balance_locked') return logger.warn('balance_locked')
       await haltProcess(`WS error:${data}`)
     }
   })
@@ -188,16 +193,16 @@ export const wsModifyOrder = async ({
   if (client === null) throw new Error('Client is null')
   if (order === null) throw new Error('Order is null')
   const { id, size } = order
-  client.send(
-    JSON.stringify({
-      action: 'modify_order',
-      type: '0', // Type enum above
-      order_id: `${id}`,
-      price: `${price}`,
-      size: `${size}`,
-      // "stop_price": "",        // mandatory for stop/stop-limit order
-      // "trailing_distance": "", // mandatory for trailing stop order
-      id: `modify-order-${id}`,
-    }),
-  )
+  const sendBack = JSON.stringify({
+    action: 'modify_order',
+    type: '0', // Type enum above
+    order_id: `${id}`,
+    price: `${price}`,
+    size: `${size}`,
+    // "stop_price": "",        // mandatory for stop/stop-limit order
+    // "trailing_distance": "", // mandatory for trailing stop order
+    id: `modify-order-${id}`,
+  })
+  logger.debug(`[Websocket][Cobinhood] Modify Order ${JSON.stringify(sendBack)}`)
+  client.send(sendBack)
 }

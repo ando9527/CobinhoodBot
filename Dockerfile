@@ -1,17 +1,14 @@
 FROM node:10
 
-RUN /bin/bash -l -c "mkdir /root/.ssh"
-ADD yk /root/.ssh/id_rsa
-RUN chmod 700 /root/.ssh/id_rsa
-RUN echo "Host bitbucket.org\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
+RUN curl -L https://raw.githubusercontent.com/dockito/vault/master/ONVAULT > /usr/local/bin/ONVAULT && \
+    chmod +x /usr/local/bin/ONVAULT
 
 WORKDIR /app
+
 COPY package.json yarn.lock ./
-RUN yarn --pure-lockfile
+RUN ONVAULT yarn --unsafe-perm --pure-lockfile
 
 COPY . .
 RUN yarn run build
-RUN rm yk
-RUN rm /root/.ssh/id_rsa
 
 CMD ["node", "dist/index.js"]

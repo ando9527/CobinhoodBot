@@ -101,4 +101,20 @@ Ask Mode
 ```javascript
 // Unknown error
 {"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
+{["order","2","u","0"],"d":["6136e360-da2c-4f7e-bcc9-d938d878a6c0","1529438496388","","FSN-ETH","open","modify_rejected","bid","0.0000001","0","50","0"]}}
+```
+
+### Event format
+```javascript
+const id = order[0]
+const timestamp = parseFloat(order[1])
+const trading_pair_id = order[3]
+const state = order[4]
+const event = order[5]
+const side = order[6]
+const price = parseFloat(order[7])
+const eq_price = parseFloat(order[8])
+const size = parseFloat(order[9])
+const filled = parseFloat(order[10]
+)
 ```
