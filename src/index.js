@@ -8,9 +8,5 @@ import config from './config'
 import logger from './helpers/sentry'
 
 bot.run().catch(async error => {
-  logger.error(`Global Error ${error}`)
-  logger.error(store.getState())
-  const record = Object.assign({}, store.getState(), { config: null })
-  await sendIfttt(`${config.mode} - ${config.symbol} - ${error.message}`, JSON.stringify(record))
-  process.exit(1)
+  logger.error(error)
 })

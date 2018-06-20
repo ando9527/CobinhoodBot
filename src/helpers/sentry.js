@@ -29,7 +29,8 @@ class Logger {
     addition
       ? Raven.captureException(obj, addition, { extra: { ...addition['extra'], record } })
       : Raven.captureException(obj, { extra: record })
-    return winstonLogger.error(obj)
+    winstonLogger.error(obj)
+    winstonLogger.error(JSON.stringify(record))
   }
 
   warn = (obj: any) => {
@@ -51,7 +52,7 @@ class Logger {
     addition
       ? Raven.captureMessage(obj, addition, { extra: { ...addition['extra'], record } })
       : Raven.captureException(obj, { extra: record })
-    return Raven.captureMessage(obj)
+    process.exit(1)
   }
 }
 
