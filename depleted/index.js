@@ -1,3 +1,5 @@
+import './../src/cobWSClient.test'
+
 // import './lib/lib'
 // import './lib/orderBookReducer'
 // import './bid/bid'
@@ -5,4 +7,4 @@
 
 // import './ask'
 
-// import './bid'
+// import './bid/async'

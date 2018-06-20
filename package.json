@@ -36,7 +36,7 @@
     "moment-timezone": "^0.5.17",
     "raven": "^2.6.2",
     "redux": "^3.7.2",
-    "winston": "^2.4.2",
+    "winston": "^3.0.0",
     "ws": "^5.2.0"
   },
   "devDependencies": {
@@ -44,11 +44,11 @@
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.1",
-    "babel-plugin-module-resolver": "^3.0.0",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-zavatta": "^6.0.1",
@@ -58,12 +58,21 @@
     "rimraf": "^2.6.2"
   },
   "ava": {
+    "files": [
+      "**/*.test.js"
+		],
+		"sources": [
+			"**/*.js"
+    ],
+    "cache": true,
+    "concurrency": 5,
+    "failFast": true,
+    "failWithoutAssertions": false,
+    "tap": true,
+    "compileEnhancements": false,
     "require": [
       "babel-register",
       "babel-polyfill"
-    ],
-    "files": [
-      "./test/index.js"
     ],
     "babel": "inherit"
   }
