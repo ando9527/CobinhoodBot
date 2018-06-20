@@ -3,6 +3,7 @@ const Raven = require('raven')
 const git = require('git-rev-sync')
 import config from '../config'
 import winstonLogger from './winston'
+import store from '../store'
 const dsn = config.SENTRY_DSN
 Raven.config(process.env.NODE_ENV === 'production' && dsn, { release: git.long() }).install()
 
@@ -24,7 +25,10 @@ class Logger {
   }
 
   error = (obj: any, addition?: AdditionData) => {
-    addition ? Raven.captureException(obj, addition) : Raven.captureException(obj)
+    const record = Object.assign({}, store.getState(), { config: null })
+    addition
+      ? Raven.captureException(obj, addition, { extra: record, ...addition })
+      : Raven.captureException(obj, { extra: record })
     return winstonLogger.error(obj)
   }
 
@@ -38,6 +42,15 @@ class Logger {
 
   record = (obj: any, addition?: AdditionData) => {
     addition ? Raven.captureMessage(obj, addition) : Raven.captureException(obj)
+    return Raven.captureMessage(obj)
+  }
+
+  recordHalt = (obj: any, addition?: AdditionData) => {
+    winstonLogger.error(`${obj} ${JSON.stringify(addition)}`)
+    const record = Object.assign({}, store.getState(), { config: null })
+    addition
+      ? Raven.captureMessage(obj, addition, { extra: { record, ...addition } })
+      : Raven.captureException(obj, { extra: record })
     return Raven.captureMessage(obj)
   }
 }

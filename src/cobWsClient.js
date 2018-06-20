@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 import config from './config'
 import store from './store'
 import { onSellOrderUpdate } from './actions/sellOrder'
-import { haltProcess } from './utils/utils'
+import { haltProcess, sendIfttt } from './utils/utils'
 import logger from './helpers/sentry'
 import { onBuyOrderUpdate } from './actions/buyOrder'
 import { setOrderBook, updateOrderBook } from './actions/orderBook'
@@ -94,38 +94,51 @@ const connect = () => {
       const order = zipOrderStateMessage(dataPayload)
 
       const { event, id, state }: { event: WsEvent, id: string, state: WsState } = order
-      if (id === config.sellOrderId && config.mode.toLowerCase() === 'ask') {
-        const eventTypes: Array<WsEvent> = ['modified', 'opened']
-        if (eventTypes.includes(event) || (event === 'executed' && state === 'partially_filled')) {
-          store.dispatch(onSellOrderUpdate({ payload: packageOrder({ order }) }))
-        } else if (event === 'balance_locked') {
-          logger.warn(event)
-          logger.record(event, { tags: { reject: 'balance_locked' }, extra: { orderId: id } })
-        } else if (event === 'modify_rejected') {
-          logger.warn(event)
-          logger.record(event, { tags: { reject: 'modify_rejected' }, extra: { orderId: id } })
-        } else if (event === 'modify_rejected') {
-        } else {
-          await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
+      if (config.mode.toLowerCase() === 'ask')
+        if (id === config.sellOrderId) {
+          const eventTypes: Array<WsEvent> = ['modified', 'opened', 'executed']
+          if (eventTypes.includes(event)) {
+            dispatchOrder(order)
+          } else if (event === 'balance_locked') {
+            logger.warn(event)
+            logger.record(event, { tags: { reject: 'balance_locked' }, extra: { orderId: id } })
+          } else if (event === 'modify_rejected') {
+            logger.warn(event)
+            logger.record(event, { tags: { reject: 'modify_rejected' }, extra: { orderId: id } })
+          } else if (event === 'executed' && state === 'partially_filled') {
+            const message = `Your order partially filled: ${config.symbol} ${id}`
+            logger.info(message)
+            sendIfttt(message)
+          } else if (event === 'executed' && state === 'filled') {
+            const message = `Your order full filled: ${config.symbol} ${id}`
+            logger.info(message)
+            sendIfttt(message)
+          } else if (event === 'cancelled' && state === 'cancelled') {
+            const message = `Your order full filled: ${config.symbol} ${id}`
+            logger.info(message)
+          } else {
+            logger.recordHalt('Unexpected WS Code', {})
+            logger.error()
+            await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
+          }
+          return
         }
-        return
-      }
 
-      if (id === config.buyOrderId && config.mode.toLowerCase() === 'bid') {
-        const eventTypes = ['modified', 'opened']
-        if (eventTypes.includes(event) || (event === 'executed' && state === 'partially_filled')) {
-          store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
-        } else if (event === 'balance_locked') {
-          logger.warn(event)
-          logger.record(event, { tags: { reject: 'balance_locked' }, extra: { orderId: id } })
-        } else if (event === 'modify_rejected') {
-          logger.warn(event)
-          logger.record(event, { tags: { reject: 'modify_rejected' }, extra: { orderId: id } })
-        } else {
-          await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
-        }
-        return
-      }
+      // if (id === config.buyOrderId && config.mode.toLowerCase() === 'bid') {
+      //   const eventTypes = ['modified', 'opened']
+      //   if (eventTypes.includes(event) || (event === 'executed' && state === 'partially_filled')) {
+      //     store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
+      //   } else if (event === 'balance_locked') {
+      //     logger.warn(event)
+      //     logger.record(event, { tags: { reject: 'balance_locked' }, extra: { orderId: id } })
+      //   } else if (event === 'modify_rejected') {
+      //     logger.warn(event)
+      //     logger.record(event, { tags: { reject: 'modify_rejected' }, extra: { orderId: id } })
+      //   } else {
+      //     await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
+      //   }
+      //   return
+      // }
       return
     }
 
@@ -214,4 +227,11 @@ export const wsModifyOrder = async ({
   })
   logger.debug(`[Websocket][Cobinhood] Modify Order ${JSON.stringify(sendBack)}`)
   client.send(sendBack)
+}
+
+const dispatchOrder = order => {
+  if (config.mode.toLowerCase() === 'ask')
+    return store.dispatch(onSellOrderUpdate({ payload: packageOrder({ order }) }))
+  if (config.mode.toLocaleLowerCase() === 'bid')
+    return store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
 }
