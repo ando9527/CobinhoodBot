@@ -5,7 +5,7 @@ import bot from './methods'
 import store from './store'
 import { sendIfttt } from './utils/utils'
 import config from './config'
-import logger from './utils/winston'
+import logger from './helpers/sentry'
 
 bot.run().catch(async error => {
   logger.error(`Global Error ${error}`)

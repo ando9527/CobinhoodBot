@@ -4,6 +4,9 @@ import * as axiosConfig from './axiosConfig'
 dotenv.load()
 const message = 'Environment Variable Error'
 
+const SENTRY_DSN =
+  process.env.SENTRY_DSN || 'https://9f16201a3b914228acd9d7bb78b82bb3@sentry.io/1228757'
+
 if (!process.env.BOT_SMALLEST_INCREMENT) throw new Error(message)
 const increment = parseFloat(process.env.BOT_SMALLEST_INCREMENT)
 const decrement = increment
@@ -71,6 +74,7 @@ const productCost = process.env.BOT_PRODUCT_COST
   : 9999999999999999999999999
 
 const config = {
+  SENTRY_DSN,
   // increment : 0.0000001,
   // decrement: 0.0000001,
   increment,

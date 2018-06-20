@@ -3,7 +3,7 @@
  * It's a websocket client.
  * Provide the average price of crypto currency from CoinGecko website.
  */
-import logger from './utils/winston'
+import logger from './helpers/sentry'
 import Websocket from 'ws'
 import { haltProcess } from './utils/utils'
 import store from './store'

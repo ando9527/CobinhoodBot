@@ -4,7 +4,7 @@ import utils from './utils'
 import store from './store'
 import lib from './lib'
 import bidLib from './bidLib'
-import logger from './utils/winston'
+import logger from './helpers/sentry'
 import { haltProcess } from './utils/utils'
 import { opAgentRun } from './opWsClient'
 import { getCCPrice } from './lib/lib'
@@ -83,7 +83,7 @@ export const check = async () => {
     })}%)/${opPrice.lastUpdate}.`,
   )
 
-  logger.info(yoursInfo, highestBidInfo, lowestAskInfo, opPriceInfo)
+  logger.info(`${yoursInfo}, ${highestBidInfo}, ${lowestAskInfo}, ${opPriceInfo}`)
 
   if (code === 'ZERO_LIMIT_PROFIT_SELL_ORDER')
     throw new Error('Price of buy orders on the list break your profit limit.')

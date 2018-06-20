@@ -1,6 +1,6 @@
 // @flow
 import { sortOrder } from '../utils/utils'
-import logger from '../utils/winston'
+import logger from '../helpers/sentry'
 import type { OrderBook, AllOrderBookActions, Order } from '../types/orderBook'
 import { SET_ORDER_BOOK, UPDATE_ORDER_BOOK } from '../types/orderBook'
 

@@ -5,7 +5,7 @@ import utils from './utils'
 import store from './store'
 import lib from './lib'
 import askLib from './askLib'
-import logger from './utils/winston'
+import logger from './helpers/sentry'
 import {
   startSync,
   wsModifyOrder,

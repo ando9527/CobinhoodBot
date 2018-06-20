@@ -1,14 +1,16 @@
 // @flow
+
+import type { BuyOrder } from '../types/buyOrder'
+import type { SellOrder } from '../types/sellOrder'
+import type { Order, OrderBook } from '../types/orderBook'
+
 import Cobinhood from 'cobinhood-api-node'
 import config from '../config'
 import colors from 'colors/safe'
 import utils from '../utils'
 import store from '../store'
 import lib from '../lib'
-import logger from '../utils/winston'
-import type { BuyOrder } from '../types/buyOrder'
-import type { SellOrder } from '../types/sellOrder'
-import type { Order, OrderBook } from '../types/orderBook'
+import logger from '../helpers/sentry'
 
 export const api = Cobinhood({
   apiSecret: config.apiSecret,

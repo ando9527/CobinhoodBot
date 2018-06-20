@@ -2,7 +2,7 @@
 import type { OpPrice, OnOpPriceUpdateAction } from '../types/opPrice'
 import { UPDATE_OP_PRICE } from '../types/opPrice'
 import moment from 'moment-timezone'
-import logger from '../utils/winston'
+import logger from '../helpers/sentry'
 
 export function opPriceReducer(
   state: OpPrice = { price: 0, lastUpdate: 'NONE' },
