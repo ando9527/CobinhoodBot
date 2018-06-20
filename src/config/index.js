@@ -5,7 +5,7 @@ dotenv.load()
 const message = 'Environment Variable Error'
 
 const SENTRY_DSN =
-  process.env.SENTRY_DSN || 'https://9f16201a3b914228acd9d7bb78b82bb3@sentry.io/1228757'
+  process.env.SENTRY_DSN || 'https://1cb22698d3764fdfbc0377e02e822b66@sentry.io/1229216'
 
 if (!process.env.BOT_SMALLEST_INCREMENT) throw new Error(message)
 const increment = parseFloat(process.env.BOT_SMALLEST_INCREMENT)

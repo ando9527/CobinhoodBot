@@ -118,6 +118,31 @@ Ask Mode
   {"h":["order","2","u","0"],"d":["961cf7e9-a145-4a29-95d2-d252c1692c0b","1529186590761","1529187794446","MFG-ETH","cancelled","cancelled","ask","0.0000283","0.0000283","4300","3000"]}
 ```
 
+### Event
+
+opened: order placed.
+modified: order modified.
+executed: order executed/matched.
+triggered: conditional order been triggered.
+cancelled: order cancelled.
+cancel_pending: server is processing cancelation.
+cancel_rejected: cancel request is rejected.
+modify_rejected: modify request is rejected.
+execute_rejected: rejected while executing.
+trigger_rejected: rejected while triggering.
+
+
+### State
+queued
+open
+partially_filled
+filled
+cancelled
+pending_cancellation
+rejected
+triggered
+pending_modification
+
 ### Event format
 ```javascript
 const id = order[0]
