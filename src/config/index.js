@@ -1,7 +1,7 @@
 // @flow
-import dotenv from 'dotenv'
+require('dotenv').load()
+
 import * as axiosConfig from './axiosConfig'
-dotenv.load()
 const message = 'Environment Variable Error'
 
 const SENTRY_DSN =

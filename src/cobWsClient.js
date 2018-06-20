@@ -3,7 +3,6 @@
 import type { WsEvent, WsState, WsOrder } from './types/cobWs'
 import type { SellOrder } from './types/sellOrder'
 import type { BuyOrder } from './types/buyOrder'
-import dotenv from 'dotenv'
 import config from './config'
 import store from './store'
 import { onSellOrderUpdate } from './actions/sellOrder'
@@ -13,7 +12,6 @@ import { onBuyOrderUpdate } from './actions/buyOrder'
 import { setOrderBook, updateOrderBook } from './actions/orderBook'
 import { packageOrder } from './lib/lib'
 
-dotenv.load()
 const WS = require('ws')
 let client = null
 export let connected = false
@@ -155,11 +153,9 @@ export const wsModifyOrder = async ({
   client.send(sendBack)
 }
 
-const dispatchOrder = order => {
-  if (config.mode.toLowerCase() === 'ask')
-    return store.dispatch(onSellOrderUpdate({ payload: packageOrder({ order }) }))
-  if (config.mode.toLocaleLowerCase() === 'bid')
-    return store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
+export const dispatchOrder = ({ order, mode }: { order: any, mode: any }) => {
+  if (mode === 'ask') return store.dispatch(onSellOrderUpdate({ payload: packageOrder({ order }) }))
+  if (mode === 'bid') return store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
 }
 
 export const processOnMessage = (rawOnMessage: any) => {
@@ -167,8 +163,6 @@ export const processOnMessage = (rawOnMessage: any) => {
   // [channel_id, version, type, request_id (optional)]
   const channelId = header[0]
   const type = header[2]
-  const errorMessage = header[4]
-
   if (type === 's' && channelId.startsWith('order-book')) {
     store.dispatch(setOrderBook({ payload: zipOrderBook(data) }))
     orderBookNewest = true
@@ -183,10 +177,10 @@ export const processOnMessage = (rawOnMessage: any) => {
    * sync cobinhood order book data
    */
   if (type === 'u' && channelId.endsWith('order')) {
-    processOrderMessage(data, rawOnMessage)
-    return 'ORDER_UPDATE'
+    return processOrderMessage(data, rawOnMessage)
   }
 
+  const errorMessage = header[4]
   if (type === 'error') {
     return processErrorMessage({ errorMessage, rawOnMessage })
   }
@@ -195,17 +189,19 @@ export const processOnMessage = (rawOnMessage: any) => {
 export const processOrderMessage = (data: any, rawOnMessage: any) => {
   const order = zipOrderStateMessage(data)
   const { event, id, state }: { event: WsEvent, id: string, state: WsState } = order
-  if (id !== config.sellOrderId && id !== config.buyOrderId) return
+  console.log(config.sellOrderId)
+  console.log(config.buyOrderId)
+
+  if (id !== config.sellOrderId && id !== config.buyOrderId) return 'IRRELEVANT_ORDER'
 
   const eventTypes: Array<WsEvent> = ['modified', 'opened', 'executed']
+
   if (eventTypes.includes(event)) {
-    dispatchOrder(order)
-  } else if (event === 'balance_locked') {
-    logger.warn(event)
-    logger.record(event, { tags: { reject: 'balance_locked' }, extra: { orderId: id } })
+    dispatchOrder({ order, mode: config.mode.toLowerCase() })
   } else if (event === 'modify_rejected') {
     logger.warn(event)
     logger.record(event, { tags: { reject: 'modify_rejected' }, extra: { orderId: id } })
+    return 'MODIFY_REJECTED'
   } else if (event === 'executed' && state === 'partially_filled') {
     const message = `Your order partially filled: ${config.symbol} ${id}`
     logger.info(message)
@@ -221,7 +217,6 @@ export const processOrderMessage = (data: any, rawOnMessage: any) => {
     logger.recordHalt('Unexpected WS Code', { extra: { rawOnMessage } })
   }
 }
-
 export const processErrorMessage = ({
   errorMessage,
   rawOnMessage,
@@ -235,19 +230,3 @@ export const processErrorMessage = ({
   }
   logger.recordHalt('Unexpected WS Code', { extra: { rawOnMessage } })
 }
-
-// if (id === config.buyOrderId && config.mode.toLowerCase() === 'bid') {
-//   const eventTypes = ['modified', 'opened']
-//   if (eventTypes.includes(event) || (event === 'executed' && state === 'partially_filled')) {
-//     store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
-//   } else if (event === 'balance_locked') {
-//     logger.warn(event)
-//     logger.record(event, { tags: { reject: 'balance_locked' }, extra: { orderId: id } })
-//   } else if (event === 'modify_rejected') {
-//     logger.warn(event)
-//     logger.record(event, { tags: { reject: 'modify_rejected' }, extra: { orderId: id } })
-//   } else {
-//     await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
-//   }
-//   return
-// }

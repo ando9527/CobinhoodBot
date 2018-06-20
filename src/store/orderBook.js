@@ -55,7 +55,8 @@ export const orderBookMaker = ({
   state: OrderBook,
   orderBook: OrderBook,
 }): OrderBook => {
-  if (state === null || orderBook === null) throw new Error('OrderBook is null')
+  if (state === null) throw new Error('state OrderBook is null')
+  if (orderBook === null) throw new Error('OrderBook is null')
   const { asks, bids } = state
   const { asks: uAsks, bids: uBids } = orderBook
   const newAsks = ordersMaker({ orders: asks, uOrders: uAsks })

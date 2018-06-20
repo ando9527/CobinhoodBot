@@ -1,5 +1,4 @@
 // @flow
-require('dotenv').load()
 import winston from 'winston'
 import moment from 'moment-timezone'
 
