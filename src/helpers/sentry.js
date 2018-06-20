@@ -27,7 +27,7 @@ class Logger {
   error = (obj: any, addition?: AdditionData) => {
     const record = Object.assign({}, store.getState(), { config: null })
     addition
-      ? Raven.captureException(obj, addition, { extra: record, ...addition })
+      ? Raven.captureException(obj, addition, { extra: { ...addition['extra'], record } })
       : Raven.captureException(obj, { extra: record })
     return winstonLogger.error(obj)
   }
@@ -49,7 +49,7 @@ class Logger {
     winstonLogger.error(`${obj} ${JSON.stringify(addition)}`)
     const record = Object.assign({}, store.getState(), { config: null })
     addition
-      ? Raven.captureMessage(obj, addition, { extra: { record, ...addition } })
+      ? Raven.captureMessage(obj, addition, { extra: { ...addition['extra'], record } })
       : Raven.captureException(obj, { extra: record })
     return Raven.captureMessage(obj)
   }

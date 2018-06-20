@@ -94,18 +94,18 @@ export const removeProperty = (obj: Object, property: string) => {
   }, {})
 }
 
-export const haltProcess = async (message: string) => {
-  try {
-    const record = Object.assign({}, store.getState(), { config: null })
+// export const haltProcess = async (message: string) => {
+//   try {
+//     const record = Object.assign({}, store.getState(), { config: null })
 
-    await sendIfttt(`${config.mode} - ${config.symbol} - ${message}`, JSON.stringify(record))
-  } catch (e) {
-    logger.error(e)
-  } finally {
-    const record = Object.assign({}, store.getState(), { config: null })
-    logger.error('Halt Process')
-    logger.error(`Error Message ${message}`)
-    logger.error(JSON.stringify(record))
-    process.exit(1)
-  }
-}
+//     await sendIfttt(`${config.mode} - ${config.symbol} - ${message}`, JSON.stringify(record))
+//   } catch (e) {
+//     logger.error(e)
+//   } finally {
+//     const record = Object.assign({}, store.getState(), { config: null })
+//     logger.error('Halt Process')
+//     logger.error(`Error Message ${message}`)
+//     logger.error(JSON.stringify(record))
+//     process.exit(1)
+//   }
+// }

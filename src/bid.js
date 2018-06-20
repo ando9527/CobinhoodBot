@@ -5,7 +5,6 @@ import store from './store'
 import lib from './lib'
 import bidLib from './bidLib'
 import logger from './helpers/sentry'
-import { haltProcess } from './utils/utils'
 import { opAgentRun } from './opWsClient'
 import { getCCPrice } from './lib/lib'
 import { onOpPriceUpdate } from './actions/opPrice'
@@ -178,7 +177,7 @@ const runBuyOrder = async () => {
     try {
       await runCheck()
     } catch (error) {
-      await haltProcess(error)
+      logger.error(error)
     }
   }, config.BOT_CHECK_INTERVAL * 1000)
 }

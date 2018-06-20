@@ -5,7 +5,6 @@
  */
 import logger from './helpers/sentry'
 import Websocket from 'ws'
-import { haltProcess } from './utils/utils'
 import store from './store'
 import { onOpPriceUpdate } from './actions/opPrice'
 import config from './config'
@@ -77,7 +76,7 @@ export const opAgentRun = () => {
       if (connected) return
       connect()
     } catch (error) {
-      haltProcess(error)
+      logger.error(error)
     }
   }, 3500)
 

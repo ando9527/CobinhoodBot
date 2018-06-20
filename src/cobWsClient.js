@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 import config from './config'
 import store from './store'
 import { onSellOrderUpdate } from './actions/sellOrder'
-import { haltProcess, sendIfttt } from './utils/utils'
+import { sendIfttt } from './utils/utils'
 import logger from './helpers/sentry'
 import { onBuyOrderUpdate } from './actions/buyOrder'
 import { setOrderBook, updateOrderBook } from './actions/orderBook'
@@ -117,9 +117,7 @@ const connect = () => {
             const message = `Your order full filled: ${config.symbol} ${id}`
             logger.info(message)
           } else {
-            logger.recordHalt('Unexpected WS Code', {})
-            logger.error()
-            await haltProcess(`This order might be done, event: ${event}, data: ${data}`)
+            logger.recordHalt('Unexpected WS Code', { extra: data })
           }
           return
         }
@@ -145,7 +143,7 @@ const connect = () => {
     if (type === 'error') {
       const errorMessage = header[4]
       if (errorMessage === 'balance_locked') return logger.warn('balance_locked')
-      await haltProcess(`WS error:${data}`)
+      logger.recordHalt('Unexpected WS Code', { extra: data })
     }
   })
   client.addEventListener('error', err => {
