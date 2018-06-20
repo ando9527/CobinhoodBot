@@ -97,11 +97,25 @@ Ask Mode
 ```
 
 
-### Error message 
+## Error message
+### Balance locked 
 ```javascript
-// Unknown error
 {"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}
+```
+### Modify rejected
+```javascript
 {["order","2","u","0"],"d":["6136e360-da2c-4f7e-bcc9-d938d878a6c0","1529438496388","","FSN-ETH","open","modify_rejected","bid","0.0000001","0","50","0"]}}
+```
+### Order filled
+```javascript
+ {"h":["order","2","u","0"],"d":["4bcf1133-18df-4517-85f9-a1b92ef7d3d0","1528335379002","1529452889470","BEE-ETH","filled","executed","bid","0.0000462","0.0000462","4300","4300"]}
+ {"h":["order","2","u","0"],"d":["9dd05bb9-9d0c-4745-b7c7-b08bc38019d1","1529422784241","1529424981918","LYM-ETH","filled","executed","ask","0.000122","0.0001226370680111","5000","5000"]}
+```
+
+### Order Canceled
+```javascript
+ {"h":["order","2","u","0"],"d":["306d755b-ceb7-47f8-801d-4ac58b8fb04d","1528933311735","1529316981529","HQX-ETH","cancelled","cancelled","bid","0.0000403","0.0000451","7000","836"]}
+  {"h":["order","2","u","0"],"d":["961cf7e9-a145-4a29-95d2-d252c1692c0b","1529186590761","1529187794446","MFG-ETH","cancelled","cancelled","ask","0.0000283","0.0000283","4300","3000"]}
 ```
 
 ### Event format
