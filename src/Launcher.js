@@ -9,9 +9,6 @@ import * as axiosConfig from './helpers/axiosConfig'
 import { runSellOrder } from './ask'
 import { runBuyOrder } from './bid'
 
-// bot.run().catch(async error => {
-//   logger.error(error)
-// })
 export default class Launcher {
   static launch = async (option: Option) => {
     if (option.mode.toUpperCase() === 'ASK') return await runSellOrder(option)

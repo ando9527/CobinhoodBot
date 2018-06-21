@@ -201,7 +201,7 @@ export const processOnMessage = ({
 /**
  * Process data from channelId: order
  */
-export const processOrderChannel = ({
+export const processOrderChannel = async ({
   order,
   option,
 }: {
@@ -236,20 +236,18 @@ export const processOrderChannel = ({
     return 'MODIFY_REJECTED'
   }
   if (state === 'partially_filled' && event === 'executed') {
-    const message = `Your order partially filled: ${option.symbol} ${id}`
-    logger.info(message)
-    sendIfttt({ value1: message, option })
+    const message = `Your order partially filled: ${option.mode} ${option.symbol} ${id}`
+    logger.warn(message)
+    await sendIfttt({ value1: message, option })
     return 'PARTIALLY_FILLED'
   }
   if (state === 'partially_filled' && event === 'modified') {
-    const message = `Your order partially filled: ${option.symbol} ${id}`
-    logger.info(message)
     return 'PARTIALLY_FILLED'
   }
   if (state === 'filled' && event === 'executed') {
     const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message)
-    sendIfttt({ value1: message, option })
+    await sendIfttt({ value1: message, option })
     logger.info('Leaving process now')
     if (option.NODE_ENV !== 'development') process.exit(0)
     return 'ORDER_FILLED'
