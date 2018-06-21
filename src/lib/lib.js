@@ -6,12 +6,14 @@ import axios from 'axios'
 import { onBuyOrderUpdate } from '../actions/buyOrder'
 import { onSellOrderUpdate } from '../actions/sellOrder'
 import packageJson from '../../package.json'
+import type { Option } from '../types/option'
 import { updateOrderBook, setOrderBook } from '../actions/orderBook'
 import logger from '../helpers/winston'
 import { onOpPriceUpdate } from '../actions/opPrice'
 import type { BuyOrder } from '../types/buyOrder'
 import type { SellOrder } from '../types/sellOrder'
 import type { Order } from '../types/orderBook'
+
 // export const api = Cobinhood({
 //   apiSecret: option.apiSecret,
 // })
@@ -29,7 +31,7 @@ export const getCCPrice = async ({
 }: {
   from: string,
   to: string,
-  option: any,
+  option: Option,
 }): Promise<number> => {
   try {
     const url = `${option.BOT_OP_API_URL}/${from.toLowerCase()}/${to.toLowerCase()}`
@@ -67,7 +69,7 @@ export const modifyOrder = async ({
 }: {
   price: number,
   order: BuyOrder | SellOrder,
-  option: any,
+  option: Option,
 }) => {
   if (!order) throw new Error('Current Order is null')
   const currentOrder = order
@@ -102,7 +104,7 @@ export const modifyOrder = async ({
  * Get information of current order
  * @return {Object} order
  */
-export const getCurrentOrder = async (option: any) => {
+export const getCurrentOrder = async (option: Option) => {
   try {
     let order_id = null
     if (option.mode === 'BID') {
@@ -223,7 +225,7 @@ export const verifyConfigFactory = ({
   env: string,
   attr: string,
   requires?: Array<string>,
-  option: any,
+  option: Option,
 }) => {
   if (!env) throw new Error('You need to pass a env string.')
   if (!attr) throw new Error('You need to pass a option attribute.')
@@ -238,7 +240,7 @@ export const verifyConfigFactory = ({
     throw new Error(`${env} ENV, please use ${requires.toString()}`)
 }
 
-export const commonVerifyConfig = async (option: any) => {
+export const commonVerifyConfig = async (option: Option) => {
   logger.info(`Version ${packageJson.version}`)
   logger.info('Verifying your option..')
   /**
@@ -328,14 +330,14 @@ export const commonVerifyConfig = async (option: any) => {
 /**
  * Update order/order book/balance/opPrice data
  */
-export const updateData = async (option: any) => {
+export const updateData = async (option: Option) => {
   if (option.mode === 'BID') {
-    const buyOrder = await getCurrentOrder()
+    const buyOrder = await getCurrentOrder(option)
     store.dispatch(onBuyOrderUpdate({ payload: buyOrder }))
     const opPrice = await getCCPrice({ from: option.productType, to: option.assetType, option })
     store.dispatch(onOpPriceUpdate({ payload: { price: opPrice } }))
   } else if (option.mode === 'ASK') {
-    const sellOrder = await getCurrentOrder()
+    const sellOrder = await getCurrentOrder(option)
     store.dispatch(onSellOrderUpdate({ payload: sellOrder }))
   }
   const api = Cobinhood({

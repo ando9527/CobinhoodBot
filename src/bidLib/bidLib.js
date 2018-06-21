@@ -8,11 +8,12 @@ import logger from '../helpers/winston'
 import type { BuyOrder } from '../types/buyOrder'
 import type { SellOrder } from '../types/sellOrder'
 import type { Order } from '../types/orderBook'
+import type { Option } from '../types/option'
 
 /**
  * Check ENV BID required
  */
-export const verifyConfig = async (option: any) => {
+export const verifyConfig = async (option: Option) => {
   await lib.commonVerifyConfig(option)
   // BOT_BUY_ORDER_ID
   lib.verifyConfigFactory({ env: 'BOT_BUY_ORDER_ID', attr: 'buyOrderId', option })

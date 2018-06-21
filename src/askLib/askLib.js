@@ -4,6 +4,8 @@ import type { BuyOrder } from '../types/buyOrder'
 import type { SellOrder } from '../types/sellOrder'
 import type { Order, OrderBook } from '../types/orderBook'
 
+import type { Option } from '../types/option'
+
 import Cobinhood from 'cobinhood-api-node'
 import colors from 'colors/safe'
 import utils from '../utils'
@@ -13,7 +15,7 @@ import logger from '../helpers/winston'
 
 // export const api = Cobinhood({apiSecret: config.apiSecret})
 
-export const verifyConfig = async (option: any) => {
+export const verifyConfig = async (option: Option) => {
   await lib.commonVerifyConfig(option)
 
   // BOT_SELL_ORDER_ID

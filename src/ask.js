@@ -14,10 +14,10 @@ import {
   setOrderBookNewest,
 } from './cobWsClient'
 
-export const initial = async () => {
-  await askLib.verifyConfig()
+export const initial = async (option: Option) => {
+  await askLib.verifyConfig(option)
 }
-export const askStateMachine = (option: any) => {
+export const askStateMachine = (option: Option) => {
   const { orderBook, sellOrder } = store.getState()
   const { asks } = orderBook
   const vQCAsks = askLib.getValidQuantityCompare({
@@ -43,7 +43,7 @@ export const askStateMachine = (option: any) => {
   if (ig === true) return 'GAIN_PRICE'
 }
 
-export const check = async (option: any) => {
+export const check = async (option: Option) => {
   // For Logic
   const code = askStateMachine(option)
 
@@ -124,7 +124,7 @@ export const check = async (option: any) => {
   await wsModifyOrder({ price: priceModified, order: sellOrder })
 }
 
-const runCheck = async option => {
+const runCheck = async (option: Option) => {
   if (!connected) return
 
   if (orderBookNewest === false) return
@@ -136,7 +136,7 @@ const runCheck = async option => {
 export const runSellOrder = async (option: Option) => {
   return new Promise(async (res, rej) => {
     try {
-      await initial()
+      await initial(option)
       await lib.updateData(option)
       await startSync(option)
     } catch (error) {
@@ -150,7 +150,7 @@ export const runSellOrder = async (option: Option) => {
     const id = setInterval(async () => {
       if (!connected) return
       try {
-        await runCheck()
+        await runCheck(option)
       } catch (error) {
         clearInterval(id)
         rej(error)

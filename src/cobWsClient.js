@@ -10,6 +10,7 @@ import logger from './helpers/winston'
 import { onBuyOrderUpdate } from './actions/buyOrder'
 import { setOrderBook, updateOrderBook } from './actions/orderBook'
 import { packageOrder } from './lib/lib'
+import type { Option } from './types/option'
 
 const WS = require('ws')
 let client = null
@@ -78,7 +79,7 @@ const connect = option => {
   })
 }
 
-export const startSync = (option: any) => {
+export const startSync = (option: Option) => {
   setInterval(async () => {
     if (connected) return
     connect(option)
@@ -157,7 +158,13 @@ export const dispatchOrder = ({ order, mode }: { order: any, mode: any }) => {
   if (mode === 'bid') return store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
 }
 
-export const processOnMessage = ({ rawOnMessage, option }: { rawOnMessage: any, option: any }) => {
+export const processOnMessage = ({
+  rawOnMessage,
+  option,
+}: {
+  rawOnMessage: any,
+  option: Option,
+}) => {
   const { h: header, d: data } = JSON.parse(rawOnMessage)
   // [channel_id, version, type, request_id (optional)]
   const channelId = header[0]
@@ -185,7 +192,7 @@ export const processOnMessage = ({ rawOnMessage, option }: { rawOnMessage: any, 
   }
 }
 
-export const processOrderMessage = ({ data, option }: { data: any, option: any }) => {
+export const processOrderMessage = ({ data, option }: { data: any, option: Option }) => {
   const order = zipOrderStateMessage(data)
   const { event, id, state }: { event: WsEvent, id: string, state: WsState } = order
 

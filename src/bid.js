@@ -17,8 +17,8 @@ import {
   setOrderBookNewest,
 } from './cobWsClient'
 
-export const initial = async () => {
-  await bidLib.verifyConfig()
+export const initial = async (option: Option) => {
+  await bidLib.verifyConfig(option)
 }
 
 export const bidStateMachine = (option: Option) => {
@@ -194,7 +194,7 @@ const runCheck = async (option: Option) => {
 export const runBuyOrder = async (option: Option) => {
   try {
     // verify configuration
-    await initial()
+    await initial(option)
     // retrieve order/order book/opPrice once
     await lib.updateData(option)
     // sync order book data
