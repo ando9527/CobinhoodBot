@@ -9,7 +9,6 @@ import {
 } from './cobWsClient'
 import store from './store'
 import { setOrderBook } from './actions/orderBook'
-// import config from './config';
 let initialEnv = null
 
 describe('processOrderMessage', function() {

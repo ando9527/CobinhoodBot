@@ -191,7 +191,7 @@ export const runBuyOrder = async (option: any) => {
     // retrieve order/order book/opPrice once
     await lib.updateData()
     // sync order book data
-    startSync()
+    startSync(option)
     // sync Op Price
     opAgentRun()
   } catch (error) {

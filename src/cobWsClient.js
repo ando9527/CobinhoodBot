@@ -3,7 +3,6 @@
 import type { WsEvent, WsState, WsOrder } from './types/cobWs'
 import type { SellOrder } from './types/sellOrder'
 import type { BuyOrder } from './types/buyOrder'
-import config from './config'
 import store from './store'
 import { onSellOrderUpdate } from './actions/sellOrder'
 import { sendIfttt } from './utils/utils'
@@ -21,7 +20,7 @@ export const setOrderBookNewest = (status: boolean) => {
   orderBookNewest = status
 }
 
-const connect = () => {
+const connect = option => {
   if (connecting || connected) return
   connecting = true
   if (!process.env.BOT_COB_WS_URL) throw new Error('Please setup process.env.BOT_COB_WS_URL')
@@ -49,7 +48,7 @@ const connect = () => {
       JSON.stringify({
         action: 'subscribe',
         type: 'order-book',
-        trading_pair_id: config.symbol,
+        trading_pair_id: option.symbol,
       }),
     )
 
@@ -57,7 +56,7 @@ const connect = () => {
       JSON.stringify({
         action: 'subscribe',
         type: 'order',
-        trading_pair_id: config.symbol,
+        trading_pair_id: option.symbol,
       }),
     )
   })
@@ -79,10 +78,10 @@ const connect = () => {
   })
 }
 
-export const startSync = () => {
+export const startSync = (option: any) => {
   setInterval(async () => {
     if (connected) return
-    connect()
+    connect(option)
   }, 3500)
 
   /**
@@ -158,7 +157,7 @@ export const dispatchOrder = ({ order, mode }: { order: any, mode: any }) => {
   if (mode === 'bid') return store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
 }
 
-export const processOnMessage = (rawOnMessage: any) => {
+export const processOnMessage = ({ rawOnMessage, option }: { rawOnMessage: any, option: any }) => {
   const { h: header, d: data } = JSON.parse(rawOnMessage)
   // [channel_id, version, type, request_id (optional)]
   const channelId = header[0]
@@ -177,7 +176,7 @@ export const processOnMessage = (rawOnMessage: any) => {
    * sync cobinhood order book data
    */
   if (type === 'u' && channelId.endsWith('order')) {
-    return processOrderMessage(data, rawOnMessage)
+    return processOrderMessage({ data, rawOnMessage, option })
   }
 
   const errorMessage = header[4]
@@ -186,32 +185,38 @@ export const processOnMessage = (rawOnMessage: any) => {
   }
 }
 
-export const processOrderMessage = (data: any, rawOnMessage: any) => {
+export const processOrderMessage = ({
+  data,
+  rawOnMessage,
+  option,
+}: {
+  data: any,
+  rawOnMessage: any,
+  option: any,
+}) => {
   const order = zipOrderStateMessage(data)
   const { event, id, state }: { event: WsEvent, id: string, state: WsState } = order
-  console.log(config.sellOrderId)
-  console.log(config.buyOrderId)
 
-  if (id !== config.sellOrderId && id !== config.buyOrderId) return 'IRRELEVANT_ORDER'
+  if (id !== option.sellOrderId && id !== option.buyOrderId) return 'IRRELEVANT_ORDER'
 
   const eventTypes: Array<WsEvent> = ['modified', 'opened', 'executed']
 
   if (eventTypes.includes(event)) {
-    dispatchOrder({ order, mode: config.mode.toLowerCase() })
+    dispatchOrder({ order, mode: option.mode.toLowerCase() })
   } else if (event === 'modify_rejected') {
     logger.warn(event)
     logger.record(event, { tags: { reject: 'modify_rejected' }, extra: { orderId: id } })
     return 'MODIFY_REJECTED'
   } else if (event === 'executed' && state === 'partially_filled') {
-    const message = `Your order partially filled: ${config.symbol} ${id}`
+    const message = `Your order partially filled: ${option.symbol} ${id}`
     logger.info(message)
     sendIfttt(message)
   } else if (event === 'executed' && state === 'filled') {
-    const message = `Your order full filled: ${config.symbol} ${id}`
+    const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message)
     sendIfttt(message)
   } else if (event === 'cancelled' && state === 'cancelled') {
-    const message = `Your order full filled: ${config.symbol} ${id}`
+    const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message)
   } else {
     logger.recordHalt('Unexpected WS Code', { extra: { rawOnMessage } })

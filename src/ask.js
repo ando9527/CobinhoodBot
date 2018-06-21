@@ -131,7 +131,7 @@ export const runSellOrder = async (option: any) => {
     try {
       await initial()
       await lib.updateData()
-      await startSync()
+      await startSync(option)
     } catch (error) {
       const record = Object.assign({}, store.getState(), { config: null })
       logger.error(error)
