@@ -7,10 +7,10 @@ import type { BuyOrder } from './types/buyOrder'
 import store from './store'
 import { onSellOrderUpdate } from './actions/sellOrder'
 import { sendIfttt } from './utils/utils'
-import logger from './helpers/winston'
 import { onBuyOrderUpdate } from './actions/buyOrder'
 import { setOrderBook, updateOrderBook } from './actions/orderBook'
 import { packageOrder } from './lib/lib'
+import logger from './helpers/logger'
 
 const WS = require('ws')
 let client = null
@@ -22,6 +22,8 @@ export const setOrderBookNewest = (status: boolean) => {
 }
 
 const connect = option => {
+  try {
+  } catch (e) {}
   if (connecting || connected) return
   connecting = true
   if (!process.env.BOT_COB_WS_URL) throw new Error('Please setup process.env.BOT_COB_WS_URL')
@@ -77,26 +79,6 @@ const connect = option => {
     connected = false
     logger.warn(`[Websocket][Cobinhood] Error event listener ${err.message}`)
   })
-}
-
-export const startSync = (option: Option) => {
-  setInterval(async () => {
-    if (connected) return
-    connect(option)
-  }, 3500)
-
-  /**
-   * require ping every 20 sec or disconnection
-   */
-  setInterval(() => {
-    if (!connected) return
-    if (client === null) throw new Error('Client is null')
-    client.send(
-      JSON.stringify({
-        action: 'ping',
-      }),
-    )
-  }, 20000)
 }
 
 const zipOrderBook = orderBook => {
@@ -249,7 +231,7 @@ export const processOrderChannel = ({
   }
   if (event === 'executed' && state === 'filled') {
     const message = `Your order full filled: ${option.symbol} ${id}`
-    logger.info(message, (option = option))
+    logger.info(message)
     sendIfttt({ value1: message, option })
     logger.info('Leaving process now')
     if (option.NODE_ENV !== 'development') process.exit(0)
@@ -272,4 +254,28 @@ export const processErrorMessage = (errorMessage: string) => {
     return 'BALANCE_LOCKED'
   }
   return 'UNMET_ERROR_MESSAGE'
+}
+
+export const startSync = (option: Option) => {
+  setInterval(async () => {
+    if (connected) return
+    try {
+      connect(option)
+    } catch (error) {
+      logger
+    }
+  }, 3500)
+
+  /**
+   * require ping every 20 sec or disconnection
+   */
+  setInterval(() => {
+    if (!connected) return
+    if (client === null) throw new Error('Client is null')
+    client.send(
+      JSON.stringify({
+        action: 'ping',
+      }),
+    )
+  }, 20000)
 }

@@ -6,7 +6,8 @@ import { BigNumber } from 'bignumber.js'
 import store from '../store'
 import logger from '../helpers/winston'
 import type { Order } from '../types/orderBook'
-
+import type { Option } from '../types/option'
+import option from '../option'
 export const sortNumber = (a: number, b: number) => {
   return minus(a, b)
 }
@@ -24,7 +25,7 @@ export const sendIfttt = ({
   value1: string,
   value2?: string,
   value3?: string,
-  option: any,
+  option: Option,
 }) => {
   if (option.NODE_ENV === 'development') return
   return axios
@@ -100,18 +101,22 @@ export const removeProperty = (obj: Object, property: string) => {
   }, {})
 }
 
-// export const haltProcess = async (message: string) => {
-//   try {
-//     const record = Object.assign({}, store.getState(), { config: null })
+export const haltProcess = async (message: string) => {
+  try {
+    const record = Object.assign({}, store.getState())
 
-//     await sendIfttt(`${config.mode} - ${config.symbol} - ${message}`, JSON.stringify(record))
-//   } catch (e) {
-//     logger.error(e)
-//   } finally {
-//     const record = Object.assign({}, store.getState(), { config: null })
-//     logger.error('Halt Process')
-//     logger.error(`Error Message ${message}`)
-//     logger.error(JSON.stringify(record))
-//     process.exit(1)
-//   }
-// }
+    await sendIfttt({
+      value1: `${option.mode} - ${option.symbol} - ${message}`,
+      value2: JSON.stringify(record),
+      option,
+    })
+  } catch (e) {
+    logger.error(e)
+  } finally {
+    const record = Object.assign({}, store.getState(), { config: null })
+    logger.error('Halt Process')
+    logger.error(`Error Message ${message}`)
+    logger.error(JSON.stringify(record))
+    process.exit(1)
+  }
+}

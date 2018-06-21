@@ -1,5 +1,5 @@
 var assert = require('assert')
-import logger from './helpers/winston'
+import logger from './helpers/logger'
 
 import {
   processOrderChannel,
@@ -112,7 +112,7 @@ describe('processErrorMessage', () => {
   })
   it('UNMET_ERROR_MESSAGE', function() {
     let rawOnMessage =
-      '{"h":["modify-order-undefined","2","error","4021","neverhappendbefore"],"d":[]}'
+      '{"h":["modify-order-undefined","2","error","4021","neverHappendBefore"],"d":[]}'
     const result = processErrorMessage({ rawOnMessage, option })
     assert.equal('UNMET_ERROR_MESSAGE', result)
   })

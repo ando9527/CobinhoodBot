@@ -3,7 +3,7 @@ import utils from './utils'
 import store from './store'
 import lib from './lib'
 import bidLib from './bidLib'
-import logger from './helpers/winston'
+import logger from './helpers/logger'
 import { opAgentRun } from './opWsClient'
 import { getCCPrice } from './lib/lib'
 import { onOpPriceUpdate } from './actions/opPrice'
@@ -202,9 +202,7 @@ export const runBuyOrder = async (option: Option) => {
     // sync Op Price
     opAgentRun(option)
   } catch (error) {
-    const record = Object.assign({}, store.getState(), { config: null })
-    logger.error(error)
-    logger.error(`Original Data: ${JSON.stringify(record)}`)
+    logger.error(error, option)
     process.exit(1)
   }
 
@@ -213,7 +211,7 @@ export const runBuyOrder = async (option: Option) => {
     try {
       await runCheck(option)
     } catch (error) {
-      logger.error(error)
+      logger.error(error, option)
     }
   }, option.BOT_CHECK_INTERVAL * 1000)
 }

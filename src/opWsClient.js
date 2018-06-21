@@ -3,10 +3,11 @@
  * It's a websocket client.
  * Provide the average price of crypto currency from CoinGecko website.
  */
-import logger from './helpers/winston'
+import logger from './helpers/logger'
 import Websocket from 'ws'
 import store from './store'
 import { onOpPriceUpdate } from './actions/opPrice'
+import type { Option } from './types/option'
 
 let client = null
 let connected = false
@@ -44,8 +45,7 @@ const connect = option => {
         receivingData({ data, option })
       }
     } catch (error) {
-      logger.error(`JSON parse failed ${error}`)
-      logger.error(`Original message: ${message}`)
+      logger.error(error, option, `rawOnMessage: ${message}`)
       return
     }
   })
@@ -69,13 +69,13 @@ const receivingData = ({ data, option }) => {
     return store.dispatch(onOpPriceUpdate({ payload: { price: parseFloat(usd) } }))
 }
 
-export const opAgentRun = (option: any) => {
+export const opAgentRun = (option: Option) => {
   setInterval(function() {
     try {
       if (connected) return
       connect(option)
     } catch (error) {
-      logger.error(error)
+      logger.error(error, option)
     }
   }, 3500)
 

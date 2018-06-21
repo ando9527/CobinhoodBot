@@ -4,7 +4,7 @@ import utils from './utils'
 import store from './store'
 import lib from './lib'
 import askLib from './askLib'
-import logger from './helpers/winston'
+import logger from './helpers/logger'
 import type { Option } from './types/option'
 import {
   startSync,
@@ -140,9 +140,7 @@ export const runSellOrder = async (option: Option) => {
       await lib.updateData(option)
       await startSync(option)
     } catch (error) {
-      const record = Object.assign({}, store.getState(), { config: null })
-      logger.error(error)
-      logger.error(`Original Data: ${JSON.stringify(record)}`)
+      logger.error(error, option)
 
       process.exit(1)
     }

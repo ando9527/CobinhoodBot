@@ -11,7 +11,7 @@ import colors from 'colors/safe'
 import utils from '../utils'
 import store from '../store'
 import lib from '../lib'
-import logger from '../helpers/winston'
+import logger from '../helpers/logger'
 
 // export const api = Cobinhood({apiSecret: config.apiSecret})
 
