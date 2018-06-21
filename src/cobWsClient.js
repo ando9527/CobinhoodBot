@@ -72,7 +72,11 @@ const connect = option => {
   })
 
   client.on('message', async rawOnMessage => {
-    processOnMessage(rawOnMessage)
+    try {
+      processOnMessage(rawOnMessage)
+    } catch (e) {
+      logger.error(e, option, `rawOnMessage: ${rawOnMessage}`)
+    }
   })
   client.addEventListener('error', err => {
     connecting = false
@@ -220,7 +224,7 @@ export const processOrderChannel = ({
   }
 
   if (event === 'modify_rejected') {
-    logger.warn(event)
+    logger.record(event, option)
     return 'MODIFY_REJECTED'
   }
   if (event === 'executed' && state === 'partially_filled') {
