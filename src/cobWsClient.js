@@ -1,6 +1,6 @@
 // @flow
 
-import type { WsEvent, WsState, WsChannelData } from './types/cobWs'
+import type { WsEvent, WsState, WsChannelOrder } from './types/cobWs'
 import type { Option } from './types/option'
 import type { SellOrder } from './types/sellOrder'
 import type { BuyOrder } from './types/buyOrder'
@@ -109,7 +109,7 @@ const zipOrderBook = orderBook => {
   return { bids: newBid, asks: newAsk }
 }
 
-export const zipOrderStateMessage = (order: Array<any>): WsChannelData => {
+export const zipOrderStateMessage = (order: Array<any>): WsChannelOrder => {
   const id = order[0]
   const timestamp = parseFloat(order[1])
   const trading_pair_id = order[3]
@@ -153,7 +153,7 @@ export const wsModifyOrder = async ({
   client.send(sendBack)
 }
 
-export const dispatchOrder = ({ order, mode }: { order: WsChannelData, mode: string }) => {
+export const dispatchOrder = ({ order, mode }: { order: WsChannelOrder, mode: string }) => {
   if (mode === 'ask') return store.dispatch(onSellOrderUpdate({ payload: packageOrder({ order }) }))
   if (mode === 'bid') return store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
 }
@@ -184,7 +184,7 @@ export const processOnMessage = ({
    */
   if (type === 'u' && channelId.endsWith('order')) {
     const wsChannelData = zipOrderStateMessage(data)
-    return processOrderChannel({ data: wsChannelData, option })
+    return processOrderChannel({ order: wsChannelData, option })
   }
 
   const errorMessage = header[4]
@@ -195,11 +195,17 @@ export const processOnMessage = ({
 /**
  * ChannelId: order
  */
-export const processOrderChannel = ({ data, option }: { data: WsChannelData, option: Option }) => {
-  const { event, id, state }: { event: WsEvent, id: string, state: WsState } = data
+export const processOrderChannel = ({
+  order,
+  option,
+}: {
+  order: WsChannelOrder,
+  option: Option,
+}) => {
+  const { event, id, state }: { event: WsEvent, id: string, state: WsState } = order
 
   if (id !== option.sellOrderId && id !== option.buyOrderId) return 'IRRELEVANT_ORDER'
-  dispatchOrder({ order: data, mode: option.mode.toLowerCase() })
+  dispatchOrder({ order: order, mode: option.mode.toLowerCase() })
 
   const stateTypes: Array<WsState> = ['open', 'filled', 'cancelled']
 
@@ -210,7 +216,7 @@ export const processOrderChannel = ({ data, option }: { data: WsChannelData, opt
   const eventTypes: Array<WsEvent> = ['modified', 'opened', 'executed', 'cancelled']
 
   if (!eventTypes.includes(event)) {
-    dispatchOrder({ order: data, mode: option.mode.toLowerCase() })
+    dispatchOrder({ order: order, mode: option.mode.toLowerCase() })
     return 'UNMET_EVENT_TYPES'
   }
 
@@ -237,7 +243,7 @@ export const processOrderChannel = ({ data, option }: { data: WsChannelData, opt
 
   console.log('else')
 
-  throw new Error(`Unknown Code, data: ${JSON.stringify(data)}`)
+  throw new Error(`Unknown Code, data: ${JSON.stringify(order)}`)
 }
 
 export const processErrorMessage = ({

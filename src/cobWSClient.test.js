@@ -24,7 +24,7 @@ const option = {
   productCost: 1e25,
 }
 import {
-  processOrderMessage,
+  processOrderChannel,
   processOnMessage,
   processErrorMessage,
   dispatchOrder,
