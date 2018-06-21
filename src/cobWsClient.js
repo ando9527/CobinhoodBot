@@ -210,10 +210,10 @@ export const processOrderMessage = ({
   } else if (event === 'executed' && state === 'partially_filled') {
     const message = `Your order partially filled: ${option.symbol} ${id}`
     logger.info(message)
-    sendIfttt(message)
+    sendIfttt(message, (option = option))
   } else if (event === 'executed' && state === 'filled') {
     const message = `Your order full filled: ${option.symbol} ${id}`
-    logger.info(message)
+    logger.info(message, (option = option))
     sendIfttt(message)
   } else if (event === 'cancelled' && state === 'cancelled') {
     const message = `Your order full filled: ${option.symbol} ${id}`

@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios'
-import config from '../config'
 import moment from 'moment'
 import colors from 'colors/safe'
 import { BigNumber } from 'bignumber.js'
@@ -20,9 +19,10 @@ export const sendIfttt = (
   value1: string,
   value2: string | null = null,
   value3: string | null = null,
+  option: any,
 ) => {
   return axios
-    .post(`https://maker.ifttt.com/trigger/${config.iftttEvent}/with/key/${config.iftttKey}`, {
+    .post(`https://maker.ifttt.com/trigger/${option.iftttEvent}/with/key/${option.iftttKey}`, {
       value1,
       value2,
       value3,

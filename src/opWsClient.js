@@ -7,17 +7,16 @@ import logger from './helpers/sentry'
 import Websocket from 'ws'
 import store from './store'
 import { onOpPriceUpdate } from './actions/opPrice'
-import config from './config'
 
 let client = null
 let connected = false
 let connecting = false
 
-const connect = () => {
+const connect = option => {
   if (connecting || connected) return
   connecting = true
-  logger.info(`[Websocket][Crypto OP] WS connecting to ${config.BOT_OP_WS_URL}`)
-  client = new Websocket(config.BOT_OP_WS_URL)
+  logger.info(`[Websocket][Crypto OP] WS connecting to ${option.BOT_OP_WS_URL}`)
+  client = new Websocket(option.BOT_OP_WS_URL)
   client.on('open', function(data) {
     logger.info('[Websocket][Crypto OP] WS opened')
     connecting = false
@@ -25,7 +24,7 @@ const connect = () => {
 
     const add = {
       action: 'subscribe',
-      symbol: config.productType.toLowerCase(),
+      symbol: option.productType.toLowerCase(),
     }
     if (client !== null) client.send(JSON.stringify(add))
   })
@@ -42,7 +41,7 @@ const connect = () => {
       logger.debug(`[Websocket][Crypto OP] WS message receiving: ${message}`)
       const { h: header, d: data } = JSON.parse(message)
       if (header[0] === 'price' && data !== null) {
-        receivingData({ data })
+        receivingData({ data, option })
       }
     } catch (error) {
       logger.error(`JSON parse failed ${error}`)
@@ -57,24 +56,24 @@ const connect = () => {
   })
 }
 
-const receivingData = ({ data }) => {
+const receivingData = ({ data, option }) => {
   const { symbol, eth, btc, usd } = data
-  if (symbol !== config.productType.toLowerCase()) return
-  if (config.assetType.toLowerCase() === 'eth')
+  if (symbol !== option.productType.toLowerCase()) return
+  if (option.assetType.toLowerCase() === 'eth')
     return store.dispatch(onOpPriceUpdate({ payload: { price: parseFloat(eth) } }))
-  if (config.assetType.toLowerCase() === 'btc')
+  if (option.assetType.toLowerCase() === 'btc')
     return store.dispatch(onOpPriceUpdate({ payload: { price: parseFloat(btc) } }))
-  if (config.assetType.toLowerCase() === 'usd')
+  if (option.assetType.toLowerCase() === 'usd')
     return store.dispatch(onOpPriceUpdate({ payload: { price: parseFloat(usd) } }))
-  if (config.assetType.toLowerCase() === 'usdt')
+  if (option.assetType.toLowerCase() === 'usdt')
     return store.dispatch(onOpPriceUpdate({ payload: { price: parseFloat(usd) } }))
 }
 
-export const opAgentRun = () => {
+export const opAgentRun = (option: any) => {
   setInterval(function() {
     try {
       if (connected) return
-      connect()
+      connect(option)
     } catch (error) {
       logger.error(error)
     }

@@ -193,7 +193,7 @@ export const runBuyOrder = async (option: any) => {
     // sync order book data
     startSync(option)
     // sync Op Price
-    opAgentRun()
+    opAgentRun(option)
   } catch (error) {
     const record = Object.assign({}, store.getState(), { config: null })
     logger.error(error)
