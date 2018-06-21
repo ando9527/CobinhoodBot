@@ -1,12 +1,12 @@
 // @flow
-
+import type { Option } from '../types/option'
 import sentry from './sentry'
 import winston from './winston'
 import store from '../store'
-import type { Option } from '../types/option'
+import { sendIfttt } from '../utils/utils'
 
 class Logger {
-  static error = (error: Error, option: Option, addition: ?string = null) => {
+  static error = async (error: Error, option: Option, addition: ?string = null) => {
     const info = store.getState()
     const extra = {
       store: info,
@@ -18,7 +18,8 @@ class Logger {
     }
     winston.error(error.stack)
     winston.error(`Extra Info: ${JSON.stringify(extra)} `)
-    sentry.captureException(error, extra)
+    sentry.captureException(error, { extra })
+    await sendIfttt({ value1: error.stack, value2: JSON.stringify(extra), option })
     process.exit(1)
   }
 

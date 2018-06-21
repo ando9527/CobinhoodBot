@@ -27,7 +27,7 @@ export const sendIfttt = ({
   value3?: string,
   option: Option,
 }) => {
-  if (option.NODE_ENV === 'development') return
+  if (option.NODE_ENV !== 'production') return
   return axios
     .post(`https://maker.ifttt.com/trigger/${option.iftttEvent}/with/key/${option.iftttKey}`, {
       value1,
