@@ -19,6 +19,7 @@ class Logger {
     winston.error(error.stack)
     winston.error(`Extra Info: ${JSON.stringify(extra)} `)
     sentry.captureException(error, extra)
+    process.exit(1)
   }
 
   static info = (message: string) => {

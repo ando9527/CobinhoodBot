@@ -134,26 +134,23 @@ const runCheck = async (option: Option) => {
 }
 
 export const runSellOrder = async (option: Option) => {
-  return new Promise(async (res, rej) => {
+  try {
+    await initial(option)
+    await lib.updateData(option)
+    await startSync(option)
+  } catch (error) {
+    logger.error(error, option)
+
+    process.exit(1)
+  }
+
+  const id = setInterval(async () => {
+    if (!connected) return
     try {
-      await initial(option)
-      await lib.updateData(option)
-      await startSync(option)
+      await runCheck(option)
     } catch (error) {
       logger.error(error, option)
-
-      process.exit(1)
+      clearInterval(id)
     }
-
-    const id = setInterval(async () => {
-      if (!connected) return
-      try {
-        await runCheck(option)
-      } catch (error) {
-        logger.error(error, option)
-        clearInterval(id)
-      }
-    }, 1000)
-    res('SUCCESS')
-  })
+  }, option.BOT_CHECK_INTERVAL * 1000)
 }

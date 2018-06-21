@@ -14,7 +14,7 @@ import { runBuyOrder } from './bid'
 // })
 export default class Launcher {
   static launch = async (option: Option) => {
-    if (option.mode.toUpperCase === 'ASK') return runSellOrder(option)
-    if (option.mode.toUpperCase === 'BID') return runBuyOrder(option)
+    if (option.mode.toUpperCase() === 'ASK') return await runSellOrder(option)
+    if (option.mode.toUpperCase() === 'BID') return await runBuyOrder(option)
   }
 }

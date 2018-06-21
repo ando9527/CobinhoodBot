@@ -72,10 +72,13 @@ const connect = option => {
   })
 
   client.on('message', async rawOnMessage => {
+    if (!rawOnMessage) return
+
     try {
-      processOnMessage(rawOnMessage)
+      processOnMessage({ rawOnMessage, option })
     } catch (e) {
       logger.error(e, option, `rawOnMessage: ${rawOnMessage}`)
+      process.exit(1)
     }
   })
   client.addEventListener('error', err => {
@@ -155,6 +158,11 @@ export const processOnMessage = ({
   // [channel_id, version, type, request_id (optional)]
   const channelId = header[0]
   const type = header[2]
+  if (type === 'subscribed') return
+  if (type === 'pong') return
+  if (header.length >= 5) {
+    if (header[4].startsWith('modify-order')) return
+  }
   if (type === 's' && channelId.startsWith('order-book')) {
     store.dispatch(setOrderBook({ payload: zipOrderBook(data) }))
     orderBookNewest = true
@@ -227,13 +235,18 @@ export const processOrderChannel = ({
     logger.record(event, option)
     return 'MODIFY_REJECTED'
   }
-  if (event === 'executed' && state === 'partially_filled') {
+  if (state === 'partially_filled' && event === 'executed') {
     const message = `Your order partially filled: ${option.symbol} ${id}`
     logger.info(message)
     sendIfttt({ value1: message, option })
     return 'PARTIALLY_FILLED'
   }
-  if (event === 'executed' && state === 'filled') {
+  if (state === 'partially_filled' && event === 'modified') {
+    const message = `Your order partially filled: ${option.symbol} ${id}`
+    logger.info(message)
+    return 'PARTIALLY_FILLED'
+  }
+  if (state === 'filled' && event === 'executed') {
     const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message)
     sendIfttt({ value1: message, option })
@@ -241,7 +254,7 @@ export const processOrderChannel = ({
     if (option.NODE_ENV !== 'development') process.exit(0)
     return 'ORDER_FILLED'
   }
-  if (event === 'cancelled' && state === 'cancelled') {
+  if (state === 'cancelled' && event === 'cancelled') {
     const message = `Your order Cancelled: ${option.symbol} ${id}`
     logger.info(message)
     logger.info('Leaving process now')
@@ -266,7 +279,7 @@ export const startSync = (option: Option) => {
     try {
       connect(option)
     } catch (error) {
-      logger
+      logger.error(error, option)
     }
   }, 3500)
 

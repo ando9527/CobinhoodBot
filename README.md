@@ -286,6 +286,11 @@ Ask Mode
   {"h":["order","2","u","0"],"d":["961cf7e9-a145-4a29-95d2-d252c1692c0b","1529186590761","1529187794446","MFG-ETH","cancelled","cancelled","ask","0.0000283","0.0000283","4300","3000"]}
 ```
 
+### Partially filled modified
+```javascript
+{"id":"1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b","timestamp":1529582634489,"trading_pair_id":"LALA-ETH","state":"partially_filled","event":"modified","side":"ask","price":0.0000716,"eq_price":0.0000643,"size":3480,"filled":1050.324}
+```
+
 ### Event
 
 opened: order placed.
@@ -325,3 +330,9 @@ const size = parseFloat(order[9])
 const filled = parseFloat(order[10]
 )
 ```
+
+ {"h":["","2","u","0","modify-order-1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b"],"d":["1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b","1529582634489","","LALA-ETH","pending_modification","","ask","0.0000708","0.0000643","3480","1050.324"]}
+
+ {"h":["order","2","u","0"],"d":["1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b","1529582634489","","LALA-ETH","partially_filled","modified","ask","0.0000708","0.0000643","3480","1050.324"]}
+
+ {"h":["order","2","u","0"],"d":["1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b","1529582634489","","LALA-ETH","partially_filled","modified","ask","0.000071","0.0000643","3480","1050.324"]}

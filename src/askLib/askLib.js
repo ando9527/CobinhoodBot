@@ -31,7 +31,9 @@ export const verifyConfig = async (option: Option) => {
   logger.info(
     `Setting mode: ${option.mode}, asset: ${option.assetType}, product: ${
       option.productType
-    }, profit limit: ${option.profitLimitPercentage}%`,
+    }, profit limit: ${option.profitLimitPercentage}%, check interval: ${
+      option.BOT_CHECK_INTERVAL
+    }`,
   )
   return 'SUCCESS'
 }
