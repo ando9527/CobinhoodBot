@@ -150,8 +150,8 @@ export const runSellOrder = async (option: Option) => {
       try {
         await runCheck(option)
       } catch (error) {
+        logger.error(error, option)
         clearInterval(id)
-        rej(error)
       }
     }, 1000)
     res('SUCCESS')

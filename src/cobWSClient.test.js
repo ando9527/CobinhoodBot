@@ -1,5 +1,4 @@
 var assert = require('assert')
-import logger from './helpers/logger'
 
 import {
   processOrderChannel,

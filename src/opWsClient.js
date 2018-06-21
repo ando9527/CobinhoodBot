@@ -52,7 +52,7 @@ const connect = option => {
   client.addEventListener('error', err => {
     connecting = false
     connected = false
-    logger.warn(`[Websocket][Crypto OP] Error event listener ${err.message}`)
+    logger.record(`[Websocket][Crypto OP] Error event listener ${err.message}`, option)
   })
 }
 
