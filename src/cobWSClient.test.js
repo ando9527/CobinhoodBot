@@ -102,45 +102,81 @@ describe('processOrderChannel', function() {
   })
 })
 
-// describe('processErrorMessage', () => {
-//   it('BALANCE_LOCKED', function() {
-//     let rawOnMessage = '{"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}'
-//     let errorMessage = 'balance_locked'
-//     const result = processOnMessage({ rawOnMessage, option })
-//     assert.equal('BALANCE_LOCKED', result)
-//   })
-// })
+describe('processErrorMessage', () => {
+  it('BALANCE_LOCKED', function() {
+    let rawOnMessage = '{"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}'
+    const { h: header, d: data } = JSON.parse(rawOnMessage)
+    const errorMessage = header[4]
+    const result = processErrorMessage(errorMessage)
+    assert.equal('BALANCE_LOCKED', result)
+  })
+  it('UNMET_ERROR_MESSAGE', function() {
+    let rawOnMessage =
+      '{"h":["modify-order-undefined","2","error","4021","neverhappendbefore"],"d":[]}'
+    const result = processErrorMessage({ rawOnMessage, option })
+    assert.equal('UNMET_ERROR_MESSAGE', result)
+  })
+})
 
-// describe('processOrderMessage', function() {
-//   beforeEach(function(done) {
-//     done()
-//   })
-// it('BALANCE_LOCKED', function() {
-//   const rawOnMessage =
-//     '{"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}'
-//   const { h: header, d: data } = JSON.parse(rawOnMessage)
-//   const result = processOrderMessage({ data, option })
-//   assert.equal('BALANCE_LOCKED', result)
-// })
+describe('processOrderMessage', function() {
+  beforeEach(function(done) {
+    done()
+  })
 
-// it('ORDER_BOOK_SNAP', function() {
-//   const rawOnMessage =
-//     '{"h":["order-book.ABT-ETH.1E-7","2","s"],"d":{"bids":[["0.0013309","1","1620.38"]],"asks":[]}}'
-//     const { h: header, d: data } = JSON.parse(rawOnMessage)
-//   const result = processOrderMessage({ data, option })
-//   assert.equal('ORDER_BOOK_SNAP', result)
-// })
-// it('ORDER_BOOK_UPDATE', function() {
-//   const rawOnMessage =
-//     '{"h":["order-book.ABT-ETH.1E-7","2","u"],"d":{"bids":[["0.0013309","1","1620.38"]],"asks":[]}}'
-//     const { h: header, d: data } = JSON.parse(rawOnMessage)
-//   const result = processOrderMessage({ data, option })
-//   assert.equal('ORDER_BOOK_UPDATE', result)
-// })
-//   it('BALANCE_LOCKED', function() {
-//     const rawOnMessage =
-//       '{"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}'
-//     const result = processOnMessage({ rawOnMessage, option })
-//     assert.equal('BALANCE_LOCKED', result)
-//   })
-// })
+  it('ORDER_BOOK_SNAP', function() {
+    const rawOnMessage =
+      '{"h":["order-book.ABT-ETH.1E-7","2","s"],"d":{"bids":[["0.0013309","1","1620.38"]],"asks":[]}}'
+    const result = processOnMessage({ rawOnMessage, option })
+    assert.equal('ORDER_BOOK_SNAP', result)
+  })
+  it('ORDER_BOOK_UPDATE', function() {
+    const rawOnMessage =
+      '{"h":["order-book.ABT-ETH.1E-7","2","u"],"d":{"bids":[["0.0013309","1","1620.38"]],"asks":[]}}'
+    const result = processOnMessage({ rawOnMessage, option })
+    assert.equal('ORDER_BOOK_UPDATE', result)
+  })
+  it('BALANCE_LOCKED', function() {
+    const rawOnMessage =
+      '{"h":["modify-order-undefined","2","error","4021","balance_locked"],"d":[]}'
+    const result = processOnMessage({ rawOnMessage, option })
+    assert.equal('BALANCE_LOCKED', result)
+  })
+  it('Catch Error UNMET_ERROR_MESSAGE ', function() {
+    const rawOnMessage = '{"h":["modify-order-undefined","2","error","4021","wtf"],"d":[]}'
+    try {
+      const result = processOnMessage({ rawOnMessage, option })
+    } catch (error) {
+      assert.equal(
+        error.message,
+        'UNMET_ERROR_MESSAGE Raw onMessage: {"h":["modify-order-undefined","2","error","4021","wtf"],"d":[]}',
+      )
+    }
+  })
+
+  it('Catch Error Unknown ws message ', function() {
+    const rawOnMessage = '{"h":["modify-order-undefined","2","its new","4021","wtf"],"d":[]}'
+    try {
+      const result = processOnMessage({ rawOnMessage, option })
+    } catch (error) {
+      assert.equal(
+        error.message,
+        'Unknown ws message, Raw onMessage: {"h":["modify-order-undefined","2","its new","4021","wtf"],"d":[]}',
+      )
+    }
+  })
+
+  it('Catch Error UNMET_STATE_TYPES ', function() {
+    const rawOnMessage =
+      '{"h":["order","2","u","0"],"d":["6136e360-da2c-4f7e-bcc9-d938d878a6c0","1529438496388","","FSN-ETH","triggered","trigger_rejected","bid","0.0000001","0","50","0"]}'
+    try {
+      const result = processOnMessage({ rawOnMessage, option })
+    } catch (error) {}
+  })
+  it('Catch Error UNMET_EVENT_TYPES ', function() {
+    const rawOnMessage =
+      '{"h":["order","2","u","0"],"d":["6136e360-da2c-4f7e-bcc9-d938d878a6c0","1529438496388","","FSN-ETH","open","trigger_rejected","bid","0.0000001","0","50","0"]}'
+    try {
+      const result = processOnMessage({ rawOnMessage, option })
+    } catch (error) {}
+  })
+})

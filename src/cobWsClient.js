@@ -184,13 +184,25 @@ export const processOnMessage = ({
    */
   if (type === 'u' && channelId.endsWith('order')) {
     const wsChannelOrder = zipChannelOrderData(data)
-    return processOrderChannel({ order: wsChannelOrder, option })
+    const code = processOrderChannel({ order: wsChannelOrder, option })
+    switch (code) {
+    case 'UNMET_STATE_TYPES':
+    case 'UNMET_EVENT_TYPES':
+      throw new Error(`${code}, Raw onMessage: ${rawOnMessage}`)
+    default:
+      return code
+    }
   }
 
   const errorMessage = header[4]
   if (type === 'error') {
-    return processErrorMessage({ errorMessage, rawOnMessage })
+    const code = processErrorMessage(errorMessage)
+    if (code === 'UNMET_ERROR_MESSAGE') {
+      throw new Error(`${code} Raw onMessage: ${rawOnMessage}`)
+    }
+    return code
   }
+  throw new Error(`Unknown ws message, Raw onMessage: ${rawOnMessage}`)
 }
 /**
  * Process data from channelId: order
@@ -251,19 +263,13 @@ export const processOrderChannel = ({
     return 'ORDER_CANCELLED'
   }
 
-  throw new Error(`Unexpected/unknown/unmet state/event code, wsOrder: ${JSON.stringify(order)}`)
+  throw new Error(`Unexpected/un state/event code, wsOrder: ${JSON.stringify(order)}`)
 }
 
-export const processErrorMessage = ({
-  errorMessage,
-  rawOnMessage,
-}: {
-  errorMessage: string,
-  rawOnMessage: string,
-}) => {
+export const processErrorMessage = (errorMessage: string) => {
   if (errorMessage === 'balance_locked') {
     logger.warn('balance_locked')
     return 'BALANCE_LOCKED'
   }
-  logger.recordHalt('Unexpected WS Code', { extra: { rawOnMessage } })
+  return 'UNMET_ERROR_MESSAGE'
 }
