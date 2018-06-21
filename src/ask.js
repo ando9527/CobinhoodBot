@@ -16,33 +16,49 @@ import {
 export const initial = async () => {
   await askLib.verifyConfig()
 }
-export const askStateMachine = () => {
+export const askStateMachine = (option: any) => {
   const { orderBook, sellOrder } = store.getState()
   const { asks } = orderBook
-  const vQCAsks = askLib.getValidQuantityCompare({ asks, sellOrder })
-  const lPSOAsks = askLib.getLimitProfitSellOrder({ asks: vQCAsks })
+  const vQCAsks = askLib.getValidQuantityCompare({
+    asks,
+    sellOrder,
+    quantityComparePercentage: option.quantityComparePercentage,
+  })
+  const lPSOAsks = askLib.getLimitProfitSellOrder({
+    asks: vQCAsks,
+    productCost: option.productCost,
+    profitLimitPercentage: option.profitLimitPercentage,
+  })
   if (lPSOAsks.length <= 1) return 'ZERO_LIMIT_PROFIT_SELL_ORDER'
-  const casks = askLib.getAboveCostSellOrder({ asks: lPSOAsks })
+  const casks = askLib.getAboveCostSellOrder({ asks: lPSOAsks, productCost: option.productCost })
 
   if (casks.length <= 1) return 'ZERO_ABOVE_COST_PRICE'
   const ia = askLib.inAskPriceBucket({ asks: casks, sellOrder })
   if (ia === false) return 'BE_LAST'
   const il = askLib.isLowestAskOrder({ asks: casks })
   if (il === false) return 'BE_LAST'
-  const ig = askLib.isGainPrice({ asks: casks })
+  const ig = askLib.isGainPrice({ asks: casks, decrement: option.decrement })
   if (ig === false) return 'NOTHING'
   if (ig === true) return 'GAIN_PRICE'
 }
 
 export const check = async (option: any) => {
   // For Logic
-  const code = askStateMachine()
+  const code = askStateMachine(option)
 
   const { sellOrder, orderBook } = store.getState()
   const { asks } = orderBook
-  const vQCAsks = askLib.getValidQuantityCompare({ asks, sellOrder })
-  const lPSOAsks = askLib.getLimitProfitSellOrder({ asks: vQCAsks })
-  const casks = askLib.getAboveCostSellOrder({ asks: lPSOAsks })
+  const vQCAsks = askLib.getValidQuantityCompare({
+    asks,
+    sellOrder,
+    quantityComparePercentage: option.quantityComparePercentage,
+  })
+  const lPSOAsks = askLib.getLimitProfitSellOrder({
+    asks: vQCAsks,
+    productCost: option.productCost,
+    profitLimitPercentage: option.profitLimitPercentage,
+  })
+  const casks = askLib.getAboveCostSellOrder({ asks: lPSOAsks, productCost: option.productCost })
 
   // Expected Profit Percentage
   const epp = lib.getProfitPercentage({ price: sellOrder.price, productCost: option.productCost })
@@ -64,7 +80,7 @@ export const check = async (option: any) => {
 
   if (code === 'NOTHING') {
     // will throw error if state machine logic is wrong
-    askLib.checkUnderCost({ price: sellOrder.price })
+    askLib.checkUnderCost({ price: sellOrder.price, productCost: option.productCost })
     lib.checkProfitLimitPercentage({ profitPercentage: epp })
     logger.info('Your price is good, you don\'t need to change')
 
@@ -73,11 +89,11 @@ export const check = async (option: any) => {
   let priceModified = 0
   let changeMessage = ''
   if (code === 'BE_LAST') {
-    priceModified = askLib.getLastPrice({ asks: casks })
+    priceModified = askLib.getLastPrice({ asks: casks, decrement: option.decrement })
     changeMessage = 'Reducing price.'
   }
   if (code === 'GAIN_PRICE') {
-    priceModified = askLib.getGainedPrice({ asks: casks })
+    priceModified = askLib.getGainedPrice({ asks: casks, decrement: option.decrement })
     changeMessage = 'Raising price.'
   }
 
@@ -95,7 +111,7 @@ export const check = async (option: any) => {
   }
 
   // will throw error if state machine logic is wrong
-  askLib.checkUnderCost({ price: priceModified })
+  askLib.checkUnderCost({ price: priceModified, productCost: option.productCost })
   lib.checkProfitLimitPercentage({ profitPercentage: mepp })
   // await lib.modifyOrder({ price: priceModified, order: sellOrder })
   await wsModifyOrder({ price: priceModified, order: sellOrder })

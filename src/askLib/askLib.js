@@ -5,18 +5,15 @@ import type { SellOrder } from '../types/sellOrder'
 import type { Order, OrderBook } from '../types/orderBook'
 
 import Cobinhood from 'cobinhood-api-node'
-import config from '../config'
 import colors from 'colors/safe'
 import utils from '../utils'
 import store from '../store'
 import lib from '../lib'
 import logger from '../helpers/sentry'
 
-export const api = Cobinhood({
-  apiSecret: config.apiSecret,
-})
+// export const api = Cobinhood({apiSecret: config.apiSecret})
 
-export const verifyConfig = async () => {
+export const verifyConfig = async (option: any) => {
   await lib.commonVerifyConfig()
 
   // BOT_SELL_ORDER_ID
@@ -24,15 +21,15 @@ export const verifyConfig = async () => {
   /**
    * Check ENV ASK required
    */
-  if (!config.productCost) throw new Error('Please setup BOT_PRODUCT_COST')
+  if (!option.productCost) throw new Error('Please setup BOT_PRODUCT_COST')
 
   /**
    * Verify Done
    */
   logger.info(
-    `Setting mode: ${config.mode}, asset: ${config.assetType}, product: ${
-      config.productType
-    }, profit limit: ${config.profitLimitPercentage}%`,
+    `Setting mode: ${option.mode}, asset: ${option.assetType}, product: ${
+      option.productType
+    }, profit limit: ${option.profitLimitPercentage}%`,
   )
   return 'SUCCESS'
 }
@@ -40,11 +37,8 @@ export const verifyConfig = async () => {
 /**
  * @param {Object} payload
  */
-export const getAboveCostSellOrder = ({ asks }: { asks: Array<Order> }) => {
-  return getAboveCostSellOrderFy({ asks, productCost: config.productCost })
-}
 
-export const getAboveCostSellOrderFy = ({
+export const getAboveCostSellOrder = ({
   asks,
   productCost,
 }: {
@@ -88,9 +82,9 @@ export const isLowestAskOrderFactory = ({
 /**
  * @param {Object} payload
  */
-export const isGainPrice = ({ asks }: { asks: Array<Order> }) => {
+export const isGainPrice = ({ asks, decrement }: { asks: Array<Order>, decrement: number }) => {
   const { sellOrder } = store.getState()
-  return isGainPriceFactory({ asks, sellOrder, decrement: config.decrement })
+  return isGainPriceFactory({ asks, sellOrder, decrement })
 }
 
 export const isGainPriceFactory = ({
@@ -108,25 +102,15 @@ export const isGainPriceFactory = ({
   return true
 }
 
-export const getLastPrice = ({ asks }: { asks: Array<Order> }) => {
-  return getLastPriceFactory({ asks, decrement: config.decrement })
-}
-
-export const getLastPriceFactory = ({
-  asks,
-  decrement,
-}: {
-  asks: Array<Order>,
-  decrement: number,
-}) => {
+export const getLastPrice = ({ asks, decrement }: { asks: Array<Order>, decrement: number }) => {
   const newAsks = asks.sort(utils.sortOrder)[0]
   return utils.minus(newAsks.price, decrement)
 }
 /**
  * Check price is under cost or not
  */
-export const checkUnderCost = ({ price }: { price: number }) => {
-  if (parseFloat(price) < parseFloat(config.productCost))
+export const checkUnderCost = ({ price, productCost }: { price: number, productCost: number }) => {
+  if (parseFloat(price) < parseFloat(productCost))
     throw new Error('Under cost price but not detected, plz contact the bot author')
 }
 
@@ -134,17 +118,8 @@ export const checkUnderCost = ({ price }: { price: number }) => {
  * get Gained price
  *
  */
-export const getGainedPrice = ({ asks }: { asks: Array<Order> }) => {
-  return getGainedPriceFactory({ asks, decrement: config.decrement })
-}
 
-export const getGainedPriceFactory = ({
-  asks,
-  decrement,
-}: {
-  asks: Array<Order>,
-  decrement: number,
-}) => {
+export const getGainedPrice = ({ asks, decrement }: { asks: Array<Order>, decrement: number }) => {
   const secAsk = asks.sort(utils.sortOrder)[1]
   return utils.minus(secAsk.price, decrement)
 }
@@ -164,11 +139,19 @@ export const getLimitProfitSellOrderFy = ({
   return newAsks
 }
 
-export const getLimitProfitSellOrder = ({ asks }: { asks: Array<Order> }) => {
+export const getLimitProfitSellOrder = ({
+  asks,
+  productCost,
+  profitLimitPercentage,
+}: {
+  asks: Array<Order>,
+  productCost: number,
+  profitLimitPercentage: number,
+}) => {
   return getLimitProfitSellOrderFy({
     asks,
-    productCost: parseFloat(config.productCost),
-    profitLimitPercentage: parseFloat(config.profitLimitPercentage),
+    productCost: parseFloat(productCost),
+    profitLimitPercentage: parseFloat(profitLimitPercentage),
   })
 }
 
@@ -217,10 +200,11 @@ export const getValidQuantityCompareFy = ({
 export const getValidQuantityCompare = ({
   asks,
   sellOrder,
+  quantityComparePercentage,
 }: {
   asks: Array<Order>,
   sellOrder: SellOrder,
+  quantityComparePercentage: number,
 }) => {
-  const quantityComparePercentage = config.quantityComparePercentage
   return getValidQuantityCompareFy({ asks, sellOrder, quantityComparePercentage })
 }
