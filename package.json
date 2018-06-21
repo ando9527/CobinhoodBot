@@ -6,7 +6,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "build": "rimraf dist && babel src -d dist",
-    "test": "mocha --require babel-core/register --require babel-polyfill src/**.test.js",
+    "test": "mocha -R spec --require babel-core/register --require babel-polyfill src/**.test.js",
     "lint": "eslint src",
     "dev": "babel-node ./src",
     "order": "babel-node cmd.js --config ask_config.env --dev --order",

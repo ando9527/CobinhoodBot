@@ -3,7 +3,7 @@
  * It's a websocket client.
  * Provide the average price of crypto currency from CoinGecko website.
  */
-import logger from './helpers/sentry'
+import logger from './helpers/winston'
 import Websocket from 'ws'
 import store from './store'
 import { onOpPriceUpdate } from './actions/opPrice'

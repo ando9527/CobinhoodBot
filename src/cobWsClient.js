@@ -6,7 +6,7 @@ import type { BuyOrder } from './types/buyOrder'
 import store from './store'
 import { onSellOrderUpdate } from './actions/sellOrder'
 import { sendIfttt } from './utils/utils'
-import logger from './helpers/sentry'
+import logger from './helpers/winston'
 import { onBuyOrderUpdate } from './actions/buyOrder'
 import { setOrderBook, updateOrderBook } from './actions/orderBook'
 import { packageOrder } from './lib/lib'
@@ -205,12 +205,10 @@ export const processOrderMessage = ({
     dispatchOrder({ order, mode: option.mode.toLowerCase() })
   } else if (event === 'modify_rejected') {
     logger.warn(event)
-    logger.record(event, { tags: { reject: 'modify_rejected' }, extra: { orderId: id } })
     return 'MODIFY_REJECTED'
   } else if (event === 'executed' && state === 'partially_filled') {
     const message = `Your order partially filled: ${option.symbol} ${id}`
     logger.info(message)
-    sendIfttt({ value1: message, option })
   } else if (event === 'executed' && state === 'filled') {
     const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message, (option = option))
@@ -219,7 +217,7 @@ export const processOrderMessage = ({
     const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message)
   } else {
-    logger.recordHalt('Unexpected WS Code', { extra: { rawOnMessage } })
+    throw new Error(`Unknown Code: ${rawOnMessage}`)
   }
 }
 export const processErrorMessage = ({

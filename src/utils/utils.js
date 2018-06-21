@@ -4,7 +4,7 @@ import moment from 'moment'
 import colors from 'colors/safe'
 import { BigNumber } from 'bignumber.js'
 import store from '../store'
-import logger from '../helpers/sentry'
+import logger from '../helpers/winston'
 import type { Order } from '../types/orderBook'
 
 export const sortNumber = (a: number, b: number) => {
