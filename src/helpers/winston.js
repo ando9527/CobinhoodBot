@@ -1,5 +1,5 @@
 // @flow
-import winston from 'winston'
+import Winston from 'winston'
 import moment from 'moment-timezone'
 
 const env = process.env.NODE_ENV || 'development'
@@ -19,9 +19,9 @@ const myFormat = printf(info => {
   return `${info.timestamp} ${info.level}: ${info.message}`
 })
 
-const winstonLogger = createLogger({
-  format: combine(winston.format.colorize(), appendTimestamp(), myFormat),
+const winston = createLogger({
+  format: combine(Winston.format.colorize(), appendTimestamp(), myFormat),
   transports: [new transports.Console()],
 })
-winstonLogger.level = env === 'development' ? 'debug' : 'info'
-export default winstonLogger
+winston.level = env === 'development' ? 'debug' : 'info'
+export default winston

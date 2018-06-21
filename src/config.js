@@ -3,9 +3,6 @@ require('dotenv').load()
 
 const message = 'Environment Variable Error'
 
-const SENTRY_DSN =
-  process.env.SENTRY_DSN || 'https://1cb22698d3764fdfbc0377e02e822b66@sentry.io/1229216'
-
 if (!process.env.BOT_SMALLEST_INCREMENT) throw new Error(message)
 const increment = parseFloat(process.env.BOT_SMALLEST_INCREMENT)
 const decrement = increment
@@ -73,7 +70,6 @@ const productCost = process.env.BOT_PRODUCT_COST
   : 9999999999999999999999999
 
 const config = {
-  SENTRY_DSN,
   // increment : 0.0000001,
   // decrement: 0.0000001,
   increment,
