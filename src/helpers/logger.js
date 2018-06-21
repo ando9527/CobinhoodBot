@@ -45,7 +45,7 @@ class Logger {
       mode: option.mode,
     }
     winston.warn(`Extra Info: ${JSON.stringify(extra)} `)
-    sentry.captureMessage(message, extra)
+    sentry.captureMessage(message, { extra })
   }
 }
 
