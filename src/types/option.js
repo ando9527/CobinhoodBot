@@ -1,6 +1,7 @@
 // @flow
 
 export type Option = {
+  NODE_ENV: string,
   increment: number,
   decrement: number,
   /**

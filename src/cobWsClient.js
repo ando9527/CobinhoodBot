@@ -109,7 +109,7 @@ const zipOrderBook = orderBook => {
   return { bids: newBid, asks: newAsk }
 }
 
-export const zipOrderStateMessage = (order: Array<any>): WsChannelOrder => {
+export const zipChannelOrderData = (order: Array<any>): WsChannelOrder => {
   const id = order[0]
   const timestamp = parseFloat(order[1])
   const trading_pair_id = order[3]
@@ -183,8 +183,8 @@ export const processOnMessage = ({
    * sync cobinhood order book data
    */
   if (type === 'u' && channelId.endsWith('order')) {
-    const wsChannelData = zipOrderStateMessage(data)
-    return processOrderChannel({ order: wsChannelData, option })
+    const wsChannelOrder = zipChannelOrderData(data)
+    return processOrderChannel({ order: wsChannelOrder, option })
   }
 
   const errorMessage = header[4]
@@ -193,7 +193,7 @@ export const processOnMessage = ({
   }
 }
 /**
- * ChannelId: order
+ * Process data from channelId: order
  */
 export const processOrderChannel = ({
   order,
@@ -207,16 +207,21 @@ export const processOrderChannel = ({
   if (id !== option.sellOrderId && id !== option.buyOrderId) return 'IRRELEVANT_ORDER'
   dispatchOrder({ order: order, mode: option.mode.toLowerCase() })
 
-  const stateTypes: Array<WsState> = ['open', 'filled', 'cancelled']
+  const stateTypes: Array<WsState> = ['open', 'filled', 'cancelled', 'partially_filled']
 
   if (!stateTypes.includes(state)) {
     return 'UNMET_STATE_TYPES'
   }
 
-  const eventTypes: Array<WsEvent> = ['modified', 'opened', 'executed', 'cancelled']
+  const eventTypes: Array<WsEvent> = [
+    'modified',
+    'opened',
+    'executed',
+    'cancelled',
+    'modify_rejected',
+  ]
 
   if (!eventTypes.includes(event)) {
-    dispatchOrder({ order: order, mode: option.mode.toLowerCase() })
     return 'UNMET_EVENT_TYPES'
   }
 
@@ -227,23 +232,26 @@ export const processOrderChannel = ({
   if (event === 'executed' && state === 'partially_filled') {
     const message = `Your order partially filled: ${option.symbol} ${id}`
     logger.info(message)
-    return 'PARTIALLY FILLED'
+    sendIfttt({ value1: message, option })
+    return 'PARTIALLY_FILLED'
   }
   if (event === 'executed' && state === 'filled') {
     const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message, (option = option))
-    // sendIfttt({ value1: message, option })
-    return 'ORDER FILLED'
+    sendIfttt({ value1: message, option })
+    logger.info('Leaving process now')
+    if (option.NODE_ENV !== 'development') process.exit(0)
+    return 'ORDER_FILLED'
   }
   if (event === 'cancelled' && state === 'cancelled') {
-    const message = `Your order full filled: ${option.symbol} ${id}`
+    const message = `Your order Cancelled: ${option.symbol} ${id}`
     logger.info(message)
-    return 'ORDER CANCELLED'
+    logger.info('Leaving process now')
+    if (option.NODE_ENV !== 'development') process.exit(0)
+    return 'ORDER_CANCELLED'
   }
 
-  console.log('else')
-
-  throw new Error(`Unknown Code, data: ${JSON.stringify(order)}`)
+  throw new Error(`Unexpected/unknown/unmet state/event code, wsOrder: ${JSON.stringify(order)}`)
 }
 
 export const processErrorMessage = ({

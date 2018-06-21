@@ -3,6 +3,8 @@ require('dotenv').load()
 import type { Option } from './types/option'
 const message = 'Environment Variable Error'
 
+const NODE_ENV = process.env.NODE_ENV || 'development'
+
 if (!process.env.BOT_SMALLEST_INCREMENT) throw new Error(message)
 const increment = parseFloat(process.env.BOT_SMALLEST_INCREMENT)
 const decrement = increment
@@ -70,6 +72,7 @@ const productCost = process.env.BOT_PRODUCT_COST
   : 9999999999999999999999999
 
 const config: Option = {
+  NODE_ENV,
   // increment : 0.0000001,
   // decrement: 0.0000001,
   increment,
