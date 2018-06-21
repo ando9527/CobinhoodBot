@@ -13,19 +13,19 @@ import type { Order } from '../types/orderBook'
  * Check ENV BID required
  */
 export const verifyConfig = async (option: any) => {
-  await lib.commonVerifyConfig()
+  await lib.commonVerifyConfig(option)
   // BOT_BUY_ORDER_ID
-  lib.verifyConfigFactory({ env: 'BOT_BUY_ORDER_ID', attr: 'buyOrderId' })
+  lib.verifyConfigFactory({ env: 'BOT_BUY_ORDER_ID', attr: 'buyOrderId', option })
   // BOT_TOTAL_PRICE_LIMIT
 
   /**
    * check api source
    */
-  lib.verifyConfigFactory({ env: 'BOT_OP_API_URL', attr: 'BOT_OP_API_URL' })
+  lib.verifyConfigFactory({ env: 'BOT_OP_API_URL', attr: 'BOT_OP_API_URL', option })
 
-  lib.verifyConfigFactory({ env: 'BOT_TOTAL_PRICE_LIMIT', attr: 'totalPriceLimit' })
+  lib.verifyConfigFactory({ env: 'BOT_TOTAL_PRICE_LIMIT', attr: 'totalPriceLimit', option })
   // BOT_OP_PERCENTAGE
-  lib.verifyConfigFactory({ env: 'BOT_OP_PERCENTAGE', attr: 'opPercentage' })
+  lib.verifyConfigFactory({ env: 'BOT_OP_PERCENTAGE', attr: 'opPercentage', option })
   logger.info(
     `Setting mode: ${option.mode}, asset: ${option.assetType}, product: ${
       option.productType

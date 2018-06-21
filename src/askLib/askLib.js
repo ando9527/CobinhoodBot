@@ -14,10 +14,10 @@ import logger from '../helpers/sentry'
 // export const api = Cobinhood({apiSecret: config.apiSecret})
 
 export const verifyConfig = async (option: any) => {
-  await lib.commonVerifyConfig()
+  await lib.commonVerifyConfig(option)
 
   // BOT_SELL_ORDER_ID
-  lib.verifyConfigFactory({ env: 'BOT_SELL_ORDER_ID', attr: 'sellOrderId' })
+  lib.verifyConfigFactory({ env: 'BOT_SELL_ORDER_ID', attr: 'sellOrderId', option })
   /**
    * Check ENV ASK required
    */

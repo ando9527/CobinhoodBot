@@ -131,7 +131,10 @@ export const check = async (option: any) => {
       totalPriceLimit: option.totalPriceLimit,
       opPercentage: option.opPercentage,
     })
-    lib.checkProfitLimitPercentage({ profitPercentage: epp })
+    lib.checkProfitLimitPercentage({
+      profitPercentage: epp,
+      profitLimitPercentage: option.profitLimitPercentage,
+    })
     logger.info('Your offer is good, you don\'t need to change.')
     return 'NOTHING'
   }
@@ -172,7 +175,10 @@ export const check = async (option: any) => {
     totalPriceLimit: option.totalPriceLimit,
     opPercentage: option.opPercentage,
   })
-  lib.checkProfitLimitPercentage({ profitPercentage: mepp })
+  lib.checkProfitLimitPercentage({
+    profitPercentage: mepp,
+    profitLimitPercentage: option.profitLimitPercentage,
+  })
   // await bidLib.checkEnoughBalance({ price: priceModified })
   await wsModifyOrder({ price: priceModified, order: buyOrder })
 }
@@ -189,7 +195,7 @@ export const runBuyOrder = async (option: any) => {
     // verify configuration
     await initial()
     // retrieve order/order book/opPrice once
-    await lib.updateData()
+    await lib.updateData(option)
     // sync order book data
     startSync(option)
     // sync Op Price

@@ -81,7 +81,10 @@ export const check = async (option: any) => {
   if (code === 'NOTHING') {
     // will throw error if state machine logic is wrong
     askLib.checkUnderCost({ price: sellOrder.price, productCost: option.productCost })
-    lib.checkProfitLimitPercentage({ profitPercentage: epp })
+    lib.checkProfitLimitPercentage({
+      profitPercentage: epp,
+      profitLimitPercentage: option.profitLimitPercentage,
+    })
     logger.info('Your price is good, you don\'t need to change')
 
     return 'NOTHING'
@@ -112,7 +115,10 @@ export const check = async (option: any) => {
 
   // will throw error if state machine logic is wrong
   askLib.checkUnderCost({ price: priceModified, productCost: option.productCost })
-  lib.checkProfitLimitPercentage({ profitPercentage: mepp })
+  lib.checkProfitLimitPercentage({
+    profitPercentage: mepp,
+    profitLimitPercentage: option.profitLimitPercentage,
+  })
   // await lib.modifyOrder({ price: priceModified, order: sellOrder })
   await wsModifyOrder({ price: priceModified, order: sellOrder })
 }
@@ -130,7 +136,7 @@ export const runSellOrder = async (option: any) => {
   return new Promise(async (res, rej) => {
     try {
       await initial()
-      await lib.updateData()
+      await lib.updateData(option)
       await startSync(option)
     } catch (error) {
       const record = Object.assign({}, store.getState(), { config: null })

@@ -1,6 +1,5 @@
 // @flow
 import utils from '../utils'
-import config from '../config'
 import store from '../store'
 import Cobinhood from 'cobinhood-api-node'
 import axios from 'axios'
@@ -13,9 +12,9 @@ import { onOpPriceUpdate } from '../actions/opPrice'
 import type { BuyOrder } from '../types/buyOrder'
 import type { SellOrder } from '../types/sellOrder'
 import type { Order } from '../types/orderBook'
-export const api = Cobinhood({
-  apiSecret: config.apiSecret,
-})
+// export const api = Cobinhood({
+//   apiSecret: option.apiSecret,
+// })
 /**
  * Crypto Compare Last trade
  * @param {Object} payload
@@ -23,14 +22,22 @@ export const api = Cobinhood({
  * @param {string} payload.to
  * @returns {number}
  */
-export const getCCPrice = async ({ from, to }: { from: string, to: string }): Promise<number> => {
+export const getCCPrice = async ({
+  from,
+  to,
+  option,
+}: {
+  from: string,
+  to: string,
+  option: any,
+}): Promise<number> => {
   try {
-    const url = `${config.BOT_OP_API_URL}/${from.toLowerCase()}/${to.toLowerCase()}`
+    const url = `${option.BOT_OP_API_URL}/${from.toLowerCase()}/${to.toLowerCase()}`
     const data = await axios.get(url)
     if (!data.data.data) throw new Error(`${from.toLowerCase()} is not available in ${url}`)
     return parseFloat(data.data.data)
   } catch (error) {
-    throw new Error(`Get price from ${config.BOT_OP_API_URL} Failed, ${error}`)
+    throw new Error(`Get price from ${option.BOT_OP_API_URL} Failed, ${error}`)
   }
 }
 
@@ -56,13 +63,18 @@ export const getCGPrice = async ({ from, to }: { from: string, to: string }): Pr
 export const modifyOrder = async ({
   price,
   order,
+  option,
 }: {
   price: number,
   order: BuyOrder | SellOrder,
+  option: any,
 }) => {
   if (!order) throw new Error('Current Order is null')
   const currentOrder = order
   try {
+    const api = Cobinhood({
+      apiSecret: option.apiSecret,
+    })
     const { success } = await api.modifyOrder({
       order_id: currentOrder.id,
       trading_pair_id: currentOrder.trading_pair_id,
@@ -90,14 +102,17 @@ export const modifyOrder = async ({
  * Get information of current order
  * @return {Object} order
  */
-export const getCurrentOrder = async () => {
+export const getCurrentOrder = async (option: any) => {
   try {
     let order_id = null
-    if (config.mode === 'BID') {
-      order_id = config.buyOrderId
-    } else if (config.mode === 'ASK') {
-      order_id = config.sellOrderId
+    if (option.mode === 'BID') {
+      order_id = option.buyOrderId
+    } else if (option.mode === 'ASK') {
+      order_id = option.sellOrderId
     }
+    const api = Cobinhood({
+      apiSecret: option.apiSecret,
+    })
     const data = await api.myOrderId({ order_id }) // eslint-disable camelcase
 
     if (data.success === false)
@@ -107,8 +122,8 @@ export const getCurrentOrder = async () => {
     logger.info(
       `Current Order Information, id: ${order.id}, symbol: ${order.trading_pair_id}, side: ${
         order.side
-      }, price: ${order.price}, size: ${order.size}, config profit: ${
-        config.profitLimitPercentage
+      }, price: ${order.price}, size: ${order.size}, option profit: ${
+        option.profitLimitPercentage
       }%`,
     )
     return packageOrder({ order })
@@ -146,9 +161,15 @@ export const packageOrder = ({ order }: { order: Object }): BuyOrder | SellOrder
   } // eslint-disable-line
 }
 
-export const checkProfitLimitPercentage = ({ profitPercentage }: { profitPercentage: number }) => {
+export const checkProfitLimitPercentage = ({
+  profitPercentage,
+  profitLimitPercentage,
+}: {
+  profitPercentage: number,
+  profitLimitPercentage: number,
+}) => {
   // due to top price minus/plus 0.0000001
-  if (utils.plus(profitPercentage, 1) < parseFloat(config.profitLimitPercentage)) {
+  if (utils.plus(profitPercentage, 1) < parseFloat(profitLimitPercentage)) {
     const message = JSON.stringify(store.getState())
     throw new Error(`'Under cost price but not detected, plz contact the bot author'.${message}`)
   }
@@ -197,17 +218,19 @@ export const verifyConfigFactory = ({
   env,
   attr,
   requires = [],
+  option,
 }: {
   env: string,
   attr: string,
   requires?: Array<string>,
+  option: any,
 }) => {
   if (!env) throw new Error('You need to pass a env string.')
-  if (!attr) throw new Error('You need to pass a config attribute.')
+  if (!attr) throw new Error('You need to pass a option attribute.')
   if (!process.env.hasOwnProperty(env)) throw new Error(`Please setup ${env}`)
-  if (!config.hasOwnProperty(attr))
+  if (!option.hasOwnProperty(attr))
     throw new Error(
-      `Config attribute issue, contact bot author plz ${attr} ${JSON.stringify(config)}`,
+      `Config attribute issue, contact bot author plz ${attr} ${JSON.stringify(option)}`,
     )
 
   if (requires.length === 0) return true
@@ -215,15 +238,18 @@ export const verifyConfigFactory = ({
     throw new Error(`${env} ENV, please use ${requires.toString()}`)
 }
 
-export const commonVerifyConfig = async () => {
+export const commonVerifyConfig = async (option: any) => {
   logger.info(`Version ${packageJson.version}`)
-  logger.info('Verifying your configuration..')
+  logger.info('Verifying your option..')
   /**
    * Check API Secret
    * BOT_API_SECRET
    */
-  verifyConfigFactory({ env: 'BOT_API_SECRET', attr: 'apiSecret' })
+  verifyConfigFactory({ env: 'BOT_API_SECRET', attr: 'apiSecret', option })
   try {
+    const api = Cobinhood({
+      apiSecret: option.apiSecret,
+    })
     await api.balances()
   } catch (error) {
     throw new Error(`API Secret is no valid. ${error.message}`)
@@ -232,65 +258,90 @@ export const commonVerifyConfig = async () => {
    * Check Ifttt
    * BOT_IFTTT_ENABLE
    */
-  verifyConfigFactory({ env: 'BOT_IFTTT_ENABLE', attr: 'iftttEnable', requires: ['true', 'false'] })
-  if (config.iftttEnable === true) {
-    verifyConfigFactory({ env: 'BOT_IFTTT_EVENT', attr: 'iftttEvent' })
-    verifyConfigFactory({ env: 'BOT_IFTTT_KEY', attr: 'iftttKey' })
+  verifyConfigFactory({
+    env: 'BOT_IFTTT_ENABLE',
+    attr: 'iftttEnable',
+    requires: ['true', 'false'],
+    option,
+  })
+  if (option.iftttEnable === true) {
+    verifyConfigFactory({ env: 'BOT_IFTTT_EVENT', attr: 'iftttEvent', option })
+    verifyConfigFactory({ env: 'BOT_IFTTT_KEY', attr: 'iftttKey', option })
   }
 
-  if (config.iftttEnable === true) {
-    verifyConfigFactory({ env: 'BOT_IFTTT_EVENT', attr: 'iftttEvent' })
-    verifyConfigFactory({ env: 'BOT_IFTTT_KEY', attr: 'iftttKey' })
+  if (option.iftttEnable === true) {
+    verifyConfigFactory({ env: 'BOT_IFTTT_EVENT', attr: 'iftttEvent', option })
+    verifyConfigFactory({ env: 'BOT_IFTTT_KEY', attr: 'iftttKey', option })
   }
 
   /**
    * check smallest increment
    */
-  verifyConfigFactory({ env: 'BOT_SMALLEST_INCREMENT', attr: 'increment' })
-  verifyConfigFactory({ env: 'BOT_SMALLEST_INCREMENT', attr: 'decrement' })
+  verifyConfigFactory({ env: 'BOT_SMALLEST_INCREMENT', attr: 'increment', option })
+  verifyConfigFactory({ env: 'BOT_SMALLEST_INCREMENT', attr: 'decrement', option })
 
   /**
    * Check ENV  BID & ASK both required
    */
   // BOT_WATCH_ONLY
-  verifyConfigFactory({ env: 'BOT_WATCH_ONLY', attr: 'watchOnly', requires: ['true', 'false'] })
+  verifyConfigFactory({
+    env: 'BOT_WATCH_ONLY',
+    attr: 'watchOnly',
+    requires: ['true', 'false'],
+    option,
+  })
   // BOT_MODE
-  verifyConfigFactory({ env: 'BOT_MODE', attr: 'mode', requires: ['bid', 'ask', 'BID', 'ASK'] })
-  if (!config.mode) throw new Error('Please setup BOT_MODE')
+  verifyConfigFactory({
+    env: 'BOT_MODE',
+    attr: 'mode',
+    requires: ['bid', 'ask', 'BID', 'ASK'],
+    option,
+  })
+  if (!option.mode) throw new Error('Please setup BOT_MODE')
   // BOT_ASSET_TYPE
   verifyConfigFactory({
     env: 'BOT_ASSET_TYPE',
     attr: 'assetType',
     requires: ['ETH', 'USDT', 'BTC', 'eth', 'usdt', 'btc'],
+    option,
   })
   // BOT_PRODUCT_TYPE
-  verifyConfigFactory({ env: 'BOT_PRODUCT_TYPE', attr: 'productType' })
+  verifyConfigFactory({ env: 'BOT_PRODUCT_TYPE', attr: 'productType', option })
+  const api = Cobinhood({
+    apiSecret: option.apiSecret,
+  })
   const data = await api.allCurrencies()
-  const ans = data.result.currencies.filter(coin => coin.currency === config.productType)
+  const ans = data.result.currencies.filter(coin => coin.currency === option.productType)
   if (!ans === 1) throw new Error('Please setup supportive BOT_PRODUCT_TYPE')
-  verifyConfigFactory({ env: 'BOT_PROFIT_LIMIT_PERCENTAGE', attr: 'profitLimitPercentage' })
-  verifyConfigFactory({ env: 'BOT_QUANTITY_COMPARE_PERCENTAGE', attr: 'quantityComparePercentage' })
-  if (parseFloat(config.profitLimitPercentage) > 100000)
+  verifyConfigFactory({ env: 'BOT_PROFIT_LIMIT_PERCENTAGE', attr: 'profitLimitPercentage', option })
+  verifyConfigFactory({
+    env: 'BOT_QUANTITY_COMPARE_PERCENTAGE',
+    attr: 'quantityComparePercentage',
+    option,
+  })
+  if (parseFloat(option.profitLimitPercentage) > 100000)
     throw new Error('Profit limit Percentage over 100000, something must wrong here')
-  if (parseFloat(config.profitLimitPercentage) < 0)
+  if (parseFloat(option.profitLimitPercentage) < 0)
     throw new Error('Profit limit Percentage is negative, something must wrong here')
 }
 
 /**
  * Update order/order book/balance/opPrice data
  */
-export const updateData = async () => {
-  if (config.mode === 'BID') {
+export const updateData = async (option: any) => {
+  if (option.mode === 'BID') {
     const buyOrder = await getCurrentOrder()
     store.dispatch(onBuyOrderUpdate({ payload: buyOrder }))
-    const opPrice = await getCCPrice({ from: config.productType, to: config.assetType })
+    const opPrice = await getCCPrice({ from: option.productType, to: option.assetType, option })
     store.dispatch(onOpPriceUpdate({ payload: { price: opPrice } }))
-  } else if (config.mode === 'ASK') {
+  } else if (option.mode === 'ASK') {
     const sellOrder = await getCurrentOrder()
     store.dispatch(onSellOrderUpdate({ payload: sellOrder }))
   }
-
-  const orderBook = await api.orderBooks({ trading_pair_id: config.symbol }) // eslint-disable-line
+  const api = Cobinhood({
+    apiSecret: option.apiSecret,
+  })
+  const orderBook = await api.orderBooks({ trading_pair_id: option.symbol }) // eslint-disable-line
   const newOrderBook = packageOrderBook({ orderBook })
   store.dispatch(setOrderBook({ payload: newOrderBook }))
 }
