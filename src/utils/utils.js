@@ -15,12 +15,17 @@ export const sortOrder = (a: Order, b: Order) => {
   return minus(a.price, b.price)
 }
 
-export const sendIfttt = (
+export const sendIfttt = ({
+  value1,
+  value2,
+  value3,
+  option,
+}: {
   value1: string,
-  value2: string | null = null,
-  value3: string | null = null,
+  value2?: string,
+  value3?: string,
   option: any,
-) => {
+}) => {
   return axios
     .post(`https://maker.ifttt.com/trigger/${option.iftttEvent}/with/key/${option.iftttKey}`, {
       value1,
