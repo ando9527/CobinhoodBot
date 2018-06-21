@@ -5,6 +5,7 @@ import store from './store'
 import lib from './lib'
 import askLib from './askLib'
 import logger from './helpers/winston'
+import type { Option } from './types/option'
 import {
   startSync,
   wsModifyOrder,
@@ -132,7 +133,7 @@ const runCheck = async option => {
   setOrderBookNewest(false)
 }
 
-export const runSellOrder = async (option: any) => {
+export const runSellOrder = async (option: Option) => {
   return new Promise(async (res, rej) => {
     try {
       await initial()

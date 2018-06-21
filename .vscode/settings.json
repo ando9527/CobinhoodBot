@@ -3,8 +3,10 @@
     "accp",
     "backoff",
     "camelcase",
+    "cobbv",
     "iost",
     "mepp",
-    "usdt"
+    "usdt",
+    "uselessmining"
   ]
 }

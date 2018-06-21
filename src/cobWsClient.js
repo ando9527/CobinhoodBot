@@ -176,7 +176,7 @@ export const processOnMessage = ({ rawOnMessage, option }: { rawOnMessage: any, 
    * sync cobinhood order book data
    */
   if (type === 'u' && channelId.endsWith('order')) {
-    return processOrderMessage({ data, rawOnMessage, option })
+    return processOrderMessage({ data, option })
   }
 
   const errorMessage = header[4]
@@ -185,41 +185,52 @@ export const processOnMessage = ({ rawOnMessage, option }: { rawOnMessage: any, 
   }
 }
 
-export const processOrderMessage = ({
-  data,
-  rawOnMessage,
-  option,
-}: {
-  data: any,
-  rawOnMessage: any,
-  option: any,
-}) => {
+export const processOrderMessage = ({ data, option }: { data: any, option: any }) => {
   const order = zipOrderStateMessage(data)
   const { event, id, state }: { event: WsEvent, id: string, state: WsState } = order
 
   if (id !== option.sellOrderId && id !== option.buyOrderId) return 'IRRELEVANT_ORDER'
+  dispatchOrder({ order, mode: option.mode.toLowerCase() })
 
-  const eventTypes: Array<WsEvent> = ['modified', 'opened', 'executed']
+  const stateTypes: Array<WsState> = ['open', 'filled', 'cancelled']
 
-  if (eventTypes.includes(event)) {
+  if (!stateTypes.includes(state)) {
+    return 'UNMET_STATE_TYPES'
+  }
+
+  const eventTypes: Array<WsEvent> = ['modified', 'opened', 'executed', 'cancelled']
+
+  if (!eventTypes.includes(event)) {
     dispatchOrder({ order, mode: option.mode.toLowerCase() })
-  } else if (event === 'modify_rejected') {
+    return 'UNMET_EVENT_TYPES'
+  }
+
+  if (event === 'modify_rejected') {
     logger.warn(event)
     return 'MODIFY_REJECTED'
-  } else if (event === 'executed' && state === 'partially_filled') {
+  }
+  if (event === 'executed' && state === 'partially_filled') {
     const message = `Your order partially filled: ${option.symbol} ${id}`
     logger.info(message)
-  } else if (event === 'executed' && state === 'filled') {
+    return 'PARTIALLY FILLED'
+  }
+  if (event === 'executed' && state === 'filled') {
     const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message, (option = option))
-    sendIfttt({ value1: message, option })
-  } else if (event === 'cancelled' && state === 'cancelled') {
+    // sendIfttt({ value1: message, option })
+    return 'ORDER FILLED'
+  }
+  if (event === 'cancelled' && state === 'cancelled') {
     const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message)
-  } else {
-    throw new Error(`Unknown Code: ${rawOnMessage}`)
+    return 'ORDER CANCELLED'
   }
+
+  console.log('else')
+
+  throw new Error(`Unknown Code, data: ${data}`)
 }
+
 export const processErrorMessage = ({
   errorMessage,
   rawOnMessage,

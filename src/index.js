@@ -1,4 +1,5 @@
+// @flow
 import Launcher from './Launcher'
-import config from './config'
+import option from './option'
 
-Launcher.launch(config)
+Launcher.launch(option)

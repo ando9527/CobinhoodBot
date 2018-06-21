@@ -1,6 +1,7 @@
 // @flow
 import { register } from 'babel-core'
 import polyfill from 'babel-polyfill'
+import type { Option } from './types/option'
 import store from './store'
 import { sendIfttt } from './utils/utils'
 import logger from './helpers/winston'
@@ -12,7 +13,7 @@ import { runBuyOrder } from './bid'
 //   logger.error(error)
 // })
 export default class Launcher {
-  static launch = async (option: any) => {
+  static launch = async (option: Option) => {
     if (option.mode.toUpperCase === 'ASK') return runSellOrder(option)
     if (option.mode.toUpperCase === 'BID') return runBuyOrder(option)
   }

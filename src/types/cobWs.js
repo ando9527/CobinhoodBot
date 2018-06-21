@@ -4,6 +4,17 @@
  * 'balance_locked' added by custom
  */
 
+export type WsState =
+  | 'open'
+  | 'queued'
+  | 'partially_filled'
+  | 'filled'
+  | 'cancelled'
+  | 'pending_cancellation'
+  | 'rejected'
+  | 'triggered'
+  | 'pending_modification'
+
 export type WsEvent =
   | 'opened'
   | 'modified'
@@ -16,17 +27,6 @@ export type WsEvent =
   | 'execute_rejected'
   | 'trigger_rejected'
   | 'balance_locked'
-
-export type WsState =
-  | 'open'
-  | 'queued'
-  | 'partially_filled'
-  | 'filled'
-  | 'cancelled'
-  | 'pending_cancellation'
-  | 'rejected'
-  | 'triggered'
-  | 'pending_modification'
 
 export type WsOrder = {
   id: string,

@@ -230,30 +230,30 @@ export const getTopPrice = ({ bids, increment }: { bids: Array<Order>, increment
 
 export const getExpectedCost = ({
   sellPrice,
-  profitPercentage,
+  profitLimitPercentage,
 }: {
   sellPrice: number,
-  profitPercentage: number,
+  profitLimitPercentage: number,
 }) => {
   // (x-y)/y*100 = z
   // y = 100x/(z+100) !=-100
   // return 100*sellPrice/(profitPercentage+100)
-  const cost = utils.div(utils.multi(100, sellPrice), utils.plus(profitPercentage, 100))
+  const cost = utils.div(utils.multi(100, sellPrice), utils.plus(profitLimitPercentage, 100))
   return cost
 }
 
 export const getLimitProfitBuyOrder = ({
   asks,
   bids,
-  profitPercentage,
+  profitLimitPercentage,
 }: {
   asks: Array<Order>,
   bids: Array<Order>,
-  profitPercentage: number,
+  profitLimitPercentage: number,
 }) => {
   const lowestAskPrice = lib.getLowestAskFy({ asks }).price
   const newBids = bids.filter(b => {
-    return b.price < getExpectedCost({ sellPrice: lowestAskPrice, profitPercentage })
+    return b.price < getExpectedCost({ sellPrice: lowestAskPrice, profitLimitPercentage })
   })
   return newBids
 }

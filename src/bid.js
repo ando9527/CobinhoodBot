@@ -8,6 +8,7 @@ import { opAgentRun } from './opWsClient'
 import { getCCPrice } from './lib/lib'
 import { onOpPriceUpdate } from './actions/opPrice'
 import colors from 'colors/safe'
+import type { Option } from './types/option'
 import {
   startSync,
   wsModifyOrder,
@@ -20,7 +21,7 @@ export const initial = async () => {
   await bidLib.verifyConfig()
 }
 
-export const bidStateMachine = (option: any) => {
+export const bidStateMachine = (option: Option) => {
   const { orderBook, buyOrder, opPrice } = store.getState()
   const { asks, bids } = orderBook
   const vQCBids = bidLib.getValidQuantityCompare({
@@ -31,7 +32,7 @@ export const bidStateMachine = (option: any) => {
   const lPBOBids = bidLib.getLimitProfitBuyOrder({
     bids: vQCBids,
     asks,
-    profitPercentage: option.profitPercentage,
+    profitLimitPercentage: option.profitLimitPercentage,
   })
   if (lPBOBids.length <= 1) return 'ZERO_LIMIT_PROFIT_BUY_ORDER'
   const oBids = bidLib.getBelowOpBuyOrder({
@@ -57,9 +58,9 @@ export const bidStateMachine = (option: any) => {
   if (ir === true) return 'REDUCE_PRICE'
 }
 
-export const check = async (option: any) => {
+export const check = async (option: Option) => {
   // For Logic
-  const code = bidStateMachine()
+  const code = bidStateMachine(option)
   const { opPrice, buyOrder, orderBook } = store.getState()
   const { asks, bids } = orderBook
   const vQCBids = bidLib.getValidQuantityCompare({
@@ -70,7 +71,7 @@ export const check = async (option: any) => {
   const lPBOBids = bidLib.getLimitProfitBuyOrder({
     bids: vQCBids,
     asks,
-    profitPercentage: option.profitPercentage,
+    profitLimitPercentage: option.profitLimitPercentage,
   })
   const oBids = bidLib.getBelowOpBuyOrder({
     bids: lPBOBids,
@@ -183,14 +184,14 @@ export const check = async (option: any) => {
   await wsModifyOrder({ price: priceModified, order: buyOrder })
 }
 
-const runCheck = async () => {
+const runCheck = async (option: Option) => {
   if (!connected) return
   if (orderBookNewest === false) return
-  await check()
+  await check(option)
   setOrderBookNewest(false)
 }
 
-export const runBuyOrder = async (option: any) => {
+export const runBuyOrder = async (option: Option) => {
   try {
     // verify configuration
     await initial()
@@ -210,7 +211,7 @@ export const runBuyOrder = async (option: any) => {
   setInterval(async () => {
     if (!connected) return
     try {
-      await runCheck()
+      await runCheck(option)
     } catch (error) {
       logger.error(error)
     }
