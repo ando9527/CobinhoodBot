@@ -6,6 +6,7 @@ import store from './store'
 import { sendIfttt } from './utils/utils'
 import config from './config'
 import logger from './helpers/sentry'
+import * as axiosConfig from './helpers/axiosConfig'
 
 bot.run().catch(async error => {
   logger.error(error)
