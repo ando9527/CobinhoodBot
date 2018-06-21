@@ -140,8 +140,6 @@ export const runSellOrder = async (option: Option) => {
     await startSync(option)
   } catch (error) {
     logger.error(error, option)
-
-    process.exit(1)
   }
 
   const id = setInterval(async () => {

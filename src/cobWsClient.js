@@ -78,7 +78,6 @@ const connect = option => {
       processOnMessage({ rawOnMessage, option })
     } catch (e) {
       logger.error(e, option, `rawOnMessage: ${rawOnMessage}`)
-      process.exit(1)
     }
   })
   client.addEventListener('error', err => {

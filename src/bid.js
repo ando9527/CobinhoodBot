@@ -203,7 +203,6 @@ export const runBuyOrder = async (option: Option) => {
     opAgentRun(option)
   } catch (error) {
     logger.error(error, option)
-    process.exit(1)
   }
 
   setInterval(async () => {
