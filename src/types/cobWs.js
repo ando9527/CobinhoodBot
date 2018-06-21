@@ -28,7 +28,7 @@ export type WsEvent =
   | 'trigger_rejected'
   | 'balance_locked'
 
-export type WsOrder = {
+export type WsChannelData = {
   id: string,
   timestamp: number,
   trading_pair_id: string,

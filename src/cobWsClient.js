@@ -1,6 +1,7 @@
 // @flow
 
-import type { WsEvent, WsState, WsOrder } from './types/cobWs'
+import type { WsEvent, WsState, WsChannelData } from './types/cobWs'
+import type { Option } from './types/option'
 import type { SellOrder } from './types/sellOrder'
 import type { BuyOrder } from './types/buyOrder'
 import store from './store'
@@ -10,7 +11,6 @@ import logger from './helpers/winston'
 import { onBuyOrderUpdate } from './actions/buyOrder'
 import { setOrderBook, updateOrderBook } from './actions/orderBook'
 import { packageOrder } from './lib/lib'
-import type { Option } from './types/option'
 
 const WS = require('ws')
 let client = null
@@ -109,7 +109,7 @@ const zipOrderBook = orderBook => {
   return { bids: newBid, asks: newAsk }
 }
 
-export const zipOrderStateMessage = (order: Array<any>): WsOrder => {
+export const zipOrderStateMessage = (order: Array<any>): WsChannelData => {
   const id = order[0]
   const timestamp = parseFloat(order[1])
   const trading_pair_id = order[3]
@@ -153,7 +153,7 @@ export const wsModifyOrder = async ({
   client.send(sendBack)
 }
 
-export const dispatchOrder = ({ order, mode }: { order: WsOrder, mode: string }) => {
+export const dispatchOrder = ({ order, mode }: { order: WsChannelData, mode: string }) => {
   if (mode === 'ask') return store.dispatch(onSellOrderUpdate({ payload: packageOrder({ order }) }))
   if (mode === 'bid') return store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
 }
@@ -183,7 +183,8 @@ export const processOnMessage = ({
    * sync cobinhood order book data
    */
   if (type === 'u' && channelId.endsWith('order')) {
-    return processOrderMessage({ data, option })
+    const wsChannelData = zipOrderStateMessage(data)
+    return processOrderChannel({ data: wsChannelData, option })
   }
 
   const errorMessage = header[4]
@@ -191,13 +192,14 @@ export const processOnMessage = ({
     return processErrorMessage({ errorMessage, rawOnMessage })
   }
 }
-
-export const processOrderMessage = ({ data, option }: { data: Array<WsOrder>, option: Option }) => {
-  const order = zipOrderStateMessage(data)
-  const { event, id, state }: { event: WsEvent, id: string, state: WsState } = order
+/**
+ * ChannelId: order
+ */
+export const processOrderChannel = ({ data, option }: { data: WsChannelData, option: Option }) => {
+  const { event, id, state }: { event: WsEvent, id: string, state: WsState } = data
 
   if (id !== option.sellOrderId && id !== option.buyOrderId) return 'IRRELEVANT_ORDER'
-  dispatchOrder({ order, mode: option.mode.toLowerCase() })
+  dispatchOrder({ order: data, mode: option.mode.toLowerCase() })
 
   const stateTypes: Array<WsState> = ['open', 'filled', 'cancelled']
 
@@ -208,7 +210,7 @@ export const processOrderMessage = ({ data, option }: { data: Array<WsOrder>, op
   const eventTypes: Array<WsEvent> = ['modified', 'opened', 'executed', 'cancelled']
 
   if (!eventTypes.includes(event)) {
-    dispatchOrder({ order, mode: option.mode.toLowerCase() })
+    dispatchOrder({ order: data, mode: option.mode.toLowerCase() })
     return 'UNMET_EVENT_TYPES'
   }
 
