@@ -1,5 +1,4 @@
 // @flow
-import config from './config'
 import utils from './utils'
 import store from './store'
 import lib from './lib'
@@ -21,7 +20,7 @@ export const initial = async () => {
   await bidLib.verifyConfig()
 }
 
-export const bidStateMachine = () => {
+export const bidStateMachine = (option: any) => {
   const { orderBook, buyOrder, opPrice } = store.getState()
   const { asks, bids } = orderBook
   const vQCBids = bidLib.getValidQuantityCompare({ bids, buyOrder })
@@ -32,19 +31,19 @@ export const bidStateMachine = () => {
   const lBids = bidLib.getBelowLimitBuyOrder({
     bids: oBids,
     buyOrder,
-    limit: config.totalPriceLimit,
+    limit: option.totalPriceLimit,
   })
   if (lBids.length <= 1) return 'ZERO_BELOW_LIMIT_PRICE'
   const ib = bidLib.inBidPriceBucket({ bids: lBids, buyOrder })
   if (ib === false) return 'BE_TOP'
   const ih = bidLib.isHighestBidOrder({ bids: lBids, buyOrder })
   if (ih === false) return 'BE_TOP'
-  const ir = bidLib.isReducePrice({ bids: lBids, buyOrder, increment: config.increment })
+  const ir = bidLib.isReducePrice({ bids: lBids, buyOrder, increment: option.increment })
   if (ir === false) return 'NOTHING'
   if (ir === true) return 'REDUCE_PRICE'
 }
 
-export const check = async () => {
+export const check = async (option: any) => {
   // For Logic
   const code = bidStateMachine()
   const { opPrice, buyOrder, orderBook } = store.getState()
@@ -55,7 +54,7 @@ export const check = async () => {
   const lBids = bidLib.getBelowLimitBuyOrder({
     bids: oBids,
     buyOrder,
-    limit: config.totalPriceLimit,
+    limit: option.totalPriceLimit,
   })
   // Expected Profit Percentage
   const epp = lib.getProfitPercentage({
@@ -101,7 +100,7 @@ export const check = async () => {
       price: buyOrder.price,
       buyOrder,
       opPrice: opPrice.price,
-      totalPriceLimit: config.totalPriceLimit,
+      totalPriceLimit: option.totalPriceLimit,
     })
     lib.checkProfitLimitPercentage({ profitPercentage: epp })
     logger.info('Your offer is good, you don\'t need to change.')
@@ -130,7 +129,7 @@ export const check = async () => {
   })
   logger.info(`${priceModified}(${mepp}%) ${changeMessage}`)
 
-  if (config.watchOnly === true) {
+  if (option.watchOnly === true) {
     logger.info('You are in watch mode now, nothing to do here ')
     return 'WATCH_ONLY'
   }
@@ -141,7 +140,7 @@ export const check = async () => {
     price: priceModified,
     buyOrder,
     opPrice: opPrice.price,
-    totalPriceLimit: config.totalPriceLimit,
+    totalPriceLimit: option.totalPriceLimit,
   })
   lib.checkProfitLimitPercentage({ profitPercentage: mepp })
   // await bidLib.checkEnoughBalance({ price: priceModified })
@@ -155,7 +154,7 @@ const runCheck = async () => {
   setOrderBookNewest(false)
 }
 
-const runBuyOrder = async () => {
+export const runBuyOrder = async (option: any) => {
   try {
     // verify configuration
     await initial()
@@ -179,9 +178,5 @@ const runBuyOrder = async () => {
     } catch (error) {
       logger.error(error)
     }
-  }, config.BOT_CHECK_INTERVAL * 1000)
-}
-
-export const run = async () => {
-  await runBuyOrder()
+  }, option.BOT_CHECK_INTERVAL * 1000)
 }

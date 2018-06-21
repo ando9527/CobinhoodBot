@@ -1,5 +1,4 @@
 // @flow
-import config from './config'
 import colors from 'colors/safe'
 import utils from './utils'
 import store from './store'
@@ -35,7 +34,7 @@ export const askStateMachine = () => {
   if (ig === true) return 'GAIN_PRICE'
 }
 
-export const check = async () => {
+export const check = async (option: any) => {
   // For Logic
   const code = askStateMachine()
 
@@ -46,7 +45,7 @@ export const check = async () => {
   const casks = askLib.getAboveCostSellOrder({ asks: lPSOAsks })
 
   // Expected Profit Percentage
-  const epp = lib.getProfitPercentage({ price: sellOrder.price, productCost: config.productCost })
+  const epp = lib.getProfitPercentage({ price: sellOrder.price, productCost: option.productCost })
   const eppInfo = `${epp}%`
 
   // For Info Display only
@@ -54,7 +53,7 @@ export const check = async () => {
   logger.info(
     `Yours: ${sellOrder.price}(${eppInfo}) Lowest: ${lowestPrice}(${lib.getProfitPercentage({
       price: lowestPrice,
-      productCost: config.productCost,
+      productCost: option.productCost,
     })}%).`,
   )
 
@@ -87,10 +86,10 @@ export const check = async () => {
     return 'NOTHING_BUG'
   }
   // Modified Expected Profit Percentage
-  const mepp = lib.getProfitPercentage({ price: priceModified, productCost: config.productCost })
+  const mepp = lib.getProfitPercentage({ price: priceModified, productCost: option.productCost })
   logger.info(`${priceModified}(${mepp}%) ${changeMessage}`)
 
-  if (config.watchOnly) {
+  if (option.watchOnly) {
     logger.info('You are in watch mode now, nothing to do here ')
     return 'WATCH_ONLY'
   }
@@ -102,16 +101,16 @@ export const check = async () => {
   await wsModifyOrder({ price: priceModified, order: sellOrder })
 }
 
-const runCheck = async () => {
+const runCheck = async option => {
   if (!connected) return
 
   if (orderBookNewest === false) return
 
-  await check()
+  await check(option)
   setOrderBookNewest(false)
 }
 
-const runSellOrder = async () => {
+export const runSellOrder = async (option: any) => {
   return new Promise(async (res, rej) => {
     try {
       await initial()
@@ -136,8 +135,4 @@ const runSellOrder = async () => {
     }, 1000)
     res('SUCCESS')
   })
-}
-
-export const run = async () => {
-  await runSellOrder()
 }
