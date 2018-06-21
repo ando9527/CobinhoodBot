@@ -23,15 +23,29 @@ export const initial = async () => {
 export const bidStateMachine = (option: any) => {
   const { orderBook, buyOrder, opPrice } = store.getState()
   const { asks, bids } = orderBook
-  const vQCBids = bidLib.getValidQuantityCompare({ bids, buyOrder })
-  const lPBOBids = bidLib.getLimitProfitBuyOrder({ bids: vQCBids, asks })
+  const vQCBids = bidLib.getValidQuantityCompare({
+    bids,
+    buyOrder,
+    quantityComparePercentage: option.quantityComparePercentage,
+  })
+  const lPBOBids = bidLib.getLimitProfitBuyOrder({
+    bids: vQCBids,
+    asks,
+    profitPercentage: option.profitPercentage,
+  })
   if (lPBOBids.length <= 1) return 'ZERO_LIMIT_PROFIT_BUY_ORDER'
-  const oBids = bidLib.getBelowOpBuyOrder({ bids: lPBOBids, opPrice: opPrice.price })
+  const oBids = bidLib.getBelowOpBuyOrder({
+    bids: lPBOBids,
+    opPrice: opPrice.price,
+    increment: option.increment,
+    opPercentage: option.opPercentage,
+  })
   if (oBids.length <= 1) return 'ZERO_BELOW_OP_PRICE'
   const lBids = bidLib.getBelowLimitBuyOrder({
     bids: oBids,
     buyOrder,
     limit: option.totalPriceLimit,
+    increment: option.increment,
   })
   if (lBids.length <= 1) return 'ZERO_BELOW_LIMIT_PRICE'
   const ib = bidLib.inBidPriceBucket({ bids: lBids, buyOrder })
@@ -48,13 +62,27 @@ export const check = async (option: any) => {
   const code = bidStateMachine()
   const { opPrice, buyOrder, orderBook } = store.getState()
   const { asks, bids } = orderBook
-  const vQCBids = bidLib.getValidQuantityCompare({ bids, buyOrder })
-  const lPBOBids = bidLib.getLimitProfitBuyOrder({ bids: vQCBids, asks })
-  const oBids = bidLib.getBelowOpBuyOrder({ bids: lPBOBids, opPrice: opPrice.price })
+  const vQCBids = bidLib.getValidQuantityCompare({
+    bids,
+    buyOrder,
+    quantityComparePercentage: option.quantityComparePercentage,
+  })
+  const lPBOBids = bidLib.getLimitProfitBuyOrder({
+    bids: vQCBids,
+    asks,
+    profitPercentage: option.profitPercentage,
+  })
+  const oBids = bidLib.getBelowOpBuyOrder({
+    bids: lPBOBids,
+    opPrice: opPrice.price,
+    increment: option.increment,
+    opPercentage: option.opPercentage,
+  })
   const lBids = bidLib.getBelowLimitBuyOrder({
     bids: oBids,
     buyOrder,
     limit: option.totalPriceLimit,
+    increment: option.increment,
   })
   // Expected Profit Percentage
   const epp = lib.getProfitPercentage({
@@ -101,6 +129,7 @@ export const check = async (option: any) => {
       buyOrder,
       opPrice: opPrice.price,
       totalPriceLimit: option.totalPriceLimit,
+      opPercentage: option.opPercentage,
     })
     lib.checkProfitLimitPercentage({ profitPercentage: epp })
     logger.info('Your offer is good, you don\'t need to change.')
@@ -110,11 +139,11 @@ export const check = async (option: any) => {
   let priceModified = 0
   let changeMessage = ''
   if (code === 'BE_TOP') {
-    priceModified = bidLib.getTopPrice({ bids: lBids })
+    priceModified = bidLib.getTopPrice({ bids: lBids, increment: option.increment })
     changeMessage = 'Rasing Price'
   }
   if (code === 'REDUCE_PRICE') {
-    priceModified = bidLib.getReducePrice({ bids: lBids })
+    priceModified = bidLib.getReducePrice({ bids: lBids, increment: option.increment })
     changeMessage = 'Reducing Price'
   }
 
@@ -141,6 +170,7 @@ export const check = async (option: any) => {
     buyOrder,
     opPrice: opPrice.price,
     totalPriceLimit: option.totalPriceLimit,
+    opPercentage: option.opPercentage,
   })
   lib.checkProfitLimitPercentage({ profitPercentage: mepp })
   // await bidLib.checkEnoughBalance({ price: priceModified })
