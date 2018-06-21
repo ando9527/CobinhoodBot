@@ -153,7 +153,7 @@ export const wsModifyOrder = async ({
   client.send(sendBack)
 }
 
-export const dispatchOrder = ({ order, mode }: { order: any, mode: any }) => {
+export const dispatchOrder = ({ order, mode }: { order: WsOrder, mode: string }) => {
   if (mode === 'ask') return store.dispatch(onSellOrderUpdate({ payload: packageOrder({ order }) }))
   if (mode === 'bid') return store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
 }
@@ -162,7 +162,7 @@ export const processOnMessage = ({
   rawOnMessage,
   option,
 }: {
-  rawOnMessage: any,
+  rawOnMessage: string,
   option: Option,
 }) => {
   const { h: header, d: data } = JSON.parse(rawOnMessage)
@@ -192,7 +192,7 @@ export const processOnMessage = ({
   }
 }
 
-export const processOrderMessage = ({ data, option }: { data: any, option: Option }) => {
+export const processOrderMessage = ({ data, option }: { data: Array<WsOrder>, option: Option }) => {
   const order = zipOrderStateMessage(data)
   const { event, id, state }: { event: WsEvent, id: string, state: WsState } = order
 
@@ -235,7 +235,7 @@ export const processOrderMessage = ({ data, option }: { data: any, option: Optio
 
   console.log('else')
 
-  throw new Error(`Unknown Code, data: ${data}`)
+  throw new Error(`Unknown Code, data: ${JSON.stringify(data)}`)
 }
 
 export const processErrorMessage = ({
