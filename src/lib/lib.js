@@ -5,7 +5,6 @@ import Cobinhood from 'cobinhood-api-node'
 import axios from 'axios'
 import { onBuyOrderUpdate } from '../actions/buyOrder'
 import { onSellOrderUpdate } from '../actions/sellOrder'
-import packageJson from '../../package.json'
 import type { Option } from '../types/option'
 import { updateOrderBook, setOrderBook } from '../actions/orderBook'
 import logger from '../helpers/winston'
@@ -245,7 +244,6 @@ export const verifyConfigFactory = ({
 }
 
 export const commonVerifyConfig = async (option: Option) => {
-  logger.info(`Version ${packageJson.version}`)
   logger.info('Verifying your option..')
   /**
    * Check API Secret
