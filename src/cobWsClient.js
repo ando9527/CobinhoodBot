@@ -75,7 +75,7 @@ const connect = option => {
     if (!rawOnMessage) return
 
     try {
-      processOnMessage({ rawOnMessage, option })
+      await processOnMessage({ rawOnMessage, option })
     } catch (e) {
       logger.error(e, option, `rawOnMessage: ${rawOnMessage}`)
     }
@@ -146,7 +146,7 @@ export const dispatchOrder = ({ order, mode }: { order: WsChannelOrder, mode: st
   if (mode === 'bid') return store.dispatch(onBuyOrderUpdate({ payload: packageOrder({ order }) }))
 }
 
-export const processOnMessage = ({
+export const processOnMessage = async ({
   rawOnMessage,
   option,
 }: {
@@ -177,7 +177,7 @@ export const processOnMessage = ({
    */
   if (type === 'u' && channelId.endsWith('order')) {
     const wsChannelOrder = zipChannelOrderData(data)
-    const code = processOrderChannel({ order: wsChannelOrder, option })
+    const code = await processOrderChannel({ order: wsChannelOrder, option })
     switch (code) {
     case 'UNMET_STATE_TYPES':
     case 'UNMET_EVENT_TYPES':
