@@ -362,16 +362,19 @@ export const isOrderMatch = (order: BuyOrder | SellOrder, option: Option) => {
  */
 export const updateData = async (option: Option) => {
   if (option.mode === 'BID') {
-    const buyOrder = await getCurrentOrder(option)
+    const buyOrder: BuyOrder = await getCurrentOrder(option)
     if (isOrderMatch(buyOrder, option) === false)
       throw new Error(`Current order and option not match, buyOrder: ${JSON.stringify(buyOrder)}`)
     store.dispatch(onBuyOrderUpdate({ payload: buyOrder }))
     const opPrice = await getCCPrice({ from: option.productType, to: option.assetType, option })
     store.dispatch(onOpPriceUpdate({ payload: { price: opPrice } }))
   } else if (option.mode === 'ASK') {
-    const sellOrder = await getCurrentOrder(option)
+    const sellOrder: SellOrder = await getCurrentOrder(option)
     store.dispatch(onSellOrderUpdate({ payload: sellOrder }))
+    if (isOrderMatch(sellOrder, option) === false)
+      throw new Error(`Current order and option not match, sellOrder: ${JSON.stringify(sellOrder)}`)
   }
+
   const api = Cobinhood({
     apiSecret: option.apiSecret,
   })
