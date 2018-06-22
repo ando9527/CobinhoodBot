@@ -19,9 +19,9 @@ class Logger {
     winston.error(error.stack)
     winston.error(`Extra Info: ${JSON.stringify(extra)} `)
     sentry.captureException(error, { extra })
-    const ifMessage = `Unexpected crashed, ${option.symbol} ${option.mode} ${option.buyOrderId} ${
-      option.sellOrderId
-    }`
+    const ifMessage = `Unexpected crashed, ${error.message}, ${option.symbol} ${option.mode} ${
+      option.buyOrderId
+    } ${option.sellOrderId}`
     await sendIfttt({
       value1: ifMessage,
       value2: error.stack,
