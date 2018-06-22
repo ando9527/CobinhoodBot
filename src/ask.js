@@ -134,13 +134,9 @@ const runCheck = async (option: Option) => {
 }
 
 export const runSellOrder = async (option: Option) => {
-  try {
-    await initial(option)
-    await lib.updateData(option)
-    await startSync(option)
-  } catch (error) {
-    logger.error(error, option)
-  }
+  await initial(option)
+  await lib.updateData(option)
+  await startSync(option)
 
   const id = setInterval(async () => {
     if (!connected) return

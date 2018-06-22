@@ -52,7 +52,11 @@ const connect = option => {
   client.addEventListener('error', err => {
     connecting = false
     connected = false
-    logger.record(`[Websocket][Crypto OP] Error event listener ${err.message}`, option)
+    logger.warn(
+      `[Websocket][Crypto OP] Error event listener, error code: ${err.code}, message: ${
+        err.message
+      }`,
+    )
   })
 }
 
@@ -71,12 +75,7 @@ const receivingData = ({ data, option }) => {
 
 export const opAgentRun = (option: Option) => {
   setInterval(function() {
-    try {
-      if (connected) return
-      connect(option)
-    } catch (error) {
-      logger.error(error, option)
-    }
+    connect(option)
   }, 3500)
 
   /**

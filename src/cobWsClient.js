@@ -83,7 +83,11 @@ const connect = option => {
   client.addEventListener('error', err => {
     connecting = false
     connected = false
-    logger.record(`[Websocket][Cobinhood] Error event listener ${err.message}`, option)
+    logger.warn(
+      `[Websocket][Cobinhood] Error event listener, error code: ${err.code}, message: ${
+        err.message
+      }`,
+    )
   })
 }
 
@@ -282,11 +286,8 @@ export const processErrorMessage = (errorMessage: string) => {
 export const startSync = (option: Option) => {
   setInterval(async () => {
     if (connected) return
-    try {
-      connect(option)
-    } catch (error) {
-      logger.error(error, option)
-    }
+
+    connect(option)
   }, 3500)
 
   /**

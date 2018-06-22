@@ -192,18 +192,14 @@ const runCheck = async (option: Option) => {
 }
 
 export const runBuyOrder = async (option: Option) => {
-  try {
-    // verify configuration
-    await initial(option)
-    // retrieve order/order book/opPrice once
-    await lib.updateData(option)
-    // sync order book data
-    startSync(option)
-    // sync Op Price
-    opAgentRun(option)
-  } catch (error) {
-    logger.error(error, option)
-  }
+  // verify configuration
+  await initial(option)
+  // retrieve order/order book/opPrice once
+  await lib.updateData(option)
+  // sync order book data
+  startSync(option)
+  // sync Op Price
+  opAgentRun(option)
 
   setInterval(async () => {
     if (!connected) return
