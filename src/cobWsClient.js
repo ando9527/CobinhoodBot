@@ -243,6 +243,9 @@ export const processOrderChannel = async ({
   if (state === 'partially_filled' && event === 'modified') {
     return 'PARTIALLY_FILLED'
   }
+
+  if (state === 'open' && event === 'modified') return 'MODIFIED'
+
   if (state === 'filled' && event === 'executed') {
     const message = `Your order full filled: ${option.symbol} ${id}`
     logger.info(message)
