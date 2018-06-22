@@ -36,8 +36,13 @@ export const sendIfttt = ({
       value3,
     })
     .then(data => {
-      if (data.data !== 'Congratulations! You\'ve fired the cbb event')
-        throw Error('IFTTT EVENT sent failed')
+      logger.info(data.data)
+    })
+    .catch(err => {
+      console.log('IFTTT sent Failed')
+      console.error(err)
+      logger.info('Leaving process..')
+      process.exit(1)
     })
 }
 
