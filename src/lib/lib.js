@@ -119,6 +119,8 @@ export const getCurrentOrder = async (option: Option) => {
     })
     const data = await api.myOrderId({ order_id }) // eslint-disable camelcase
 
+    if (!data)
+      throw new Error('Can not retrieve your order from server, Error possibility not auth.')
     if (data.success === false)
       throw new Error(`Can not retrieve your order from server, Error ${data}`)
     const { order } = data.result

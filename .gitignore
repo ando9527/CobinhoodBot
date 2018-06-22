@@ -9,5 +9,4 @@ env
 _env
 env_config/
 
-test/test_temp.js
-yk
+.alpha.js
