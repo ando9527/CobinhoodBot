@@ -1,5 +1,4 @@
 // @flow
-require('dotenv').load()
 import type { Option } from './types/option'
 const message = 'Environment Variable Error'
 

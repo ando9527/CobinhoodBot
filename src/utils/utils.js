@@ -7,7 +7,6 @@ import store from '../store'
 import logger from '../helpers/winston'
 import type { Order } from '../types/orderBook'
 import type { Option } from '../types/option'
-import option from '../option'
 import _ from 'lodash'
 export const sortNumber = (a: number, b: number) => {
   return minus(a, b)
@@ -28,7 +27,7 @@ export const sendIfttt = ({
   value3?: string,
   option: Option,
 }) => {
-  if (option.NODE_ENV !== 'production') return
+  if (process.env.NODE_ENV !== 'production') return
   return axios
     .post(`https://maker.ifttt.com/trigger/${option.iftttEvent}/with/key/${option.iftttKey}`, {
       value1,
@@ -39,8 +38,9 @@ export const sendIfttt = ({
       logger.info(data.data)
     })
     .catch(err => {
-      console.log('IFTTT sent Failed')
+      console.log(err)
       console.error(err)
+      console.log('IFTTT sent Failed')
       logger.info('Leaving process..')
       process.exit(1)
     })

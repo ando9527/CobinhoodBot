@@ -1,3 +1,4 @@
+require('dotenv').load()
 import { assert } from 'chai'
 import store from '../store'
 import { updateData, getCCPrice } from '../lib/lib'

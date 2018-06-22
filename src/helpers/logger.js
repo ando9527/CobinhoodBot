@@ -18,7 +18,6 @@ class Logger {
     }
     winston.error(error.stack)
     winston.error(`Extra Info: ${JSON.stringify(extra)} `)
-    sentry.captureException(error, { extra })
     const ifMessage = `Unexpected crashed, ${error.message}, ${option.symbol} ${option.mode} ${
       option.buyOrderId
     } ${option.sellOrderId}`
@@ -28,8 +27,15 @@ class Logger {
       value3: JSON.stringify(extra),
       option,
     })
+    sentry.captureException(error, { extra }, (sendErr, eventId) => {
+      if (sendErr) {
+        console.error('Failed to send captured exception to Sentry')
+      } else {
+        console.log('Captured exception and send to Sentry successfully')
+      }
+    })
+
     logger.warn('Leaving process now..')
-    process.exit(1)
   }
 
   static info = (message: string) => {
@@ -55,6 +61,9 @@ class Logger {
     }
     winston.warn(`Extra Info: ${JSON.stringify(extra)} `)
     sentry.captureMessage(message, { extra })
+  }
+  static getSentry = () => {
+    return sentry
   }
 }
 

@@ -1,5 +1,5 @@
 var assert = require('assert')
-
+require('dotenv').load()
 import {
   processOrderChannel,
   processOnMessage,

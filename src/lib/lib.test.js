@@ -1,3 +1,4 @@
+require('dotenv').load()
 import { assert } from 'chai'
 import { isOrderMatch } from './lib'
 
