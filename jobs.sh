@@ -4,7 +4,7 @@ REGISTRY=docker.kumay.net
 IMAGE="$REGISTRY/$REPOSITORY:latest"
 BUILDCMD="sudo docker build -t $IMAGE ."
 PUSHCMD="sudo docker push $IMAGE"
-PULLCMD="sudo docker pull $IMAGE"
+PULLCMD="docker pull $IMAGE"
 
 echo "Image: $IMAGE"
 
