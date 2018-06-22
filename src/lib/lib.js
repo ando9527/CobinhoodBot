@@ -13,7 +13,9 @@ import { onOpPriceUpdate } from '../actions/opPrice'
 import type { BuyOrder } from '../types/buyOrder'
 import type { SellOrder } from '../types/sellOrder'
 import type { Order } from '../types/orderBook'
-
+import _ from 'lodash'
+import { isSubset } from '../utils/utils'
+import assert from 'assert'
 // export const api = Cobinhood({
 //   apiSecret: option.apiSecret,
 // })
@@ -327,12 +329,42 @@ export const commonVerifyConfig = async (option: Option) => {
     throw new Error('Profit limit Percentage is negative, something must wrong here')
 }
 
+export const isOrderMatch = (order: BuyOrder | SellOrder, option: Option) => {
+  if (!order) throw new Error('Can not get current order')
+  // const {trading_pair_id, side  } = order
+
+  if (option.mode.toUpperCase() === 'ASK') {
+    try {
+      assert.deepEqual(order.id, option.sellOrderId)
+      assert.deepEqual(order.trading_pair_id.toUpperCase(), option.symbol.toUpperCase())
+      assert.deepEqual(order.side.toUpperCase(), option.mode.toUpperCase())
+    } catch (e) {
+      return false
+    }
+    return true
+  }
+  if (option.mode.toUpperCase() === 'BID') {
+    try {
+      assert.deepEqual(order.id, option.buyOrderId)
+      assert.deepEqual(order.trading_pair_id.toUpperCase(), option.symbol.toUpperCase())
+      assert.deepEqual(order.side.toUpperCase(), option.mode.toUpperCase())
+    } catch (e) {
+      return false
+    }
+    return true
+  }
+
+  return false
+}
+
 /**
  * Update order/order book/balance/opPrice data
  */
 export const updateData = async (option: Option) => {
   if (option.mode === 'BID') {
     const buyOrder = await getCurrentOrder(option)
+    if (isOrderMatch(buyOrder, option) === false)
+      throw new Error(`Current order and option not match, buyOrder: ${JSON.stringify(buyOrder)}`)
     store.dispatch(onBuyOrderUpdate({ payload: buyOrder }))
     const opPrice = await getCCPrice({ from: option.productType, to: option.assetType, option })
     store.dispatch(onOpPriceUpdate({ payload: { price: opPrice } }))

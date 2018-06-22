@@ -8,6 +8,7 @@ import logger from '../helpers/winston'
 import type { Order } from '../types/orderBook'
 import type { Option } from '../types/option'
 import option from '../option'
+import _ from 'lodash'
 export const sortNumber = (a: number, b: number) => {
   return minus(a, b)
 }
@@ -100,3 +101,6 @@ export const removeProperty = (obj: Object, property: string) => {
     return acc
   }, {})
 }
+
+export const isSubset = (subSet: Object, superSet: Object) =>
+  _.every(subSet, (val, key) => _.isEqual(val, superSet[key]))

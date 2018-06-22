@@ -52,7 +52,6 @@ describe('askLib', () => {
     const profitLimitPercentage = 10
     //get rid of the price under 110
     const newAsks = getLimitProfitSellOrderFy({ asks, productCost, profitLimitPercentage })
-    console.log(newAsks)
 
     assert.deepEqual(newAsks, [{ price: 120 }, { price: 200 }, { price: 300 }])
   })
