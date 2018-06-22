@@ -2,9 +2,9 @@
 REPOSITORY=$(sed -nE 's/^\s*"name": "(.*?)",$/\1/p' package.json)
 REGISTRY=docker.kumay.net
 IMAGE="$REGISTRY/$REPOSITORY:latest"
-BUILDCMD="docker build -t $IMAGE ."
-PUSHCMD="docker push $IMAGE"
-PULLCMD="docker pull $IMAGE"
+BUILDCMD="sudo docker build -t $IMAGE ."
+PUSHCMD="sudo docker push $IMAGE"
+PULLCMD="sudo docker pull $IMAGE"
 
 echo "Image: $IMAGE"
 

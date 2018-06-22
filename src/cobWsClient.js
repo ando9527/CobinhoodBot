@@ -236,6 +236,8 @@ export const processOrderChannel = async ({
     } ${id}`
     logger.warn(message)
     await sendIfttt({ value1: message, option })
+    logger.info('Leaving process now')
+    if (option.NODE_ENV !== 'development') process.exit(0)
     return 'MODIFY_REJECTED'
   }
   if (state === 'partially_filled' && event === 'executed') {
