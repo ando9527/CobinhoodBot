@@ -331,13 +331,17 @@ const filled = parseFloat(order[10]
 )
 ```
 
+### Pending Modification
+```javascript
  {"h":["","2","u","0","modify-order-1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b"],"d":["1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b","1529582634489","","LALA-ETH","pending_modification","","ask","0.0000708","0.0000643","3480","1050.324"]}
+```
 
+### Modify order
+```javascript
  {"h":["order","2","u","0"],"d":["1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b","1529582634489","","LALA-ETH","partially_filled","modified","ask","0.0000708","0.0000643","3480","1050.324"]}
+```
 
- {"h":["order","2","u","0"],"d":["1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b","1529582634489","","LALA-ETH","partially_filled","modified","ask","0.000071","0.0000643","3480","1050.324"]}
-
-
-
- getCurrentOrder
+ ### getCurrentOrder
+```javascript
  {"id":"1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b","trading_pair_id":"LALA-ETH","side":"ask","type":"limit","price":0.0000599,"size":3480,"filled":1050.324,"state":"partially_filled","timestamp":"1529582634489","eq_price":0.0000643,"completed_at":null}
+ ```

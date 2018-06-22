@@ -231,7 +231,11 @@ export const processOrderChannel = async ({
   }
 
   if (event === 'modify_rejected') {
-    logger.record(event, option)
+    const message = `Modify rejected, possibility you don't have enough $$: ${option.mode} ${
+      option.symbol
+    } ${id}`
+    logger.warn(message)
+    await sendIfttt({ value1: message, option })
     return 'MODIFY_REJECTED'
   }
   if (state === 'partially_filled' && event === 'executed') {
