@@ -3,4 +3,4 @@ yarn-error.log
 .env
 dist
 .alpha.js
-
+coverage/

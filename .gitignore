@@ -10,3 +10,4 @@ _env
 env_config/
 
 .alpha.js
+coverage/
