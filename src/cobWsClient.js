@@ -260,7 +260,7 @@ export const processOrderChannel = async ({
   if (state === 'open' && event === 'modified') return 'MODIFIED'
 
   if (state === 'filled' && event === 'executed') {
-    const message = `Your order full filled: ${option.symbol} ${id}`
+    const message = `Your order full filled: ${option.mode} ${option.symbol} ${id}`
     logger.info(message)
     await sendIfttt({ value1: message, option })
     logger.info('Leaving process now')
