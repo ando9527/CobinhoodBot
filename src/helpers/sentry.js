@@ -2,8 +2,9 @@
 const Raven = require('raven')
 const git = require('git-rev-sync')
 import store from '../store'
+const active = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'DEBUG'
 const dsn = process.env.SENTRY_DSN || 'https://1cb22698d3764fdfbc0377e02e822b66@sentry.io/1229216'
-const sentry = Raven.config(process.env.NODE_ENV === 'production' && dsn, {
+const sentry = Raven.config(active && dsn, {
   release: git.long(),
 }).install(function(err, initialErr, eventId) {
   console.error(err)
