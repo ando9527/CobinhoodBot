@@ -345,3 +345,8 @@ const filled = parseFloat(order[10]
 ```javascript
  {"id":"1e1f5dd1-cc9d-4c47-b0b8-c6145eb6812b","trading_pair_id":"LALA-ETH","side":"ask","type":"limit","price":0.0000599,"size":3480,"filled":1050.324,"state":"partially_filled","timestamp":"1529582634489","eq_price":0.0000643,"completed_at":null}
  ```
+
+### Send without ws connection
+```javascript
+ 2018-06-23 14:23:17.9210 error: Error: UNMET_ERROR_MESSAGE Raw onMessage: {"h":["","2","error","4005","invalid_payload"],"d":[]}
+ ```

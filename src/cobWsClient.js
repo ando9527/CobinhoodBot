@@ -197,6 +197,9 @@ export const processOnMessage = async ({
     if (code === 'UNMET_ERROR_MESSAGE') {
       throw new Error(`${code} Raw onMessage: ${rawOnMessage}`)
     }
+    if (code === 'INVALID_PAYLOAD') {
+      throw new Error(`${code} Raw onMessage: ${rawOnMessage}`)
+    }
     return code
   }
   throw new Error(`Unknown ws message, Raw onMessage: ${rawOnMessage}`)
@@ -280,6 +283,11 @@ export const processErrorMessage = (errorMessage: string) => {
     logger.warn('balance_locked')
     return 'BALANCE_LOCKED'
   }
+  if (errorMessage === 'invalid_payload') {
+    logger.warn('invalid_payload')
+    return 'INVALID_PAYLOAD'
+  }
+
   return 'UNMET_ERROR_MESSAGE'
 }
 

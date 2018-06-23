@@ -13,6 +13,7 @@ import {
   orderBookNewest,
   setOrderBookNewest,
 } from './cobWsClient'
+import { modifyOrder } from './lib/lib'
 
 export const initial = async (option: Option) => {
   await askLib.verifyConfig(option)
@@ -43,7 +44,7 @@ export const askStateMachine = (option: Option) => {
   if (ig === true) return 'GAIN_PRICE'
 }
 
-export const check = async (option: Option) => {
+export const check = async ({ option, wsModify }: { option: Option, wsModify: boolean }) => {
   // For Logic
   const code = askStateMachine(option)
 
@@ -120,8 +121,10 @@ export const check = async (option: Option) => {
     profitPercentage: mepp,
     profitLimitPercentage: option.profitLimitPercentage,
   })
-  // await lib.modifyOrder({ price: priceModified, order: sellOrder })
-  await wsModifyOrder({ price: priceModified, order: sellOrder })
+  //
+  if (wsModify === true) return await wsModifyOrder({ price: priceModified, order: sellOrder })
+  if (wsModify === false)
+    return await modifyOrder({ price: priceModified, order: sellOrder, option })
 }
 
 const runCheck = async (option: Option) => {
@@ -129,13 +132,14 @@ const runCheck = async (option: Option) => {
 
   if (orderBookNewest === false) return
 
-  await check(option)
+  await check({ option, wsModify: true })
   setOrderBookNewest(false)
 }
 
 export const runSellOrder = async (option: Option) => {
   await initial(option)
   await lib.updateData(option)
+  await check({ option, wsModify: false })
   await startSync(option)
 
   const id = setInterval(async () => {

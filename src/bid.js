@@ -5,7 +5,7 @@ import lib from './lib'
 import bidLib from './bidLib'
 import logger from './helpers/logger'
 import { opAgentRun } from './opWsClient'
-import { getCCPrice } from './lib/lib'
+import { getCCPrice, modifyOrder } from './lib/lib'
 import { onOpPriceUpdate } from './actions/opPrice'
 import colors from 'colors/safe'
 import type { Option } from './types/option'
@@ -58,7 +58,7 @@ export const bidStateMachine = (option: Option) => {
   if (ir === true) return 'REDUCE_PRICE'
 }
 
-export const check = async (option: Option) => {
+export const check = async ({ option, wsModify }: { option: Option, wsModify: boolean }) => {
   // For Logic
   const code = bidStateMachine(option)
   const { opPrice, buyOrder, orderBook } = store.getState()
@@ -181,13 +181,16 @@ export const check = async (option: Option) => {
     profitLimitPercentage: option.profitLimitPercentage,
   })
   // await bidLib.checkEnoughBalance({ price: priceModified })
-  await wsModifyOrder({ price: priceModified, order: buyOrder })
+
+  if (wsModify === true) return await wsModifyOrder({ price: priceModified, order: buyOrder })
+  if (wsModify === false)
+    return await modifyOrder({ price: priceModified, order: buyOrder, option })
 }
 
 const runCheck = async (option: Option) => {
   if (!connected) return
   if (orderBookNewest === false) return
-  await check(option)
+  await check({ option, wsModify: true })
   setOrderBookNewest(false)
 }
 
@@ -196,6 +199,7 @@ export const runBuyOrder = async (option: Option) => {
   await initial(option)
   // retrieve order/order book/opPrice once
   await lib.updateData(option)
+  await check({ option, wsModify: false })
   // sync order book data
   startSync(option)
   // sync Op Price

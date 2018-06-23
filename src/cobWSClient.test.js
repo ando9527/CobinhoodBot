@@ -112,6 +112,13 @@ describe('processErrorMessage', () => {
     const result = processErrorMessage(errorMessage)
     assert.equal('BALANCE_LOCKED', result)
   })
+  it('INVALID_PAYLOAD"', async function() {
+    // {"h":["","2","error","4005","invalid_payload"],"d":[]}
+    const rawOnMessage = '{"h":["","2","error","4005","invalid_payload"],"d":[]}'
+    const result = processErrorMessage({ rawOnMessage, option })
+    assert.equal('UNMET_ERROR_MESSAGE', result)
+  })
+
   it('UNMET_ERROR_MESSAGE', async function() {
     let rawOnMessage =
       '{"h":["modify-order-undefined","2","error","4021","neverHappendBefore"],"d":[]}'
@@ -125,7 +132,7 @@ describe('processOrderMessage', async function() {
     done()
   })
 
-  it('ORDER_BOOK_SNAP', async function() {
+  it.skip('ORDER_BOOK_SNAP', async function() {
     const rawOnMessage =
       '{"h":["order-book.ABT-ETH.1E-7","2","s"],"d":{"bids":[["0.0013309","1","1620.38"]],"asks":[]}}'
     const result = await processOnMessage({ rawOnMessage, option })
