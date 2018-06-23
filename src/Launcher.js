@@ -14,6 +14,7 @@ export default class Launcher {
   static launch = async (option: Option) => {
     logger.info(`Version ${packageJson.version}`)
     logger.info(`NODE_ENV: ${option.NODE_ENV}`)
+    logger.info(`Check interval: ${option.BOT_CHECK_INTERVAL.toString()}`)
     if (option.mode.toUpperCase() === 'ASK') return await runSellOrder(option)
     if (option.mode.toUpperCase() === 'BID') return await runBuyOrder(option)
   }
