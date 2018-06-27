@@ -81,17 +81,13 @@ export const opAgentRun = (option: Option) => {
   /**
    * require ping every 20 sec or disconnection
    */
-  // setInterval(() => {
-  //   try {
-  //     if (!connected) return
-  //     if (client === null) return
-  //     client.send(
-  //       JSON.stringify({
-  //         action: 'ping',
-  //       }),
-  //     )
-  //   } catch (e) {
-  //     haltProcess(e)
-  //   }
-  // }, 20000)
+  setInterval(() => {
+    if (!connected) return
+    if (client === null) return
+    client.send(
+      JSON.stringify({
+        action: 'ping',
+      }),
+    )
+  }, 20000)
 }
