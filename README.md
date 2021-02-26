@@ -1,5 +1,5 @@
 # Cobinhood Bot V2
-This is version 2 cobinhood bot, the primary changed is communication go through websocket.
+This is version 2 cobinhood bot, the primary changed is using websocket.
 
 # UML
 
